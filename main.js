@@ -36,3 +36,4 @@ deviceManager.on('deviceStateChanged', function () {
 // }
 // catch (err) {}
 
+console.log("main.js ran");
