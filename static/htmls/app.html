@@ -1,0 +1,96 @@
+<HTML>
+	<head>
+	</head>
+	<style>
+		body{
+			width:100%;
+			height: 100%;
+			padding:0;
+			margin:0;
+			text-align: center;
+			background-color: rgb(215,211,182);
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		}
+		#appCont {
+			min-height:100%;
+			max-width:500px;
+			margin:auto;
+			background-color: rgb(255,255,255);
+			text-align:left;
+			padding:20px;
+		}
+		hr {
+			border:0;
+			border-top: 1px solid #eeeeee;
+			border-bottom: 1px solid #ffffff;
+		}
+		.roomTitleCont {
+			padding:8px 20px;
+			background:#69C1A8;
+		}
+	</style>
+	<body>
+		<div id='appCont'>
+			<div style="font-weight:100;font-size:36px;color:#48C4B7; margin-bottom:18px;">
+				<span style="color:gray;">Y</span><span style="">antram</span>
+			</div>
+			<hr/>
+
+		</div>	
+
+	</body>
+	<script type="text/javascript" src="/static/scripts/zepto.js"></script>
+<!--	
+	<script type="text/javascript" src="http://static.mygola.com/static/11262/scripts/jquery-1.7.2.min.js"></script> 
+-->
+	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.5.2.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
+	<script type="text/template" id="roomTemplate">
+		<div>
+			<br/>
+			<div class="roomTitleCont">
+				<span style="text-align:left;font-size:28px;color:white;font-weight:400;"><%=name%></span>
+				<img class='powerButton' src="static/images/power.png" style="width:25px;float:right;margin-top:2px;cursor:pointer;"/>
+				<div style='clear:both;'></div>
+			</div>
+			<br/>
+			<div>
+				<% for(var i=0; i<controls.length; i++) { var ctl = controls[i];%>
+					<img class='toggelSwitch' src="static/images/<%=ctl.state%>/<%print((ctl.name=='Fan')?'fan':'bulb')%>.png" style="width:100px;float:left;" devId="<%=ctl.devId%>" switchId="<%=ctl.switchID%>"/>
+				<%}%>
+				<div style='clear:both;'></div>
+			</div>	
+		</div>	
+	</script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
+	<script>
+		var RoomCollection = Backbone.Collection.extend({
+			url: '/room/list',
+			model:RoomModel
+		});
+		var rC = new RoomCollection();
+		rC.on("add", function(roomModel){
+			roomModel.on('change', function (model, data) {
+				console.log("change called on "+model.get('name'));
+			});
+			var roomView = new RoomView1({model:roomModel});
+			$('#appCont').append(roomView.$el);
+			roomView.render();
+		})
+		rC.fetch({update:true});
+	</script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	  var socket = io.connect('/');
+	  socket.on('connectionSuccess', function (data) {
+	    socket.emit('testData', { my: 'data' });
+	  });
+	  socket.on('roomConfigUpdated', function (config) {
+	  	rC.add(config, {merge: true});
+	  });
+	</script>
+
+<HTML>	

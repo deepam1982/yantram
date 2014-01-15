@@ -1,0 +1,34 @@
+[
+{	"id":1,
+	"name":"Drawing Room", 
+	"controls":[
+		{"id":1, "name":"Fan", "devId":"00021369", "switchID":0},
+		{"id":2, "name":"Tubelight", "devId":"00021369", "switchID":2},
+		{"id":3, "name":"Light", "devId":"00021369", "switchID":3}
+	]
+},
+{
+	"id":2,
+	"name":"Dining Room", 
+	"controls":[
+		{"id":1, "name":"Fan", "devId":"00020dba", "switchID":0},
+		{"id":2, "name":"Light", "devId":"00020dba", "switchID":2}
+	]
+},
+{	
+	"id":3,
+	"name":"Kitchen", 
+	"controls":[
+		{"id":1, "name":"Light", "devId":"00020dba", "switchID":3}
+	]
+},
+{       "id":4,
+        "name":"Bed Room",
+        "controls":[
+                {"id":1, "name":"Fan", "devId":"0003017c", "switchID":0},
+                {"id":2, "name":"Tubelight", "devId":"0003017c", "switchID":2},
+                {"id":3, "name":"Balcony", "devId":"0003017c", "switchID":3},
+		{"id":3, "name":"Togglelight", "devId":"0003017c", "switchID":5}
+        ]
+}
+]
