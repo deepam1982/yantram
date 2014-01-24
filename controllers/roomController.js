@@ -20,24 +20,31 @@ RoomController = BaseController.extend({
         res.send(roomModel.getList());
     },
     toggelSwitch : function (req, res) {
-        var config = deviceManager.getConfig(req.query.devId); 
-        var state = config[req.query.devId]["switch"][req.query.switchId]["state"];
-        config[req.query.devId]["switch"][req.query.switchId]["state"] = !state;
-        var swId = req.query.switchId;
-        if (swId == 0 || swId == 1) {
-            if(!state) config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x50;
-            else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x70) {
-                config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x70
-                config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
+        try {
+            var config = deviceManager.getConfig(req.query.devId); 
+            var state = config[req.query.devId]["switch"][req.query.switchId]["state"];
+            config[req.query.devId]["switch"][req.query.switchId]["state"] = !state;
+            var swId = req.query.switchId;
+            if (swId == 0 || swId == 1) {
+                if(!state) config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x50;
+                else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x70) {
+                    config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x70
+                    config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
+                }
+                else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x77) {
+                    config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x80
+                    config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
+                }
             }
-            else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x77) {
-                config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x80
-                config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
-            }
-        }
 
-        deviceManager.applyConfig(config);
-        res.send({"status":"success", "data":!state});
+            deviceManager.applyConfig(config);
+            res.send({"status":"success", "data":!state});
+        }
+        catch(err) {
+            console.log(err);
+            if(!config) err = "physical device not found";
+             res.send({"status":"error", "data":err});   
+        }
     },
     powerOff : function (req, res) {
         var jR = new JsonReader;

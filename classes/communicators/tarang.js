@@ -102,7 +102,7 @@ var TarangController = BaseClass.extend({
 				var qObj = this._queryQ.shift();
 				qObj && this._send(qObj.query, qObj.callback);
 				if(this._queryQ.length) this._processQueryQ();
-			}, this), 200);
+			}, this), 50);
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},

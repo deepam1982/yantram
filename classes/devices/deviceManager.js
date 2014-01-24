@@ -2,31 +2,40 @@ var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var BaseDevice = require(__rootPath+"/classes/devices/baseDevice");
 var SwitchBoardV1 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV1");
+var SwitchBoardV2 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV2");
 
 var DeviceManager = BaseClass.extend({
 	communicator : null,
 	_deviceMap : {},
 	init : function (communicator) {
+		this._knownDeciceIds={};
 		this.communicator = communicator;
 		this.communicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
 		this.communicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
 		__.each(this.communicator.getDeviceIds(), __.bind(this._onNewDeviceFound, this));
 	},
 	_registrationCheck : {},
-	_onNewDeviceFound : function (deviceId) {
+	_onNewDeviceFound : function (deviceId, count) {
+		if(this._knownDeciceIds[deviceId] && !count) return;
+		if (!this._knownDeciceIds[deviceId]) this._knownDeciceIds[deviceId] = true;
+		if(typeof count=='undefined') count=0;
+		if (count > 5) {
+			console.log('#### Registration of device:'+deviceId+" failed afret "+count+" tries");
+			return;
+		}
 		if(!this._registrationCheck[deviceId]) { 
- 			this._registrationCheck[deviceId] = __.throttle(__.bind(function(){
+ 			this._registrationCheck[deviceId] = __.throttle(__.bind(function(cnt){
 				if (!this._deviceMap[deviceId]) {
 					this.sendQuery(deviceId, "GTDVTP"); //Get Device Type
-					console.log('#### Registration of device:'+deviceId+" not found retrying now");
-					this._onNewDeviceFound(deviceId);
+					console.log('#### Registration of device:'+deviceId+" not found retrying now-"+cnt);
+					this._onNewDeviceFound(deviceId, cnt);
 				}
 			}, this), 2000);
 			this.sendQuery(deviceId, "GTDVTP"); //Get Device Type
-			setTimeout(__.bind(this._registrationCheck[deviceId], this), 2000);
+			setTimeout(__.bind(this._registrationCheck[deviceId], this, count+1), 2000);
 		}
 		else
-			this._registrationCheck[deviceId]();
+			this._registrationCheck[deviceId](count+1);
 	},
 	_buildQuery : function (qryStr) {
 		return qryStr+"\x0d\x0a";
@@ -50,6 +59,7 @@ var DeviceManager = BaseClass.extend({
 	_registerNewDevice : function (type, deviceId) {
 		switch (type) {
 			case "SWITCHBOARDV1" : var device = new SwitchBoardV1 (deviceId, this); break;
+			case "SWITCHBOARDV2" : var device = new SwitchBoardV2 (deviceId, this); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		this._deviceMap[deviceId] = device;

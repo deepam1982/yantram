@@ -15,6 +15,7 @@ var Class = function(){};
 var util = require("util");
 var events = require("events");
 util.inherits(Class, events.EventEmitter);
+Class.prototype.off = events.EventEmitter.prototype.removeListener
 // Create a new Class that inherits from this class
 Class.extend = function(prop) {
     var _super = this.prototype;
