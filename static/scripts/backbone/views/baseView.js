@@ -1,22 +1,21 @@
-var BaseView = Backbone.View.extend({
-    name : 'BasicViewClass',
-    _getJsonToRenderTemplate : function () {return (this.model)?this.model.toJSON():{};},
-    render  :   function () {
-        var template = (typeof this.template != 'undefined')?this.template:_.template($(this.templateSelector).html());
-        this.$el.html(template(this._getJsonToRenderTemplate()));
-        return this;
-    },
-    erase   :   function () {
-        this.$el.html("");
-        return this;
-    },
-    repaint :   function () {
-        this.erase().render();
-        return this;
-    }
-})
+// var BaseView = Backbone.View.extend({
+//     name : 'BasicViewClass',
+//     _getJsonToRenderTemplate : function () {return (this.model)?this.model.toJSON():{};},
+//     render  :   function () {
+//         var template = (typeof this.template != 'undefined')?this.template:_.template($(this.templateSelector).html());
+//         this.$el.html(template(this._getJsonToRenderTemplate()));
+//         return this;
+//     },
+//     erase   :   function () {
+//         this.$el.html("");
+//         return this;
+//     },
+//     repaint :   function () {
+//         this.erase().render();
+//         return this;
+//     }
+// })
 
-/*
 var BaseView = Backbone.View.extend({
     name : 'BasicViewClass',
     initialize: function(obj) {
@@ -153,4 +152,3 @@ var BaseView = Backbone.View.extend({
     }
 
 });
-*/

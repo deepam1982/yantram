@@ -25,14 +25,17 @@
 			border-bottom: 1px solid #ffffff;
 		}
 		.roomTitleCont {
-			padding:8px 20px;
+			padding:5px 20px;
 			background:#69C1A8;
+		}
+		.switchCont {
+			font-size: 14px;
 		}
 	</style>
 	<body>
 		<div id='appCont'>
 			<div style="font-weight:100;font-size:36px;color:#48C4B7; margin-bottom:18px;">
-				<span style="color:gray;">Y</span><span style="">antram</span>
+				<span style="color:gray;">Ino</span><span style="">ho</span>
 			</div>
 			<hr/>
 
@@ -51,20 +54,24 @@
 		<div>
 			<br/>
 			<div class="roomTitleCont">
-				<span style="text-align:left;font-size:28px;color:white;font-weight:400;"><%=name%></span>
+				<span style="text-align:left;font-size:24px;color:white;font-weight:400;"><%=name%></span>
 				<img class='powerButton' src="static/images/power.png" style="width:25px;float:right;margin-top:2px;cursor:pointer;"/>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
-			<div>
-				<% for(var i=0; i<controls.length; i++) { var ctl = controls[i];%>
-					<img class='toggelSwitch' src="static/images/<%=ctl.state%>/<%print((ctl.name=='Fan')?'fan':'bulb')%>.png" style="width:100px;float:left;" devId="<%=ctl.devId%>" switchId="<%=ctl.switchID%>"/>
-				<%}%>
-				<div style='clear:both;'></div>
-			</div>	
+			<div class='switchCont'>
+				
+			</div>
+			<div style='clear:both;'></div>	
+		</div>	
+	</script>
+	<script type="text/template" id="basicSwitchTemplate">
+		<div style='width:100px;float:left;text-align:center;'>
+			<img class='toggelSwitch' src="<%=src%>" style="width:100px;cursor:pointer" devId="<%=devId%>" switchId="<%=switchID%>"/><span><%=name%></span>
 		</div>	
 	</script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
 	<script>
 		var RoomCollection = Backbone.Collection.extend({
@@ -75,6 +82,7 @@
 		rC.on("add", function(roomModel){
 			roomModel.on('change', function (model, data) {
 				console.log("change called on "+model.get('name'));
+				console.log(model);
 			});
 			var roomView = new RoomView1({model:roomModel});
 			$('#appCont').append(roomView.$el);
@@ -82,7 +90,8 @@
 		})
 		rC.fetch({update:true});
 	</script>
-	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script>
+	<!--  <script src="/socket.io/socket.io.js"></script> -->
 	<script>
 	  var socket = io.connect('/');
 	  socket.on('connectionSuccess', function (data) {

@@ -38,6 +38,7 @@ var TarangController = BaseClass.extend({
 		this.serialPort.open(__.bind(this._onPortOpen, this));
 	},
 	_onPortOpen : function () {
+		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
 		this._broadcast();
 		setInterval(__.bind(this._broadcast, this), 8000);
@@ -102,7 +103,7 @@ var TarangController = BaseClass.extend({
 				var qObj = this._queryQ.shift();
 				qObj && this._send(qObj.query, qObj.callback);
 				if(this._queryQ.length) this._processQueryQ();
-			}, this), 50);
+			}, this), 100);
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},
@@ -113,7 +114,10 @@ var TarangController = BaseClass.extend({
 	},
 	_send : function (command, callback) {
 		this.serialPort.write(__.map(command, function (c){return c.charCodeAt(0);}), function(err, results) {
-			if (err) console.log('err ' + err);
+			if (err) {
+				console.log('Error: error while writing data on serial Port');
+				throw err
+			}
 			if (callback && typeof callback == 'function') callback(err, results)
 		});	
 	}

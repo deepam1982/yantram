@@ -38,27 +38,54 @@ var SwitchBoardV1 = BaseDevice.extend({
 		this.switchState[1] = (swst>>4) % 2;
 		this.switchState[0] = (swst>>5) % 2;
 	},
-	setDimmer : function(dimmerNo, value) {
+	setDimmer : function(dimmerNo, value, donotRetry) {
 		if (dimmerNo > this.dimmerState.length) return;
 		value = Math.min(255, Math.max(0, value));
-		this._sendQuery("STFSD"+dimmerNo+this._intToHexStr(value), __.bind(function(){this.syncState()}, this))
+		this._sendQuery("STFSD"+dimmerNo+this._intToHexStr(value), __.bind(function(){
+			setTimeout(__.bind(function () {
+				if (Math.abs(value - this.dimmerState[dimmerNo]) > 10) {
+					if(donotRetry) this.syncState();
+					else this.setDimmer(dimmerNo, value, true);
+				}
+			}, this), 500);
+		}, this))
 	},
 	dimmerUp : function (dimmerNo) {this.setDimmer(dimmerNo, this.dimmerState[dimmerNo]+16);},
 	dimmerDown : function (dimmerNo) {this.setDimmer(dimmerNo, this.dimmerState[dimmerNo]-16);},
-	setSwitch : function (switchNo, state, callback, donotRetry) {
-		if (switchNo >= this.switchState.length) return;
+	setSwitch : function (switchNo, state, callback) {
+		if (!this.setSwitchQ) this.setSwitchQ = [];
+		this.setSwitchQ.push({"switchNo":switchNo, "state":state, "callback":callback});
+		if(!this.__foo)
+			this.__foo = __.throttle(__.bind(function(){this._processSetSwitchQ()}, this), 500, {leading: false});
+		this.__foo();
+	},
+	_processSetSwitchQ : function () {
 		var copy = __.clone(this.switchState);
-		copy[switchNo] = (state)?1:0;
+		var setSwitchQ = this.setSwitchQ
+		this.setSwitchQ = null;
+		__.each(setSwitchQ, function (obj){
+			if (obj.switchNo >= this.switchState.length) return;
+			copy[obj.switchNo] = (obj.state)?1:0;	
+		}, this);
 		var swst = this._binStateToInt(copy);
+		this._setSwitch(swst, __.bind(function () {
+			__.each(setSwitchQ, function (obj) {obj.callback && obj.callback();}, this);
+		}, this))
+	},
+	_setSwitch : function (swst, callback, donotRetry) {
 		this._sendQuery("STSWPT"+this._intToHexStr(swst), 
 			__.bind(function(){
-				this.syncState(__.bind(function () {
-					if(!donotRetry && this.switchState[switchNo]^state) {
-						console.log("#### retrying STSWPT")
-						this.setSwitch(switchNo, state, callback, true);
-					}
+				setTimeout(__.bind(function () {
+					if (this._binStateToInt(this.switchState)^swst)
+						this.syncState(__.bind(function () {
+							if(!donotRetry && this._binStateToInt(this.switchState)^swst) {
+								console.log("#### retrying STSWPT")
+								this._setSwitch(swst, callback, true);
+							}
+							else callback && callback()
+						}, this))
 					else callback && callback()
-				}, this))
+				}, this), 1000);	
 			}, this));
 	},
 	toggleSwitch : function(switchNo) {return this.setSwitch(switchNo, !this.switchState[switchNo]);} 	

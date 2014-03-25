@@ -7,20 +7,24 @@ var SwitchBoardV2 = require(__rootPath+"/classes/devices/switchBoards/switchBoar
 var DeviceManager = BaseClass.extend({
 	communicator : null,
 	_deviceMap : {},
+	_virtualNodes : {},
 	init : function (communicator) {
-		this._knownDeciceIds={};
 		this.communicator = communicator;
 		this.communicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
 		this.communicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
 		__.each(this.communicator.getDeviceIds(), __.bind(this._onNewDeviceFound, this));
 	},
+	getDeviceNodes	: function (nodeIds) {
+		return __.pick(this._virtualNodes, nodeIds);
+	}, 
 	_registrationCheck : {},
 	_onNewDeviceFound : function (deviceId, count) {
-		if(this._knownDeciceIds[deviceId] && !count) return;
-		if (!this._knownDeciceIds[deviceId]) this._knownDeciceIds[deviceId] = true;
+		if(this._deviceMap[deviceId] || typeof this._deviceMap[deviceId] != 'undefined' && !count) return;
+		this._deviceMap[deviceId]=false;
 		if(typeof count=='undefined') count=0;
 		if (count > 5) {
 			console.log('#### Registration of device:'+deviceId+" failed afret "+count+" tries");
+//			this._deviceMap[deviceId]=true;
 			return;
 		}
 		if(!this._registrationCheck[deviceId]) { 
@@ -30,7 +34,7 @@ var DeviceManager = BaseClass.extend({
 					console.log('#### Registration of device:'+deviceId+" not found retrying now-"+cnt);
 					this._onNewDeviceFound(deviceId, cnt);
 				}
-			}, this), 2000);
+			}, this), 5000);
 			this.sendQuery(deviceId, "GTDVTP"); //Get Device Type
 			setTimeout(__.bind(this._registrationCheck[deviceId], this, count+1), 2000);
 		}
@@ -57,18 +61,22 @@ var DeviceManager = BaseClass.extend({
 		}
 	},
 	_registerNewDevice : function (type, deviceId) {
+		if(this._deviceMap[deviceId]) return;
 		switch (type) {
 			case "SWITCHBOARDV1" : var device = new SwitchBoardV1 (deviceId, this); break;
 			case "SWITCHBOARDV2" : var device = new SwitchBoardV2 (deviceId, this); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
-		this._deviceMap[deviceId] = device;
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);
 		device.on('stateChanged', __.bind(function (device) {
 			this.emit('deviceStateChanged', device.id, device.getConfig());
 		}, this, device));
-
-		this.emit('newDeviceFound', deviceId, device.getConfig());
+		this._deviceMap[deviceId] = device;
+		__.extend(this._virtualNodes, device.virtualNodes);
+		this.emit('newNodesFound', device.virtualNodes);
+		
+		// device.getConfig();
+		// this.emit('newDeviceFound', deviceId);
 	},
 	getConfig : function (deviceId) {
 		if (this._deviceMap[deviceId])

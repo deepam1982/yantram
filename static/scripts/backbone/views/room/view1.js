@@ -1,23 +1,22 @@
 RoomView1 = BaseView.extend({
 	templateSelector:"#roomTemplate",
+	subViewArrays : [{'viewClassName':'BasicSwitch', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection'}],
 	initialize: function(obj) {
+		console.log(obj.model.get("controls").length);
+			
+		var ColClass = Backbone.Collection.extend({model:SwitchModel});
+		this.switchCollection = new ColClass(obj.model.get("controls"));
+		console.log(this.switchCollection.length)
 		BaseView.prototype.initialize.apply(this, obj);
-		this.model.on('change', _.bind(this.render, this));
+		this.model.on('change', _.bind(function () {
+			this.switchCollection.add(this.model.get("controls"), {merge: true});
+		}, this));
+//		this.model.on('change', _.bind(this.repaint, this));
     },
 	events: {
 		"click .powerButton" : "onPowerOffClick",
-		"click .toggelSwitch" : "toggelSwitch"
 	},
 	onPowerOffClick : function () {
 		this.model.powerOff();
 	}, 
-	toggelSwitch : function (event) {
-		var tar = $(event.target);
-		var calbackfunc = _.bind(function(status) {
-			var src = tar.attr('src')
-			src = src.replace(/\/((on)|(off))\//, "/"+((status)?"on":"off")+"/")
-			tar.attr('src', src)
-		}, this);
-		this.model.toggelSwitch(tar.attr('devId'), tar.attr('switchId'), calbackfunc);
-	}
 })
