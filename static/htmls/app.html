@@ -1,5 +1,6 @@
 <HTML>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<style>
 		body{
@@ -18,6 +19,7 @@
 			background-color: rgb(255,255,255);
 			text-align:left;
 			padding:20px;
+			position:relative;
 		}
 		hr {
 			border:0;
@@ -31,9 +33,35 @@
 		.switchCont {
 			font-size: 14px;
 		}
+		input[type=range] {
+		    -webkit-appearance: none;
+		    background-color: black;
+		    height:2px;
+		}
+
+		input[type="range"]::-webkit-slider-thumb {
+		     -webkit-appearance: none;
+		    /*background-color: rgb(71,167,78);
+		    width: 15px;
+		    height: 60px;
+			border-radius:12px;    
+		    */
+
+    width: 10px;
+    height: 60px;
+    padding: 5px;
+    border-radius: 20px;
+    border: double 10px transparent;
+    background: rgb(71,167,78);
+    background-clip: padding-box;
+
+		    position:relative;
+		    top:10px;
+		    cursor:pointer;
+		}
 	</style>
 	<body>
-		<div id='appCont'>
+		<div id='appCont' class='appArea'>
 			<div style="font-weight:100;font-size:36px;color:#48C4B7; margin-bottom:18px;">
 				<span style="color:gray;">Ino</span><span style="">ho</span>
 			</div>
@@ -42,12 +70,14 @@
 		</div>	
 
 	</body>
-	<script type="text/javascript" src="/static/scripts/zepto.js"></script>
+	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
+	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
 <!--	
 	<script type="text/javascript" src="http://static.mygola.com/static/11262/scripts/jquery-1.7.2.min.js"></script> 
 -->
 	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.5.2.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
+	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="roomTemplate">
@@ -66,12 +96,18 @@
 		</div>	
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
-		<div style='width:100px;float:left;text-align:center;'>
-			<img class='toggelSwitch' src="<%=src%>" style="width:100px;cursor:pointer" devId="<%=devId%>" switchId="<%=switchID%>"/><span><%=name%></span>
+		<div style='float:left;background-color:white;'>
+			<div style='width:85px;float:left;text-align:center;'>
+				<div class='toggelSwitch' style="width:85px;height:85px;cursor:pointer;background:url('<%=src%>');background-size: 85px Auto;" devId="<%=devId%>" switchId="<%=switchID%>"/><span><%=name%></span>
+			</div>
+			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
+				<div class='cross' style='position:absolute; right:5;top:4; cursor:pointer;font-size:20px;height:50px; width:30px; text-align:center;'><b>X</b></div>
+			</div>
 		</div>	
 	</script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
 	<script>
 		var RoomCollection = Backbone.Collection.extend({

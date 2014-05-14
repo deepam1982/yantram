@@ -53,6 +53,7 @@ var Coordinator = BaseClass.extend({
 
 //S||A && !(S&&B)
 nodeConnectionConf = {
+//	 "0001eff1-l2" : {"onCondition":"!dayLight&&0001eff1-s1", "offCondition":"!0001eff1-s1"},
 	"00021369-l3" : {"onCondition":"!00021369-l2&&!dayLight&&00021369-s1", "offCondition":"!00021369-s1"},
 	"00020dba-l3" : {"onCondition":"00020dba-s1", "offCondition":"!00020dba-s1", "manualTime":100, "maxTime":300},
 	"0041544e-l3" : {"onCondition":"0041544e-s1", "manualTime":180},

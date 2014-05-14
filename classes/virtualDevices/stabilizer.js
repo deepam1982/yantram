@@ -4,7 +4,7 @@ var __ = require("underscore");
 var Stabilizer = Timer.extend({
 	className : "SmartMotionSensor",
 	init : function(obj){
-		this.defaultTime = (obj && obj.defaultTime)?obj.defaultTime:30; // 15 sec
+		this.defaultTime = (obj && obj.defaultTime)?obj.defaultTime:60; // 15 sec
 		this.mnStTm = this.defaultTime;
 		this._super.apply(this, arguments);
 		__.bindAll(this, "_setMaintainState", "_reduceMaintainStateTime");

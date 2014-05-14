@@ -1,42 +1,26 @@
 [
-{	"id":1,
-	"name":"Drawing Room", 
-	"controls":[
-		{"id":1, "name":"Fan", "type":"fan", "devId":"00021369", "switchID":0},
-		{"id":2, "name":"Tubelight", "type":"tubelight", "devId":"00021369", "switchID":2},
-		{"id":3, "name":"Light", "type":"bulb", "devId":"00021369", "switchID":3}
-	]
-},
-{
-	"id":2,
-	"name":"Dining Room", 
-	"controls":[
-		{"id":1, "name":"Fan", "type":"fan", "devId":"00020dba", "switchID":0},
-		{"id":2, "name":"Light", "type":"cfl", "devId":"00020dba", "switchID":2}
-	]
-},
-{	
-	"id":3,
-	"name":"Kitchen", 
-	"controls":[
-		{"id":1, "name":"Light", "type":"bulb", "devId":"00020dba", "switchID":3}
-	]
-},
-{       "id":4,
-        "name":"Bed Room",
+{       "id":1,
+        "name":"Guest Room", 
         "controls":[
-                {"id":1, "name":"Fan", "type":"fan", "devId":"0003017c", "switchID":0},
-                {"id":2, "name":"Tubelight", "type":"tubelight", "devId":"0003017c", "switchID":2},
-                {"id":3, "name":"Balcony", "type":"bulb", "devId":"0003017c", "switchID":3},
-				{"id":4, "name":"Togglelight", "type":"cfl", "devId":"0003017c", "switchID":5}
+                {"id":1, "name":"Fan", "type":"fan", "devId":"0001eff1", "switchID":0},
+                {"id":2, "name":"Light", "type":"bulb", "devId":"0001eff1", "switchID":2},
+                {"id":3, "name":"Plug", "type":"plug", "devId":"0001eff1", "switchID":5}
         ]
 },
-{       "id":5,
-        "name":"Bathroom",
+{       "id":2,
+        "name":"Living Room", 
         "controls":[
-                {"id":1, "name":"Fan", "type":"fan", "devId":"00030180", "switchID":3},
-                {"id":2, "name":"Tubelight", "type":"tubelight", "devId":"00030180", "switchID":4},
-                {"id":3, "name":"Gyser", "type":"bulb", "devId":"00030180", "switchID":2}
+                {"id":1, "name":"Fan1", "type":"fan", "devId":"0001f141", "switchID":0},
+                {"id":2, "name":"Fan2", "type":"fan", "devId":"0001f141", "switchID":1},
+                {"id":3, "name":"Light", "type":"bulb", "devId":"0001f141", "switchID":4},
+                {"id":4, "name":"Plug", "type":"plug", "devId":"0001f141", "switchID":3}
+        ]
+},
+{       "id":3,
+        "name":"Kitchen", 
+        "controls":[
+                {"id":1, "name":"Light", "type":"bulb", "devId":"0001f141", "switchID":2},
+                {"id":3, "name":"Lobby", "type":"bulb", "devId":"0001f141", "switchID":5}
         ]
 }
 

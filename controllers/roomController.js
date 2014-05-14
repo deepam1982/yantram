@@ -22,25 +22,40 @@ RoomController = BaseController.extend({
     list: function (req, res) {
         res.send(roomModel.getList());
     },
+    setDuty : function (req, res) {
+        var swId = req.query.switchId;
+        if(swId != 0 && swId != 1)res.send({"status":"error", "msg":"Cannot set duty for this switch!"});
+        var config = deviceManager.getConfig(req.query.devId); 
+        config[req.query.devId]["dimmer"][req.query.switchId]["state"] = req.query.duty;
+        eventLogger.addEvent("setDuty", {
+            'boardId':req.query.devId, 
+            'pointId':req.query.devId+'-l'+req.query.switchId,
+            'pointKey':req.query.switchId,
+            'remoteDevice':req.device.type, 
+            'state':req.query.duty
+        });
+        deviceManager.applyConfig(config);
+        res.send({"status":"success", "data":req.query.duty});
+    },
     toggelSwitch : function (req, res) {
         try {
             var config = deviceManager.getConfig(req.query.devId); 
             var state = config[req.query.devId]["switch"][req.query.switchId]["state"];
             config[req.query.devId]["switch"][req.query.switchId]["state"] = !state;
             var swId = req.query.switchId;
-            if (swId == 0 || swId == 1) {
-                if(!state) config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x50;
-                else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x70) {
-                    config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x70
-                    config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
-                    state = !state; // for logging
-                }
-                else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x77) {
-                    config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x80
-                    config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
-                    state = !state; // for logging
-                }
-            }
+            // if (swId == 0 || swId == 1) {
+            //     if(!state) config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x50;
+            //     else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x70) {
+            //         config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x70
+            //         config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
+            //         state = !state; // for logging
+            //     }
+            //     else if (config[req.query.devId]["dimmer"][req.query.switchId]["state"] < 0x77) {
+            //         config[req.query.devId]["dimmer"][req.query.switchId]["state"] = 0x80
+            //         config[req.query.devId]["switch"][req.query.switchId]["state"] = state;
+            //         state = !state; // for logging
+            //     }
+            // }
             eventLogger.addEvent("toggelSwitch", {
                 'boardId':req.query.devId, 
                 'pointId':req.query.devId+'-l'+req.query.switchId,

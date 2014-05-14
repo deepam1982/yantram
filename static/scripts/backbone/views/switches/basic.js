@@ -11,11 +11,11 @@ BasicSwitch = BaseView.extend({
 		return retJson;
 	},
 	events: {
-		"click .toggelSwitch" : "toggelSwitch"
+		"tap .toggelSwitch" : "toggelSwitch",
 	},
 	toggelSwitch : function (event) {
 		var $tar = $(event.target);
-		this.$el.append('<img src="static/images/loading.gif" style="position:absolute;left:'+(26+$tar.offset().left)+';top:'+(26+$tar.offset().top)+'"/>')
+		this.$el.append('<img src="static/images/loading.gif" style="position:absolute;left:'+(19+$tar.position().left)+';top:'+(17+$tar.position().top)+'"/>')
 		var calbackfunc = _.bind(function(status) {}, this);
 		this.model.toggelSwitch(calbackfunc);
 	}

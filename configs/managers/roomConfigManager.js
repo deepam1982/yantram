@@ -10,10 +10,10 @@ var RoomConfigManager = BaseConfigManager.extend({
 				ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
 				ctl.state = (ctl.state)?'on':'off';
 				if (ctl.state == 'on' && (ctl.switchID == 0 || ctl.switchID == 1)) {
-					var dimmerState = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
+					ctl.duty = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
 					ctl.state = 'high';
-					if (dimmerState < 0x77) ctl.state = 'mid';
-					if (dimmerState < 0x55) ctl.state = 'on';
+					if (ctl.duty < 0x77) ctl.state = 'mid';
+					if (ctl.duty < 0x55) ctl.state = 'on';
 				}
 			});
 		});

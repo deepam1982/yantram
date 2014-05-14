@@ -19,7 +19,7 @@
 var BaseView = Backbone.View.extend({
     name : 'BasicViewClass',
     initialize: function(obj) {
-        _.extend(this, obj);
+//        _.extend(this, obj);
         this._attachModelEvents();
         this._attachCollectionEvents();
         _.each(this.subViews, function (orignalParams) {
@@ -40,7 +40,6 @@ var BaseView = Backbone.View.extend({
             	newArr.push(new window[params.viewClassName](_.omit(params,'events')));}, this);
             this[params.reference] = newArr;
         }, this);
-
 	},
     _attachModelEvents:function(){
         _.each(this.modelEvents, function (value, key) {
