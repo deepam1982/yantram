@@ -1,5 +1,9 @@
 __rootPath = __dirname;
-__userEmail = 'deepam1982@gmail.com';
+//
+
+__userEmail = 'dharmaraopv@gmail.com';
+//__userEmail = 'deepam1982@gmail.com';
+//__userEmail = 'kaddyiitr@gmail.com';
 var express = require('express');
 var expressDevice = require('express-device');
 var app = express()
@@ -9,6 +13,8 @@ var app = express()
 io.set('log level', 1);
 server.listen(3210);
 
+app.use(express.favicon(__rootPath + '/static/images/favicon.ico'));
+//app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
 app.use('/static/images', express.static(__rootPath + '/static/images', {maxAge:86400}));
 app.use('/static', express.static(__rootPath + '/static'));
 app.use(expressDevice.capture());
