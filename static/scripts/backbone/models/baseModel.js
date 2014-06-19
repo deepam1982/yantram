@@ -9,7 +9,17 @@ BaseModel = Backbone.Model.extend({
 		console.log('error while fetching model data');
 		return ;
 	},
-	sendActionRequest	:	function ($actionName, data, success, error) {
+	sendActionRequest	:   function (actionName, data, success, error) {
+		if (!ioSocket || !ioSocket.socket.connected) {
+			if (error) error("Socket not connected");
+			console.log(actionName + " cannot be perfomed, socket not connected.");
+			return;
+		}
+		data.deviceType = ( screen.width <= 480 )?'Mobile':'Laptop';
+		ioSocket.emit(actionName, data);
+		if (success) success();
+	}
+/*	sendActionRequest	:	function ($actionName, data, success, error) {
 		if(!data) data = {};
 //		data.respondWithModel=true;
 		$.ajax({
@@ -36,4 +46,5 @@ BaseModel = Backbone.Model.extend({
 			}
 		});		
 	}
+*/	
 })

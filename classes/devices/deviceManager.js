@@ -88,6 +88,9 @@ var DeviceManager = BaseClass.extend({
 			if (!device) return;
 			device.applyConfig(config[deviceId]);
 		}, this);
+	},
+	getDevice : function (deviceId) {
+		return this._deviceMap[deviceId];
 	}
 });
 

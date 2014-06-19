@@ -35,7 +35,7 @@ AdvanceSwitch = BasicSwitch.extend({
  	},
 	events: _.extend(BasicSwitch.prototype.events,{
 		"longTap .toggelSwitch" : "showAdvancePannel",
-		"tap .advancePannel .cross" : "hideAdvancePannel",
+		"tap .advancePannel .cross" : "hideAdvancePannel"
 	}),
 	showAdvancePannel : function () {
 		if(this.bd) return;

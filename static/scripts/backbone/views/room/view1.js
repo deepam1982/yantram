@@ -11,16 +11,16 @@ RoomView1 = BaseView.extend({
 	initialize: function(obj) {
 		var ColClass = Backbone.Collection.extend({model:SwitchModel});
 		this.switchCollection = new ColClass(obj.model.get("controls"));
-		BaseView.prototype.initialize.apply(this, obj);
+		BaseView.prototype.initialize.apply(this, arguments);
 		this.model.on('change', _.bind(function () {
 			this.switchCollection.add(this.model.get("controls"), {merge: true});
 		}, this));
 //		this.model.on('change', _.bind(this.repaint, this));
     },
 	events: {
-		"click .powerButton" : "onPowerOffClick",
+		"click .powerButton" : "onPowerOffClick"
 	},
 	onPowerOffClick : function () {
 		this.model.powerOff();
-	}, 
+	}
 })

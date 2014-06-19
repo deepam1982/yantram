@@ -109,7 +109,24 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
+	<script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script>
+	<!--  <script src="/socket.io/socket.io.js"></script> -->
 	<script>
+	  var ioSocket = io.connect('/');
+	  ioSocket.on('roomConfigUpdated', function (config) {
+	  	rC.add(config, {merge: true});
+	  });
+	</script>
+	<script>
+		var backboneAjax = Backbone.ajax;
+		Backbone.ajax = function (obj) {
+			if(!obj.useSocket) return backboneAjax.call(arguments);
+			// var data = (obj.data)?obj.data:{};
+			// data.reqId = new Date().getTime()+''; 
+			// ioSocket.once(data.reqId, obj.success);
+			// ioSocket.emit(obj.url, data);
+			ioSocket.emit(obj.url, obj.data, obj.success);
+		}
 		var RoomCollection = Backbone.Collection.extend({
 			url: '/room/list',
 			model:RoomModel
@@ -124,18 +141,7 @@
 			$('#appCont').append(roomView.$el);
 			roomView.render();
 		})
-		rC.fetch({update:true});
+		rC.fetch({update:true, useSocket:true});
 	</script>
-	<script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script>
-	<!--  <script src="/socket.io/socket.io.js"></script> -->
-	<script>
-	  var socket = io.connect('/');
-	  socket.on('connectionSuccess', function (data) {
-	    socket.emit('testData', { my: 'data' });
-	  });
-	  socket.on('roomConfigUpdated', function (config) {
-	  	rC.add(config, {merge: true});
-	  });
-	</script>
-
+	
 <HTML>	

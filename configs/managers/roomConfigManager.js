@@ -2,7 +2,7 @@ var __ = require("underscore");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var BaseConfigManager = require(__rootPath+"/configs/managers/baseManager");
 var RoomConfigManager = BaseConfigManager.extend({
-	path : '/configs/roomConfig.json',
+	path : '/../configs/roomConfig.json',
 	getList : function () {
 		__.each(this.data, function (conf) {    
 			__.each(conf.controls, function (ctl) {

@@ -11,14 +11,14 @@ RoomModel = BaseModel.extend({
 SwitchModel = BaseModel.extend({
 	urlRoot		:	'/room/model/',
 	toggelSwitch : function (calback, errorCalback) {
-		this.sendActionRequest("toggelSwitch/", {"devId":this.get('devId'), "switchId":this.get('switchID')}, calback, errorCalback);	
+		this.sendActionRequest("toggleSwitch", {"devId":this.get('devId'), "switchId":this.get('switchID'), "state":this.get('state')}, calback, errorCalback);	
 	},
 	setDuty : function (duty, calback) {
-		this.sendActionRequest("setDuty/", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
+		this.sendActionRequest("setDuty", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
 	}
 })
 FanModel = SwitchModel.extend({
 	setDuty : function (duty, calback) {
-		this.sendActionRequest("setDuty/", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
+		this.sendActionRequest("setDuty", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
 	}
 });

@@ -1,7 +1,7 @@
 BasicSwitch = BaseView.extend({
 	templateSelector:"#basicSwitchTemplate",
 	initialize: function(obj) {
-		BaseView.prototype.initialize.apply(this, obj);
+		BaseView.prototype.initialize.apply(this, arguments);
 		this.model.on('change', _.bind(this.repaint, this));
     },
 	_getJsonToRenderTemplate : function () {
@@ -11,7 +11,7 @@ BasicSwitch = BaseView.extend({
 		return retJson;
 	},
 	events: {
-		"tap .toggelSwitch" : "toggelSwitch",
+		"tap .toggelSwitch" : "toggelSwitch"
 	},
 	toggelSwitch : function (event) {
 		var $tar = $(event.target);
