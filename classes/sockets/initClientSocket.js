@@ -24,7 +24,8 @@ module.exports = function (callback) {
 	 *  internally to simulate XMLHttpRequest in the browser world.
 	 */
 	var originalRequest = require('xmlhttprequest').XMLHttpRequest;
-	require(__rootPath+'/../node_modules/socket.io-client/node_modules/xmlhttprequest').XMLHttpRequest = function(){
+//	require(__rootPath+'/../node_modules/socket.io-client/node_modules/xmlhttprequest').XMLHttpRequest = function(){
+	require('xmlhttprequest').XMLHttpRequest = function(){	
 		originalRequest.apply(this, arguments);
 		this.setDisableHeaderCheck(true);
 		var stdOpen = this.open;
