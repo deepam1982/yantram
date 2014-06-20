@@ -2,11 +2,11 @@ var __ = require("underscore");
 var JsonReader = require(__rootPath+"/classes/utils/jsonReader");
 var BaseConfigManager = JsonReader.extend({
 	
-	init : function () {this.load()},
+	init : function (obj) {this.load((obj||{}).callback);},
 	load : function (calback) {
 		this.readfile(__rootPath+this.path, __.bind(function (err, data) { 
-			if (typeof error == "undefined") this.data = data;
-			calback && calback();
+			this.data = data;
+			calback && calback(err);
 		}, this))
 	},
 	save : function () {}, 

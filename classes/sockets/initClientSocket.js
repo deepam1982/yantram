@@ -1,3 +1,9 @@
+/*
+*
+*		https://gist.github.com/jfromaniello/4087861
+*
+*/
+
 module.exports = function (callback) {
 
 	/*
@@ -37,7 +43,7 @@ module.exports = function (callback) {
 	* with the credentials for instance
 	*/
 	var foo = function () {
-		request.get({jar: j, url: 'http://cloud.inoho.com/login/', form: {username: 'deepam1982@gmail.com', password: 'abc123'} }, function (err, resp, body){
+		request.get({jar: j, url: 'http://cloud.inoho.com/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
 	 		console.log('got response!!');
 	 		if(err) console.log(err);
 	 		if(resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
