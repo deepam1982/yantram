@@ -13,7 +13,7 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
     , server = require('http').createServer(app)
     , io = require('socket.io').listen(server)
 
-  io.set('log level', 1);
+  //io.set('log level', 1);
   server.listen(3210);
 
   app.use(favicon(__rootPath + '/static/images/favicon.ico'));
