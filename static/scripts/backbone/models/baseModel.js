@@ -10,7 +10,7 @@ BaseModel = Backbone.Model.extend({
 		return ;
 	},
 	sendActionRequest	:   function (actionName, data, success, error) {
-		if (!ioSocket || !ioSocket.socket.connected) {
+		if (!ioSocket || !ioSocket.connected) {
 			if (error) error("Socket not connected");
 			console.log(actionName + " cannot be perfomed, socket not connected.");
 			return;
