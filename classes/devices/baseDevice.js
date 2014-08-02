@@ -80,12 +80,11 @@ var BaseDevice = BaseClass.extend({
 	_logDVST : function (msg) {
 		console.log("#### DVST of "+this.id+" is " + msg.substr(4));
 	},
-	_onMsgRecieved : function (msg) {
-		if (this.id == '00021369') console.log(msg);
-		if (msg.substr(0,4) == "DVST") {
-			this._recordDeviceStatus(msg.substr(4));
+	_onMsgRecieved : function (type, msg) {
+		if (type == "DVST") {
+			this._recordDeviceStatus(msg);
 		}
-		else console.log(msg);
+		else console.log(((type)?type:"")+msg);
 	},
 	_recordDeviceStatus : function (msg) {
 		this._logDVST(msg);
@@ -134,12 +133,12 @@ var BaseDevice = BaseClass.extend({
 		if(!force && this.syncInProgress) return;
 		if(typeof count == 'undefined') count=0;
 		if (count > 10) { this.syncCallbackStack = []; this.syncInProgress=false; return;}
-		this._sendQuery("GTDVST");
+		this._sendQuery({name:"GTDVST"});
 		clearTimeout(this.syncInProgress);
 		this.syncInProgress = setTimeout(__.bind(this.syncState, this, null, true, count+1), 2500);
 	//	console.log("this.syncInProgress - "+this.syncInProgress);
 	},
-	_sendQuery : function (query, callback) {this.router.sendQuery(this.id,query,callback);},
+	_sendQuery : function (queryObj, callback) {this.router.sendQuery(this.id,queryObj,callback);},
 	setSwitch : function (switchNo, state, callback) {},
 	setDimmer : function(dimmerNo, value) {},
 	getConfig : function () {
@@ -164,19 +163,20 @@ var BaseDevice = BaseClass.extend({
 		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState};
 		this.stateJson = retObj;
 	},
-	applyConfig : function (conf) {
-		__.each(__.keys(conf), function (key){
-			__.each(__.keys(conf[key]), function (id) {
-				if (conf[key][id]['state'] != this[key+'State'][id]) {
-					if (key == 'switch')
-						this.virtualNodes[this.id+"-l"+id].setState(conf[key][id]['state']);
-					else 
-						this["set"+__(key).capitalize()](id, conf[key][id]['state']);
-				}
-			}, this);
-		}, this);
-//		this.stateJson = conf;
-	}
+// 	applyConfig : function (conf) {
+// 		console.log("###### applyConfig called");
+// 		__.each(__.keys(conf), function (key){
+// 			__.each(__.keys(conf[key]), function (id) {
+// 				if (conf[key][id]['state'] != this[key+'State'][id]) {
+// 					if (key == 'switch')
+// 						this.virtualNodes[this.id+"-l"+id].setState(conf[key][id]['state']);
+// 					else 
+// 						this["set"+__(key).capitalize()](id, conf[key][id]['state']);
+// 				}
+// 			}, this);
+// 		}, this);
+// //		this.stateJson = conf;
+// 	}
 });
 
 module.exports = BaseDevice;

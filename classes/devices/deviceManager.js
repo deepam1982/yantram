@@ -3,7 +3,7 @@ var BaseClass = require(__rootPath+"/classes/baseClass");
 var BaseDevice = require(__rootPath+"/classes/devices/baseDevice");
 var SwitchBoardV1 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV1");
 var SwitchBoardV2 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV2");
-
+var SwBd01 = require(__rootPath+"/classes/devices/switchBoards/swBd01");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
 	_deviceMap : {},
@@ -30,30 +30,26 @@ var DeviceManager = BaseClass.extend({
 		if(!this._registrationCheck[deviceId]) { 
  			this._registrationCheck[deviceId] = __.throttle(__.bind(function(cnt){
 				if (!this._deviceMap[deviceId]) {
-					this.sendQuery(deviceId, "GTDVTP"); //Get Device Type
+					this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
 					console.log('#### Registration of device:'+deviceId+" not found retrying now-"+cnt);
 					this._onNewDeviceFound(deviceId, cnt);
 				}
 			}, this), 5000);
-			this.sendQuery(deviceId, "GTDVTP"); //Get Device Type
+			this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
 			setTimeout(__.bind(this._registrationCheck[deviceId], this, count+1), 2000);
 		}
 		else
 			this._registrationCheck[deviceId](count+1);
 	},
-	_buildQuery : function (qryStr) {
-		return qryStr+"\x0d\x0a";
-	},
-	sendQuery : function (deviceId, query, callback) {
-		this.communicator.sendQuery(deviceId, this._buildQuery(query), function (err, result) {
+	sendQuery : function (deviceId, queryObj, callback) {
+		this.communicator.sendQuery(deviceId, queryObj, function (err, result, query) {
 				console.log("#### query sent to "+deviceId+":"+query);
 				callback && callback(err, result);
 		});
 	},
-	_onMsgRecieved : function (msg, deviceId) {
-		if(msg.substr(msg.length-2,2) == '\x0d\x0a') msg = msg.substr(0,msg.length-2);
-		if(msg.substr(0,4) == "DVTP") this._registerNewDevice (msg.substr(4), deviceId);
-		else if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', msg); // its device's job to handel its own msg
+	_onMsgRecieved : function (type, msg, deviceId) {
+		if(type == "DVTP") this._registerNewDevice (msg, deviceId);
+		else if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg); // its device's job to handel its own msg
 		else {
 			// message from unregistered device
 			console.log("#### Msg:"+msg+" from Unregistered Device:"+deviceId);
@@ -65,6 +61,7 @@ var DeviceManager = BaseClass.extend({
 		switch (type) {
 			case "SWITCHBOARDV1" : var device = new SwitchBoardV1 (deviceId, this); break;
 			case "SWITCHBOARDV2" : var device = new SwitchBoardV2 (deviceId, this); break;
+			case "SWBD01"		 : var device = new SwBd01 (deviceId, this); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);
@@ -94,7 +91,8 @@ var DeviceManager = BaseClass.extend({
 	}
 });
 
-var TarangController = require(__rootPath+'/classes/communicators/tarang');
+//var TarangController = require(__rootPath+'/classes/communicators/tarang');
+var TarangController = require(__rootPath+'/classes/communicators/cc2530');
 var communicator = new TarangController;
 if(typeof deviceManager == 'undefined') 
 	deviceManager = new DeviceManager(communicator);

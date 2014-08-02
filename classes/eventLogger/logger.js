@@ -27,27 +27,42 @@ var EventLogger = BaseClass.extend({
 	init : function () {
 		this.logger = loggerObj;
 		this.pendingEvents = {};
-		setInterval(__.bind(function () {this.pendingEvents = {};}, this), 3*60000);
+		this.internetDown = false;
+	},
+	logPendingEvents : function () {
+		if(__.keys(this.pendingEvents).length) {
+			this.logger.addEvents(this.pendingEvents, __.bind(function (err, rsp){
+				if(!err) this.internetDown = false;
+				if(err && err.code == "ENOTFOUND") {
+					this.internetDown = true;
+					setTimeout(__.bind(this.logPendingEvents, this), 10*60000);
+				}
+			}, this));
+			this.pendingEvents = {};
+		}
 	},
 	addEvent : function (eventName, properties, callback) {
 		!properties && (properties = {});
 		properties.user = __userEmail;
 		properties.keen={"timestamp":formatLocalDate()};
 		properties.localTimeStamp = formatLocalDate();
+		if(this.internetDown) {
+			if(!this.pendingEvents[eventName])
+				this.pendingEvents[eventName] = [];
+			this.pendingEvents[eventName].push(properties);
+			if (callback) callback("InternetDown");
+			return;
+		}
 		this.logger.addEvent(eventName, properties, __.bind(function(err, res) {
 			if (err) {
-				if(err.code = "ENOTFOUND") {
+				if(err.code == "ENOTFOUND") {
+					this.internetDown = true;
+					setTimeout(__.bind(this.logPendingEvents, this), 10*60000);
 					if(!this.pendingEvents[eventName])
 						this.pendingEvents[eventName] = [];
 					this.pendingEvents[eventName].push(properties);
 				}
 				if (callback) callback(err);
-			} else {
-				if(__.keys(this.pendingEvents).length) {
-					this.logger.addEvents(this.pendingEvents);
-					this.pendingEvents = {};
-				}
-				if (callback) callback();
 			}
 		}, this));
 	},

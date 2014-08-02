@@ -1,0 +1,79 @@
+var parsers = require("serialport").parsers;
+var SerialPort = require("serialport").SerialPort;
+
+var BaseClass = require(__rootPath+"/classes/baseClass");
+var __ = require("underscore");
+
+var BaseCommunicator = BaseClass.extend({
+	baudrate: 9600,
+	portAddress : "/dev/ttyAMA0",
+	serialPort : null,
+	_data : "",
+	deviceList : [],
+	_queryQ : [],
+	byteStrToHexStr : function (byteStr) {
+        var hexOut = "";
+        for (var i=0; i<byteStr.length; i++) {
+                var tmp = byteStr.charCodeAt(i).toString(16);
+                if (tmp.length == 1) tmp = "0"+tmp;
+                hexOut += tmp;
+        }
+        return hexOut;
+	},
+	byteDataToStr : function (data){
+		byteStr = '';
+		for (var i=0; i < data.length; i++) {
+			byteStr += String.fromCharCode( parseInt(data[i], 16).toString(16) );
+		}
+		return byteStr;
+	},
+	init : function () {
+		this.serialPort = new SerialPort(this.portAddress, {
+			baudrate: this.baudrate,
+			parser: parsers.raw
+		}, false);
+		this.serialPort.open(__.bind(this._onPortOpen, this));
+	},
+	_onPortOpen : function () {
+		console.log("###### serialPort has oppened.")
+		this.serialPort.on('data', __.bind(this._onDataArrival, this));
+		this._broadcast();
+		setInterval(__.bind(this._broadcast, this), 8000);
+	},
+	_onDataArrival : function (data) {
+		data = this.byteDataToStr(data);
+		this._processArrivedData(data);
+	},
+	_processArrivedData : function(data) {
+
+	},
+	_processPacket : function (data) {
+
+	},
+	_broadcast : function () {
+	
+	},
+	_send : function (command, callback) {
+		this.serialPort.write(__.map(command, function (c){return c.charCodeAt(0);}), function(err, results) {
+			if (err) {
+				console.log('Error: error while writing data on serial Port');
+				throw err
+			}
+			if (callback && typeof callback == 'function') callback(err, results)
+		});	
+	},
+	getDeviceIds : function() {
+		return __.map(this.deviceList, function (itm){return itm.deviceId});
+	},
+	_getMacAdd : function (devId) {
+		try {return __.findWhere(this.deviceList, {'deviceId':devId}).macAdd;}
+		catch(err){return null;}
+	},
+	_getNwkAdd : function (devId) {
+		try {return __.findWhere(this.deviceList, {'deviceId':devId}).nwkAdd;}
+		catch(err){return null;}
+	}
+
+
+});
+module.exports = BaseCommunicator;

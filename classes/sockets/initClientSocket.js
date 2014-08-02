@@ -44,11 +44,15 @@ module.exports = function (callback) {
 	* with the credentials for instance
 	*/
 	var foo = function () {
+//		console.log("Trying to login to cloud");
 		request.get({jar: j, url: 'http://cloud.inoho.com/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
 	 		console.log('got response!!');
-	 		if(err) console.log(err);
-	 		if(resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
-	 		if (err || resp.statusCode != 200) {setTimeout(foo, 30000); return;}
+	 		if(err) {
+	 			console.log(err);
+	 			console.log('Found no response from cloud, probably internet is down!!')
+	 		}
+	 		if(!err && resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
+	 		if (!resp || err || resp.statusCode != 200) {setTimeout(foo, 30000); return;}
 
 			/*
 			* now we can connect.. and socket.io will send the cookies!

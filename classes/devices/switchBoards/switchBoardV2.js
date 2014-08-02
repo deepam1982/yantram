@@ -12,7 +12,7 @@ var SwitchBoardV2 = SwitchBoardV1.extend({
 	_getActiveSensorMsg : function (msg) {return msg.substr(6, 2);},
 
 	_recordDeviceStatus : function (msg) {
-		if (msg.lenght < 12) return;
+		if (msg.lenght < 8) return;
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(this._getDimmerStateMsg(msg));

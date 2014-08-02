@@ -42,7 +42,6 @@ var CommandManager = BaseClass.extend({
 		
 	},
 	onLocalToggleSwitchCommand	: function (commandData) {
-		console.log('toggleSwitch called');
 		var devId = commandData.devId, switchId = commandData.switchId;
 		var device = deviceManager.getDevice(devId);
 		if(!device) {
@@ -57,6 +56,8 @@ var CommandManager = BaseClass.extend({
 	        'state':(commandData.state == 'off')?true:false // log new state
 	    });
 		device.toggleSwitch(switchId);
+		console.log("@@@@@@@@@ switch toggelled by "+commandData.deviceType+" @@@@@@@@@@@");
+	
 	} 
 });
 

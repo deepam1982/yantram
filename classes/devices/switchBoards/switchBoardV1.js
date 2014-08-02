@@ -5,8 +5,8 @@ var SwitchBoardV1 = BaseDevice.extend({
 	type : 'switchBoardV1',
 	numberOfSwitches : 6,
 	numberOfDimmers : 2,
-	_onMsgRecieved : function (msg) {
-		this._super(msg);
+	_onMsgRecieved : function (type, msg) {
+		this._super(type, msg);
 	},
 	_getSwitchStateMsg : function (msg) {return msg;},
 	_getDimmerStateMsg : function (msg) {return msg.substr(2);},
@@ -31,17 +31,20 @@ var SwitchBoardV1 = BaseDevice.extend({
 	},
 	_setSwitchState : function (msg) {
 		var swst = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);
-		this.switchState[5] = (swst>>0) % 2;
-		this.switchState[4] = (swst>>1) % 2;
-		this.switchState[3] = (swst>>2) % 2;
-		this.switchState[2] = (swst>>3) % 2;
-		this.switchState[1] = (swst>>4) % 2;
-		this.switchState[0] = (swst>>5) % 2;
+		__.times(this.numberOfSwitches, function(indx){
+			this.switchState[this.numberOfSwitches-1-indx] = (swst>>indx) % 2;	
+		}, this);
+		// this.switchState[5] = (swst>>0) % 2;
+		// this.switchState[4] = (swst>>1) % 2;
+		// this.switchState[3] = (swst>>2) % 2;
+		// this.switchState[2] = (swst>>3) % 2;
+		// this.switchState[1] = (swst>>4) % 2;
+		// this.switchState[0] = (swst>>5) % 2;
 	},
 	setDimmer : function(dimmerNo, value, donotRetry) {
 		if (dimmerNo > this.dimmerState.length) return;
 		value = Math.min(255, Math.max(0, value));
-		this._sendQuery("STFSD"+dimmerNo+this._intToHexStr(value), __.bind(function(){
+		this._sendQuery({name:"STFSD", id:dimmerNo, value:this._intToHexStr(value)}, __.bind(function(){
 			setTimeout(__.bind(function () {
 				if (Math.abs(value - this.dimmerState[dimmerNo]) > 10) {
 					if(donotRetry) this.syncState();
@@ -55,8 +58,9 @@ var SwitchBoardV1 = BaseDevice.extend({
 	setSwitch : function (switchNo, state, callback) {
 		if (!this.setSwitchQ) this.setSwitchQ = [];
 		this.setSwitchQ.push({"switchNo":switchNo, "state":state, "callback":callback});
+//		console.log("Pushed to Switch Q");
 		if(!this.__foo)
-			this.__foo = __.throttle(__.bind(function(){this._processSetSwitchQ()}, this), 500, {leading: false});
+			this.__foo = __.throttle(__.bind(function(){this._processSetSwitchQ()}, this), 50, {leading: false});
 		this.__foo();
 	},
 	_processSetSwitchQ : function () {
@@ -68,12 +72,13 @@ var SwitchBoardV1 = BaseDevice.extend({
 			copy[obj.switchNo] = (obj.state)?1:0;	
 		}, this);
 		var swst = this._binStateToInt(copy);
+//		console.log("Processing Switch Q");
 		this._setSwitch(swst, __.bind(function () {
 			__.each(setSwitchQ, function (obj) {obj.callback && obj.callback();}, this);
 		}, this))
 	},
 	_setSwitch : function (swst, callback, donotRetry) {
-		this._sendQuery("STSWPT"+this._intToHexStr(swst), 
+		this._sendQuery({name:"STSWPT", value:this._intToHexStr(swst)}, 
 			__.bind(function(){
 				setTimeout(__.bind(function () {
 					if (this._binStateToInt(this.switchState)^swst)
@@ -85,10 +90,13 @@ var SwitchBoardV1 = BaseDevice.extend({
 							else callback && callback()
 						}, this))
 					else callback && callback()
-				}, this), 1000);	
+				}, this), 100); // if this interval is long it will create problem when user rapidly toggels the switch.	
 			}, this));
 	},
-	toggleSwitch : function(switchNo) {return this.setSwitch(switchNo, !this.switchState[switchNo]);} 	
+	toggleSwitch : function(switchNo) {
+		return this.virtualNodes[this.id+"-l"+switchNo].setState(!this.switchState[switchNo]);
+//		return this.setSwitch(switchNo, !this.switchState[switchNo]);
+	} 	
 });
 
 module.exports = SwitchBoardV1;
