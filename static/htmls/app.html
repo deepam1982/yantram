@@ -11,24 +11,56 @@
 			text-align: center;
 			background-color: rgb(215,211,182);
 			font-family: "Arial, Helvetica Neue", Helvetica, sans-serif;
+			color:gray;
+			font-weight: lighter;
 		}
-		#appCont {
+		#mainCont{
 			min-height:100%;
-			max-width:500px;
+			max-width:500px;			
 			margin:auto;
 			background-color: rgb(255,255,255);
 			text-align:left;
-			padding:20px;
+		}
+		#header {
+			padding:20px 20px 0 20px;
+		}
+		#appCont {
+			min-height:100%;
+			padding:0 20px 20px 20px;
 			position:relative;
 		}
-		hr {
+		#menuCont {
+			min-height:100%;
+			padding:20px 0px 0 10px;
+			background-color: #EE972D;
+			font-size: 14px;
+			color: white;
+			font-weight: 400;
+			text-align:left;
+			position:relative;
+		}
+		#menuCont .options {
+			padding:5px 2px;
+			margin-top:6px;
+			cursor:pointer;
+		}
+/*		#menuCont .options.selected {
+			border : 1px solid white;
+			font-size: 12px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+*/		hr {
 			border:0;
 			border-top: 1px solid #eeeeee;
 			border-bottom: 1px solid #ffffff;
 		}
-		.roomTitleCont {
+		.titleCont, .roomTitleCont {
 			padding:5px 20px;
 			background:#EE972D;
+			color: white;
+			font-weight: 200;	
+			font-size: 18px;
 		}
 		.switchCont {
 			font-size: 14px;
@@ -59,15 +91,64 @@
 		    top:10px;
 		    cursor:pointer;
 		}
+		input[type=password], input[type=text], textarea {
+		  @include transition(all 0.30s ease-in-out);
+		  outline: none;
+		  padding: 3px 0px 3px 3px;
+		  margin: 5px 1px 3px 0px;
+		  border: 1px solid rgb(255, 233, 166);
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		 
+		input[type=password]:focus, input[type=text]:focus, textarea:focus {
+		  @include box-shadow(0 0 5px #EE972D);
+		  padding: 3px 0px 3px 3px;
+		  margin: 5px 1px 3px 0px;
+		  border: 1px solid #EE972D;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+
+		.helpText {
+			color:#BBBBBB;
+			font-size: 12px;
+
+		}
+		.button {
+			cursor: pointer;
+		  outline: none;
+		  padding: 5px;
+		  border: 1px solid #EE972D;
+		  color:#EE972D;
+			font-weight: 200;	
+			font-size: 16px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		.errorMsgDiv{
+			display: none;
+			color:#EE972D;	
+			font-weight: 100;	
+			font-size: 12px;
+		}
+
 	</style>
 	<body>
-		<div id='appCont' class='appArea'>
-			<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;">
-				<span style="color:gray;">ino</span><span style="">ho</span>
+		<div id='mainCont'>
+			<div style='float: left;width:100%;'>
+				<div id='header'>
+					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;">
+						<span style="color:gray;">ino</span><span style="">ho</span>
+						<img id='burgerImage' style="float:right; margin:10px 18px 0 0;" src="/static/images/burgericon.png"></img>
+					</div>
+					<hr/>
+				</div>
+				<div id='appCont' class='appArea'></div>
 			</div>
-			<hr/>
-
-		</div>	
+			<div id='sideMenuCont' style='float:left;width:35%;display:none'></div>
+			<div style='clear:both;'></div>	
+		</div>		
 
 	</body>
 	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
@@ -80,12 +161,89 @@
 	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
+	<script type="text/template" id="sideMenuTemplate">
+		<div id='menuCont' class='menuArea'>
+			<div class='options mainPannel' jsVarNm='mainPageView'>Main Pannel</div>	
+			<br/><br/><br/>
+			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
+			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
+			<br/><br/>
+		</div>
+	</script>
+	<script type="text/template" id="addNewModuleTemplate">
+		<div>
+			<br/>
+			<div class='moduleAttached' style='display:none;'>
+				<span style='margin-right:10px'>Enter module name</span>
+				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
+				<div class='helpText'>e.g. module1. You can change the name of the module any time latter.</div>
+				<br/>
+				<div class='errorMsgDiv'><br/><span>error:</span></div>
+				<br/>
+				<span class='button' id='configureNewModuleButton'>Configure</span>
+			</div>
+			<div class='moduleNotAttached'>
+				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
+				<span class='retryMsg' style='display:none;'>Oh no!! Home controller still cannot communicate with Switchboard module. Check the connections of serial cable and then retry.</span>
+				<br/><br/>
+				<span class='button' id='retryButton'>Try now</span>
+			</div>	
+			
+		</div>
+	</script>
+	<script type="text/template" id="networkSettingTemplate">
+		<div>
+			<br/>
+			<div class="titleCont"><span style="text-align:left;">Network Settings</span></div>
+			<br/>
+			<span style='margin-right:10px'>Enter security key</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKey'></input>
+			<br/>
+			<span style='margin-right:10px'>Confirm security key</span>
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
+			<div class='helpText'>This key is used to encrypt data in inoho zigbee network. Modifying this key will require reconfiguration of all the switch board modules.</div>
+			<br/>
+			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<br/>
+			<span class='button' id='modifyNwkSecKeyButton'>Confirm</span>
+
+			
+		</div>
+	</script>
+	<script type="text/template" id="cloudSettingTemplate">
+		<div>
+			<br/>
+			<div class="titleCont"><span style="text-align:left;">Cloud Settings</span></div>
+			<br/>
+			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
+			<br/>
+			<span style='margin-right:10px'>Confirm email id</span>
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmailCnf'></input>
+			<div class='helpText'>While you are away from home, you can access your home controller using this email id through http://cloud.inoho.com. You will be able to change cloud settings when you are not on move, and connected directly to home controller.</div>
+						<br/>
+			<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwd'></input>
+			<br/>
+			<span style='margin-right:10px'>Confirm password</span>
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwdCnf'></input>
+
+			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<br/><br/>
+			<span class='button' id='modifyCloudAccountButton'>Confirm</span>
+			<br/><br/>
+			<hr/>
+			
+		</div>
+	</script>
+	
 	<script type="text/template" id="roomTemplate">
 		<div>
 			<br/>
 			<div class="roomTitleCont">
-				<span style="text-align:left;font-size:24px;color:white;font-weight:400;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style="width:25px;float:right;margin-top:2px;cursor:pointer;"/>
+				<span style="text-align:left;"><%=name%></span>
+				<img class='powerButton' src="static/images/power.png" style="width:18px;float:right;margin-top:2px;cursor:pointer;"/>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
@@ -109,8 +267,28 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/mainPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
+	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		$('#burgerImage').on('tap', function () {
+			var $menuContPar = $('#menuCont').parent();
+			var $appContPar = $('#appCont').parent();
+			if($menuContPar.css('display') == 'block') {
+				$menuContPar.hide();
+				$appContPar.css('width', '100%');
+			}
+			else {
+				$menuContPar.show();
+				$appContPar.css('width', '65%');				
+			}
+		});
+	</script>
 	<script>
 	  var ioSocket = io.connect('/');
 	  ioSocket.on('roomConfigUpdated', function (config) {
@@ -118,6 +296,8 @@
 	  });
 	</script>
 	<script>
+		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
+		sideMenu.render();
 		var backboneAjax = Backbone.ajax;
 		Backbone.ajax = function (obj) {
 			if(!obj.useSocket) return backboneAjax.call(arguments);
@@ -137,11 +317,19 @@
 				console.log("change called on "+model.get('name'));
 				console.log(model);
 			});
-			var roomView = new RoomView1({model:roomModel});
-			$('#appCont').append(roomView.$el);
-			roomView.render();
 		})
 		rC.fetch({update:true, useSocket:true});
+		var mainPageView = new MainPageView({'collection':rC});
+		$('#appCont').append(mainPageView.$el);
+		mainPageView.render();
+		sideMenu.currentPage = mainPageView;
+		var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
+		$('#appCont').append(configureModulePage.$el);
+		var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});
+		$('#appCont').append(cloudSettingPage.$el);
+		var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
+		$('#appCont').append(networkSettingPage.$el);
+
 	</script>
 	
 <HTML>	

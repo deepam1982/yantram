@@ -59,13 +59,14 @@ var BaseView = Backbone.View.extend({
     collectionEvents : {},
     _getJsonToRenderTemplate : function () {return (this.model)?this.model.toJSON():{};},
 	render	:	function () {
-		var template = (typeof this.template != 'undefined')?this.template:_.template($(this.templateSelector).html());
-		this.$el.html(template(this._getJsonToRenderTemplate()));
+		var template = (typeof this.template != 'undefined')?this.template:
+                        (this.templateSelector)?_.template($(this.templateSelector).html()):null;
+		if(template) this.$el.html(template(this._getJsonToRenderTemplate()));
         _.each(this.subViews, function (params) { 
             if(!params) return;
             var ref = this[params.reference];
-            var $parent = this.$el.find(params.parentSelector);
-            if (!$parent.length) $parent=this.$el; 
+            var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
+            if (!$parent || !$parent.length) $parent=this.$el; 
             $parent.append(ref.$el);
             if (!params.supressRender) ref.render();
             var events = params.events;
@@ -75,8 +76,8 @@ var BaseView = Backbone.View.extend({
             if(!params) return;
             var events = params.events;
             _.each(this[params.reference], function (viewObj) {
-            	var $parent = this.$el.find(params.parentSelector);
-            	if (!$parent.length) $parent=this.$el; 
+            	var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
+            	if (!$parent || !$parent.length) $parent=this.$el; 
                 $parent.append(viewObj.$el);
                 if (!params.supressRender) viewObj.render();
                 if (events) for(var eventName in events) {viewObj.on(eventName, this[events[eventName]], this)}

@@ -69,7 +69,7 @@ var TarangController = BaseCommunicator.extend({
 		this._send("\x2B\x00\x02\x00\xFF\xFF\xFF\xFF", function () {
 //			console.log('##### Sent broadcast')
 		});
-	},
+	}
 
 });
 

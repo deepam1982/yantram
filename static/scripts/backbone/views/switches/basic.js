@@ -7,7 +7,7 @@ BasicSwitch = BaseView.extend({
 	_getJsonToRenderTemplate : function () {
 		var retJson = this.model.toJSON();
 //		retJson.src = "static/images/"+retJson.state+"/"+((retJson.name=='Fan')?'fan':'bulb')+".png";
-		retJson.src = "static/images/"+retJson.state+"/"+retJson.type+".png";
+		retJson.src = "static/images/"+retJson.state+"/"+retJson.icon+".png";
 		return retJson;
 	},
 	events: {

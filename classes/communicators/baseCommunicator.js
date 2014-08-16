@@ -11,6 +11,13 @@ var BaseCommunicator = BaseClass.extend({
 	_data : "",
 	deviceList : [],
 	_queryQ : [],
+	_pendingReqCallbackMap : {},
+	_timeoutPendingRequests : function () {
+		__.each(this._pendingReqCallbackMap, function (callback, code) {
+			callback && callback('timeout');
+		}, this);
+		this._pendingReqCallbackMap = {};
+	},
 	byteStrToHexStr : function (byteStr) {
         var hexOut = "";
         for (var i=0; i<byteStr.length; i++) {
@@ -32,11 +39,17 @@ var BaseCommunicator = BaseClass.extend({
 			baudrate: this.baudrate,
 			parser: parsers.raw
 		}, false);
-		this.serialPort.open(__.bind(this._onPortOpen, this));
+		this.serialPort.open(__.bind(function () {
+			this._broadcast(); // for some reason we do not get response to first request, so a dummy request.
+			setTimeout(__.bind(this._onPortOpen, this), 1000);
+		}, this));
+		setInterval(__.bind(this._timeoutPendingRequests, this), 3000);
 	},
+	checkCommunication : function () {},
 	_onPortOpen : function () {
 		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
+		this.checkCommunication();
 		this._broadcast();
 		setInterval(__.bind(this._broadcast, this), 8000);
 	},
@@ -72,7 +85,11 @@ var BaseCommunicator = BaseClass.extend({
 	_getNwkAdd : function (devId) {
 		try {return __.findWhere(this.deviceList, {'deviceId':devId}).nwkAdd;}
 		catch(err){return null;}
+	},
+	updateNetworkKey : function (networkKey, callback) {
+		callback && callback('noSupport');
 	}
+
 
 
 });

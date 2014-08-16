@@ -25,9 +25,12 @@ var CC2530Controller = BaseCommunicator.extend({
 		return this._intToHexStr(newSt);							
 	},
 	_processPacket : function (data) {
-//		console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
+		// if(msgTypeCode != '0301')
+		// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		this._pendingReqCallbackMap[msgTypeCode] && this._pendingReqCallbackMap[msgTypeCode](null, data.substr(7)); 
+		this._pendingReqCallbackMap[msgTypeCode] = null;					
 		if(data.length < 8) return;
 		var sourceMacAdd = data.substr(7,16);
 		var sourceNwkAdd = data.substr(23,4);
@@ -38,6 +41,8 @@ var CC2530Controller = BaseCommunicator.extend({
 							this.emit('msgRecieved', "DVST", state, sourceMacAdd); break;
 			case '0304'	: 	this.emit('msgRecieved', "STSWPT", msg, sourceMacAdd); break;
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
+			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break;
+			default 	: 	return;
 		}
 //		console.log(msgId);
 		if (msgTypeCode == '0301') this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); 
@@ -78,17 +83,18 @@ var CC2530Controller = BaseCommunicator.extend({
 			case "GTDVTP" :  qry="0301"; break;
 			case "GTDVST" :  qry="0302"; break;
 			case "STSWPT" :  qry="0304"+this._invertBinaryNumber(queryObj.value);break; 
-			case "STFSD" :  qry="0305"+this._intToHexStr(queryObj.id)+queryObj.value;break; 
+			case "STFSD" :  qry="0305"+this._intToHexStr(queryObj.id)+queryObj.value;break;
+			default :  qry = queryObj.name;
 		}
 		return qry;
 	},
 
 	sendQuery : function (devId, queryObj, callback) {
-		var nwkAdd = this._getNwkAdd(devId);
+		var nwkAdd = devId?this._getNwkAdd(devId):'';
 		var queryInHexStr = this._buildQuery(queryObj)
 		var cbk = function (err, results, queryInHxStr) {
 //			console.log( "$$$$$$$$$$$$$$$$$$$$$ sent query - "+queryInHxStr);
-			callback(err, results, queryInHxStr);
+			callback && callback(err, results, queryInHxStr);
 		}
 		this._queryQ.push({'query':"\x2B"+queryInHexStr+nwkAdd+"\x0D", 'callback':cbk, 'queryInHexStr':queryInHexStr});
 //		console.log("Qurey pushed to Query Q");
@@ -102,6 +108,48 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},
+
+	updateNetworkKey : function (networkKey, callback) {
+		if(networkKey.length != 32 || networkKey.search(/^[a-fA-F0-9]*$/g) != 0) {
+			callback && callback('invalidKey');
+			return;
+		}
+		console.log(qry)
+		this.sendQuery(null, {name:qry});
+		this._pendingReqCallbackMap["0106"] = callback;
+	}, 
+
+	checkCommunication : function () {
+		console.log("Checking Communication.");
+		this._pendingReqCallbackMap["FFFF"] = function (err) {
+			console.log("Test Communication "+((err)?"Failed!!":"Success!!"));
+		}
+		this.sendQuery(null, {name:"FFFF"});
+	},
+
+	checkSerialCable	: function (callback) {
+		console.log("checking Serial cable connection!!");
+		this.sendQuery(null, {name:"0201"});
+		this._pendingReqCallbackMap["0201"] = callback;
+	}, 
+
+	configureModule : function (moduleName, callback) {
+		this.checkSerialCable(__.bind(function (err, msg) {
+			if(err) {callback('noConnect');return;}
+			console.log(msg)
+			this.sendQuery(null, {name:"0202"});
+			console.log("sent 0202 query to module");
+			this._pendingReqCallbackMap["0202"] = __.bind(function (err, macId) {
+				if(!err) console.log("got response of 0202 query");
+				console.log(macId)
+				this.sendQuery(null, {name:"0102"});
+				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
+				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
+				callback(err, macId);
+//					this.sendQuery(null, {name:"0105"}); // restart coordinator
+			}, this);
+		}, this));
+	}
 
 
 });

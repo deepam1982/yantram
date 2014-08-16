@@ -1,11 +1,10 @@
 __rootPath = __dirname;
-var BaseConfigManager = require(__rootPath+"/configs/managers/baseManager");
-var UsrCnfMngr = BaseConfigManager.extend({path : '/../configs/userConfig.json'});
+var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
+var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
+__remoteDevInfoConf = new (BasicConfigManager.extend({file : '/../configs/remoteDeviceInfoConfig.json'}))();
+var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
 __userConfig = new UsrCnfMngr({'callback':function (err) {
   __userEmail = __userConfig.get('email');
-  //__userEmail = 'dharmaraopv@gmail.com';
-  //__userEmail = 'deepam1982@gmail.com';
-  //__userEmail = 'kaddyiitr@gmail.com';
   var express = require('express');
   var favicon = require('serve-favicon');
   //var expressDevice = require('express-device');
@@ -42,16 +41,16 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
   var socReqMngr = new SocketRequestManager({'localIo':io});
 
   var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
-  var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
+  //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
 
   deviceManager.on('deviceStateChanged', function () {
-    io.sockets.emit('roomConfigUpdated', roomModel.getList())
+    io.sockets.emit('roomConfigUpdated', groupConfig.getList())
   });
 
   require(__rootPath + '/classes/sockets/initClientSocket')(function (err, cloudSocket) {
-    cloudSocket.emit('roomConfigUpdated', roomModel.getList())
+    cloudSocket.emit('roomConfigUpdated', groupConfig.getList())
     deviceManager.on('deviceStateChanged', function () {
-      cloudSocket.emit('roomConfigUpdated', roomModel.getList())
+      cloudSocket.emit('roomConfigUpdated', groupConfig.getList())
     });  
     socComMngr.setCloudSocket(cloudSocket);
     socReqMngr.setCloudSocket(cloudSocket);

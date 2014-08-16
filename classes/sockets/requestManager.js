@@ -2,8 +2,8 @@ var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
-var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
-
+//var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
+var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 
 var RequestManager = BaseClass.extend({
 	init : function (obj) {
@@ -26,7 +26,7 @@ var RequestManager = BaseClass.extend({
 	},
 	onRoomListRequest : function (socket, reqData, calback) {
 		console.log('recieved room list request!!');
-		var resp = roomModel.getList();
+		var resp = groupConfig.getList();
 		if(typeof calback == 'function') calback(resp);
 //		socket.emit(reqData.reqId, resp);
 	}
