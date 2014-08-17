@@ -3,7 +3,7 @@ echo "------------------ os update done ----------------";
 
 mkdir /home/in/inoho
 mkdir /home/in/inoho/homeController
-git clone https://github.com/deepam1982/yantram.git /home/in/inoho/homeController
+git clone -b dev https://github.com/deepam1982/yantram.git /home/in/inoho/homeController
 mv /home/in/inoho/homeController/package.json /home/in/inoho/
 mkdir /home/in/inoho/configs
 echo "------------------ git clone inoho done ----------------";
@@ -42,12 +42,13 @@ echo "------------------ disabled getty ----------------";
 
 sudo cp /home/in/inoho/homeController/shellScripts/inoho.sh /etc/init.d/inoho
 sudo chmod 755 /etc/init.d/inoho
-sudo update-rc.d /etc/init.d/inoho defaults
+sudo update-rc.d inoho defaults
 
 echo "------------------ added inoho.sh to startup scripts ----------------";
 
-sudo chmod 755 /home/in/inoho/homeController/shellScripts/checkIpAlias.sh
-sudo update-rc.d /home/in/inoho/homeController/shellScripts/checkIpAlias.sh defaults
+sudo cp /home/in/inoho/homeController/shellScripts/inoho.sh /etc/init.d/checkIpAlias.sh
+sudo chmod 755 /etc/init.d/checkIpAlias.sh
+sudo update-rc.d checkIpAlias.sh defaults
 
 sudo chmod 755 /home/in/inoho/shellScripts/homeController/checkIpAlias.sh
 line="* * * * * sudo /home/in/inoho/shellScripts/homeController/checkIpAlias.sh > /home/in/inoho/logs/checkIpAlias.log"
