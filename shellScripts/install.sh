@@ -3,8 +3,11 @@ echo "------------------ os update done ----------------";
 
 mkdir /home/in/inoho
 mkdir /home/in/inoho/homeController
+mkdir /home/in/inoho/logs
+mkdir /home/in/inoho/configs
+
 git clone -b dev https://github.com/deepam1982/yantram.git /home/in/inoho/homeController
-mv /home/in/inoho/homeController/package.json /home/in/inoho/
+cp /home/in/inoho/homeController/package.json /home/in/inoho/
 mkdir /home/in/inoho/configs
 echo "------------------ git clone inoho done ----------------";
 

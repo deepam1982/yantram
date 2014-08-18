@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NODE=/opt/node/bin/node
+NODE=/usr/bin/node
 SERVER_JS_FILE=/home/in/homeController/main.js
 USER=in
 OUT=/home/in/inoho/logs/inoho.log

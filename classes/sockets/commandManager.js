@@ -38,7 +38,7 @@ var CommandManager = BaseClass.extend({
 				var noDim=2, swCnt=5;
 				__remoteDevInfoConf.set(macAdd+"", {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "deviceCode":"xxx"});
 				__remoteDevInfoConf.save();
-				var maxId = __.max(__.keys(groupConfig.data), function (id) {console.log(id);return parseInt(id);});
+				var maxId = __.max(__.keys(groupConfig.data), function (id) {return parseInt(id);});
 				if(maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}
 				for(var i=0; i<swCnt; i++) {
