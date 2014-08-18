@@ -1,0 +1,21 @@
+{
+  "name": "Inoho",
+  "description": "Inoho home controller",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+    "underscore": "1.6.0",
+    "serve-favicon": "x",
+    "socket.io-client": "0.9.11",
+    "socket.io": "x",
+    "serialport": "1.x",
+    "cron": "x",
+    "keen.io": "x",
+    "request": "x",
+    "xmlhttprequest": "x"
+  },
+  "devDependencies": {
+    "xmlhttprequest": "~1.6.0"
+  }
+}
