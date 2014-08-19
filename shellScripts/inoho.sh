@@ -1,9 +1,9 @@
 #!/bin/bash
 
 NODE=/usr/bin/node
-SERVER_JS_FILE=/home/in/homeController/main.js
-USER=in
-OUT=/home/in/inoho/logs/inoho.log
+SERVER_JS_FILE=/home/admin/homeController/main.js
+USER=admin
+OUT=/home/admin/inoho/logs/inoho.log
 
 case "$1" in
 
