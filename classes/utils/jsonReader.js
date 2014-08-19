@@ -5,9 +5,9 @@ var JsonReader = BaseClass.extend({
 		fs.readFile(file, 'utf8', function (err, data) {
 			if (err) {
 				console.log('Tried to read file '+ file +' Error: ' + err);
-				callback(err);
+				callback && callback(err);
 			}
-			callback(null,  JSON.parse(data));
+			callback && callback(null,  JSON.parse(data));
 		});
 	}
 });

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NODE=/usr/bin/node
-SERVER_JS_FILE=/home/admin/homeController/main.js
+SERVER_JS_FILE=/home/admin/inoho/homeController/main.js
 USER=admin
 OUT=/home/admin/inoho/logs/inoho.log
 
