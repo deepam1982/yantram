@@ -1,14 +1,16 @@
 #!/bin/bash
-DIR1=/home/admin/inoho/homeController
-DIR2=/home/admin/inoho/gitScripts
-DIR3=/home/admin/inoho/gitScripts/shellScripts/upgradeScripts
-REPO=https://github.com/deepam1982/yantram.git
-BRANCH=dev
 
-mkdir /home/admin/inoho
-mkdir /home/admin/inoho/homeController
-mkdir /home/admin/inoho/logs
-mkdir /home/admin/inoho/configs
+DIR0=/home/admin/inoho
+DIR1=$DIR0/homeController
+DIR2=$DIR0/gitScripts
+DIR3=$DIR0/gitScripts/shellScripts/upgradeScripts
+REPO=https://github.com/deepam1982/yantram.git
+BRANCH=V1
+
+mkdir $DIR0
+mkdir $DIR1
+mkdir $DIR0/logs
+mkdir $DIR0/configs
 
 git clone -b $BRANCH $REPO $DIR1
 cp $DIR1/package.json $DIR1/../package.json
@@ -31,31 +33,37 @@ sudo ln -s /opt/node/bin/npm /usr/bin/npm
 
 echo "------------------ nodejs and npm installation done ----------------";
 
-npm install /home/admin/inoho/
+npm install $DIR0/
 mv -if node_modules/Inoho/node_modules/ inoho/node_modules
 rm -r node_modules
 
 echo "------------------ inoho node package installation done ----------------";
 
 
-sudo cp /home/admin/inoho/homeController/shellScripts/inoho.sh /etc/init.d/inoho
+sudo cp $DIR1/shellScripts/inoho.sh /etc/init.d/inoho
 sudo chmod 755 /etc/init.d/inoho
 sudo update-rc.d inoho defaults
 
 echo "------------------ added inoho.sh to startup scripts ----------------";
 
-sudo cp /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh /etc/init.d/checkIpAlias.sh
+sudo cp $DIR1/shellScripts/checkIpAlias.sh /etc/init.d/checkIpAlias.sh
 sudo chmod 755 /etc/init.d/checkIpAlias.sh
 sudo update-rc.d checkIpAlias.sh defaults
 
-sudo chmod 755 /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh
-line="* * * * * sudo /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh > /home/admin/inoho/logs/checkIpAlias.log"
+sudo chmod 755 $DIR1/shellScripts/checkIpAlias.sh
+line="* * * * * sudo $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkIpAlias.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkIpAlias added to cron ----------------";
 
-sudo chmod 755 /home/admin/inoho/homeController/shellScripts/wifiCheck.sh
-line="* * * * * sudo /home/admin/inoho/homeController/shellScripts/wificheck.sh > /home/admin/inoho/logs/wificheck.log"
+sudo chmod 755 $DIR1/shellScripts/wifiCheck.sh
+line="* * * * * sudo $DIR1/shellScripts/wificheck.sh > $DIR0/logs/wificheck.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkWifi added to cron ----------------";
+
+sudo chmod 755 $DIR1/shellScripts/updateCron.sh
+line="0 0 * * * sudo $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCron.log"
+(crontab -u root -l; echo "$line" ) | crontab -u root -
+
+echo "------------------ updateCron added to cron ----------------";
