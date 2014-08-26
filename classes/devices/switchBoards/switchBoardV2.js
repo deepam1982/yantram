@@ -10,12 +10,12 @@ var SwitchBoardV2 = SwitchBoardV1.extend({
 //	_getSwitchStateMsg : function (msg) {return msg.substr(2, 2);},
 //	_getDimmerStateMsg : function (msg) {return msg.substr(4, 4);},
 	_getActiveSensorMsg : function (msg) {return msg.substr(6, 2);},
-
+	_getSensorStateMsg : function (msg) {return this._getDimmerStateMsg(msg);},
 	_recordDeviceStatus : function (msg) {
 		if (msg.lenght < 8) return;
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
 		var oldSnSt = this.sensorState.slice(0); //make a clone
-		this._setSensorState(this._getDimmerStateMsg(msg));
+		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
 		this._super(msg);
 		if (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]) this.emit('stateChanged', 'sensor');
 	},

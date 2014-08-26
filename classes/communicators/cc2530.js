@@ -29,15 +29,16 @@ var CC2530Controller = BaseCommunicator.extend({
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0301')
 		// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
-		this._pendingReqCallbackMap[msgTypeCode] && this._pendingReqCallbackMap[msgTypeCode](null, data.substr(7)); 
-		this._pendingReqCallbackMap[msgTypeCode] = null;					
+		var clbk = this._pendingReqCallbackMap[msgTypeCode];
+		this._pendingReqCallbackMap[msgTypeCode] = null;
+		clbk && clbk(null, data.substr(7)); 
 		if(data.length < 8) return;
 		var sourceMacAdd = data.substr(7,16);
 		var sourceNwkAdd = data.substr(23,4);
 		var msg = data.substr(29);
 		switch (msgTypeCode) {
 			case '0301' : 	this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); break;
-			case '0302' : 	var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2); 
+			case '0302' : 	var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
 							this.emit('msgRecieved', "DVST", state, sourceMacAdd); break;
 			case '0304'	: 	this.emit('msgRecieved', "STSWPT", msg, sourceMacAdd); break;
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
@@ -114,16 +115,18 @@ var CC2530Controller = BaseCommunicator.extend({
 			callback && callback('invalidKey');
 			return;
 		}
+		var qry="0106"+networkKey
 		console.log(qry)
 		this.sendQuery(null, {name:qry});
 		this._pendingReqCallbackMap["0106"] = callback;
 	}, 
 
-	checkCommunication : function () {
+	checkCommunication : function (retrying) {
 		console.log("Checking Communication.");
-		this._pendingReqCallbackMap["FFFF"] = function (err) {
-			console.log("Test Communication "+((err)?"Failed!!":"Success!!"));
-		}
+		this._pendingReqCallbackMap["FFFF"] = __.bind(function (err) {
+			console.log("Test Communication "+((err)?((retrying)?"Failed!!":"retrying!!"):"Success!!"));
+			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true), 1000);
+		}, this);
 		this.sendQuery(null, {name:"FFFF"});
 	},
 
@@ -146,7 +149,7 @@ var CC2530Controller = BaseCommunicator.extend({
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
 				callback(err, macId);
-//					this.sendQuery(null, {name:"0105"}); // restart coordinator
+					this.sendQuery(null, {name:"0100"}); // restart coordinator
 			}, this);
 		}, this));
 	}

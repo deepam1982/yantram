@@ -7,9 +7,14 @@ OUT=/home/admin/inoho/logs/inoho.log
 
 case "$1" in
 
-start)
+startWithLogs)
 	echo "starting node: $NODE $SERVER_JS_FILE"
 	sudo -u $USER $NODE $SERVER_JS_FILE > $OUT 2>$OUT &
+	;;
+
+start)
+	echo "starting node: $NODE $SERVER_JS_FILE"
+	sudo -u $USER $NODE $SERVER_JS_FILE noLogs &
 	;;
 
 stop)

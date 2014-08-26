@@ -7,7 +7,7 @@ var JsonReader = BaseClass.extend({
 				console.log('Tried to read file '+ file +' Error: ' + err);
 				callback && callback(err);
 			}
-			callback && callback(null,  JSON.parse(data));
+			callback && callback(null,  data?JSON.parse(data):{});
 		});
 	}
 });

@@ -27,7 +27,8 @@ var CommandManager = BaseClass.extend({
 	},
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
-		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this, socket));
+		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
+		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		console.log('Added Command Listners!!')
@@ -55,17 +56,62 @@ var CommandManager = BaseClass.extend({
 			callback && callback((!err)?true:false);	
 		});		
 	},
-	onModifyNetworkSecurityKey : function (socket, commandData) {
+	modifyCloudSettings : function (commandData, callback) {
+		var email = __userConfig.get('email');
+		var password = __userConfig.get('password');
+		if (email == commandData.email && password == commandData.password) callback({'success':true});
+		var request = require('request');
+		var createAccount = function (newEmail, newPassword) {
+			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
+			request.post('http://cloud.inoho.com/register/', 
+				{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, donotredirect:true}}, 
+				function (err, resp, body){
+					console.log("got response from http://cloud.inoho.com/register/");
+					console.log(err, resp.statusCode, body);
+					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+					var rspJson = JSON.parse(body);
+					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+					__userConfig.set('email', newEmail);__userConfig.set('password', newPassword);
+					console.log("cleated new account on cloud for  "+newEmail);
+					__userConfig.save(function (err) {
+						if(err) return console.log(err);
+						console.log('Cloud configuration success');
+						callback({'success':true});
+					});
+				}
+			);
+		}
+		if (email && password) {
+			request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password}}, 
+				function (err, resp, body){
+					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+					var rspJson = JSON.parse(body);
+					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+					__userConfig.set('email', '');__userConfig.set('password', '');
+					console.log("removed "+email+' from cloud');
+					createAccount(commandData.email, commandData.password)
+					__userConfig.save(function (err) {err && console.log(err)});
+				}
+			);	 	
+		}
+		else 
+			createAccount(commandData.email, commandData.password)
+
+
+	},
+	onModifyNetworkSecurityKey : function (commandData, callback) {
+		//TODO consider network name as well
 		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, msg){
 			if(err) {
-				socket.emit('modifyNetworkSecurityKeyResponse', {'success':false, 'msg':err});
+				callback({'success':false, 'msg':err});
 				return
 			}
 			__userConfig.set('zigbeeNetworkKey', commandData.securityKey);
+			__userConfig.set('zigbeeNetworkName', commandData.networkName);
 			__userConfig.save(function (err) {
 				if(err) console.log(err);
 				console.log('Network key modification success');
-				socket.emit('modifyNetworkSecurityKeyResponse', {'success':true});
+				callback({'success':true});
 			});	
 		},this));
 	},

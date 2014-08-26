@@ -197,12 +197,15 @@
 			<br/>
 			<div class="titleCont"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
+			<span style='margin-right:10px'>Enter network name</span>&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
+			<br/>
 			<span style='margin-right:10px'>Enter security key</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKey'></input>
 			<br/>
 			<span style='margin-right:10px'>Confirm security key</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
-			<div class='helpText'>This key is used to encrypt data in inoho zigbee network. Modifying this key will require reconfiguration of all the switch board modules.</div>
+			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require reconfiguration of all the switch board modules.</div>
 			<br/>
 			<div class='errorMsgDiv'><br/><span>error:</span></div>
 			<br/>
@@ -233,7 +236,6 @@
 			<br/><br/>
 			<span class='button' id='modifyCloudAccountButton'>Confirm</span>
 			<br/><br/>
-			<hr/>
 			
 		</div>
 	</script>
@@ -294,6 +296,19 @@
 	  ioSocket.on('roomConfigUpdated', function (config) {
 	  	rC.add(config, {merge: true});
 	  });
+	  var configurationWorkFlow = function (pageName) {
+			var pageObjName;
+			switch(pageName) {
+				case "networkSetting" : pageObjName = 'networkSettingPage'; break;
+				case "cloudSetting" : pageObjName = 'cloudSettingPage'; break;
+				case "configureModule" : pageObjName = 'configureModulePage'; break;
+			}
+			if(pageObjName) {
+				sideMenu.switchPage(pageObjName);
+				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
+			}
+	  }
+	  ioSocket.on('switchPage', configurationWorkFlow);
 	</script>
 	<script>
 		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});

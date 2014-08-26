@@ -68,51 +68,19 @@ AdvanceFanSwitch = AdvanceSwitch.extend({
 	},
 	render	:	function () {
  		AdvanceSwitch.prototype.render.apply(this, arguments);
- 		this.$slider = $('<input type="range" class="inside" min="0" max="100" value="30" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
+ 		this.$slider = $('<input type="range" class="inside" min="10" max="86" value="30" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
  		this.$el.find('.advancePannel').append(this.$slider);
  		this.$slider.width(Math.max(120,this.$el.parent().width() - 2*this.$el.find('.toggelSwitch').width() - 20));
- // //		duty0 = (255/3.14159)*acos(1-2*duty0/255);
- // 		var tmp = Math.cos((3.14159/255)*this.model.get('duty'));
- // 		var duty = 255*(1-Math.pow(tmp, 1))/2
- // //		var duty = 255*(1-((tmp>0)?Math.pow(tmp, .5):-Math.pow(-tmp, .5)))/2
-
- 		// var duty = this.model.get('duty')-50;
- 		// duty = Math.min(Math.max(0, duty), 100)
-
- 		var duty = parseInt(this.model.get('duty'));
-
- 		if(duty < 40) duty /= 4;
- 		else if(duty < 100) duty = 10 + (duty-40)/3;
- 		else if(duty < 160) duty = 30 + (duty-100);
- 		else duty = 90 + (duty-160)*10/95;
- 		// if(duty < 60) duty /= 3;
- 		// else if (duty < 120) duty = 20 + (duty-60)/2;
- 		// else if (duty < 150) duty = 50 + (duty - 120);
- 		// else duty = 80 + (duty-150)*20/105;
- 		duty = parseInt(duty);
-
- 		this.$slider.val(duty);
+ 		var duty = parseInt(100*parseInt(this.model.get('duty'))/255);
+ 		this.$slider.val(Math.min(Math.max(duty, 10), 86));
  		this.$slider.on("input change", this._onDutyChange);
  	},
  	onDutyChange : function (event) {
- 		// alert("duty changed!!");
  		var duty = parseInt(this.$slider.val());
+ 		if(duty == 86) duty=100;
  		console.log(duty);
- 		if(duty < 10) duty *= 4;
- 		else if(duty < 30) duty = 40 + (duty - 10)*3;
- 		else if(duty < 90) duty = 100 + (duty - 30);
- 		else duty = 160 + (duty - 90)*95/10;
-
- 		// if(duty < 20) duty *= 3;
- 		// else if (duty < 50) duty = 60 + (duty-20)*2;
- 		// else if (duty < 80) duty = 120 + (duty-50);
- 		// else duty = 150 + (duty-80)*105/20;
- 		duty = parseInt(duty);
+ 		duty = parseInt(255*duty/100);
  		this.model.setDuty(duty);
-
- 		// var duty = parseInt(this.$slider.val())+50;
- 		// if(duty > 149) duty=255;
- 		// this.model.setDuty(duty);
  	}, 
  	erase	: function () {
  		this.$slider.off("input change", this._onDutyChange);

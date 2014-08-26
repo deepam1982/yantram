@@ -4,9 +4,11 @@ SideMenuView = BaseView.extend({
 		"tap .options" : "optionChange",
 	},
 	optionChange : function (event) {
-		var varName = $(event.target).attr('jsVarNm');
+		this.switchPage($(event.target).attr('jsVarNm'));
+	},
+	switchPage : function (pageName) {
 		if(this.currentPage)this.currentPage.erase();
-		this.currentPage = window[varName];
+		this.currentPage = window[pageName];
 		this.currentPage.render();
 	}
 

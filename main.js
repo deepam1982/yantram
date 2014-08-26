@@ -1,3 +1,14 @@
+var __ = require("underscore");
+
+var noLogs = false;
+__.each(process.argv, function (argmnt) {
+  if(argmnt == 'noLogs') noLogs = true;
+});
+if(noLogs) {
+  console.log = function () {};
+}
+
+
 __rootPath = __dirname;
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
@@ -28,9 +39,18 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
   var websiteRoutes = require(__rootPath + '/routes/website')
   websiteRoutes(app);
 
-  //app.get('/', websiteRoutes);
+  var checkConfigurations = function (socket){
+    if(!__userConfig.get('zigbeeNetworkName') || !__userConfig.get('zigbeeNetworkKey'))
+      socket.emit('switchPage', 'networkSetting');
+    else if(!__userConfig.get('email') || !__userConfig.get('password'))
+      socket.emit('switchPage', 'cloudSetting');
+    else if(!__.keys(__remoteDevInfoConf.data).length)
+      socket.emit('switchPage', 'configureModule');
+  }
   io.sockets.on('connection', function (socket) {
-    console.log('Socket connection established!!')
+    console.log('Socket connection established!!');
+    socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
+    checkConfigurations(socket);
   });
 
 

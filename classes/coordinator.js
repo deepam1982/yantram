@@ -2,13 +2,15 @@ var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var CronDevice = require(__rootPath+"/classes/virtualDevices/cronDevice");
+var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
+var devCoordConf = new (BasicConfigManager.extend({file : '/../configs/deviceCoordinatorConfig.json'}))();
+
 
 var Coordinator = BaseClass.extend({
 	utilNodes : {},
 	init : function (obj) {
 		__.bindAll(this, "onNewNodesFound");
 		this.populateUtilNodes();
-		this.nodeConnectionConf = obj.nodeConnectionConf;
 		this.deviceManager = obj.deviceManager;
 		this.deviceManager.on("newNodesFound", this.onNewNodesFound);
 	},
@@ -30,7 +32,7 @@ var Coordinator = BaseClass.extend({
 		return __.extend(nodeMap, __.pick(this.utilNodes, nodeIdArr));
 	},
 	onNewNodesFound : function (nodes) {
-		__.each(this.nodeConnectionConf, function (conf, nodeId) {
+		__.each(devCoordConf.toJSON(), function (conf, nodeId) {
 			if (!conf.conditionApplied) {
 				try {
 					var nodeIdArr = []
@@ -52,16 +54,16 @@ var Coordinator = BaseClass.extend({
 });
 
 //S||A && !(S&&B)
-nodeConnectionConf = {
-//	 "0001eff1-l2" : {"onCondition":"!dayLight&&0001eff1-s1", "offCondition":"!0001eff1-s1"},
-	"00021369-l3" : {"onCondition":"!00021369-l2&&!dayLight&&00021369-s1", "offCondition":"!00021369-s1"},
-	"00020dba-l3" : {"onCondition":"00020dba-s1", "offCondition":"!00020dba-s1", "manualTime":100, "maxTime":300},
-	"0041544e-l3" : {"onCondition":"0041544e-s1", "manualTime":180},
-	"0041544e-l4" : {"onCondition":"0041544e-s1", "manualTime":180},
-	"0003017c-l5" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
-	"0003017c-l2" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
-}
+// nodeConnectionConf = {
+// //	 "0001eff1-l2" : {"onCondition":"!dayLight&&0001eff1-s1", "offCondition":"!0001eff1-s1"},
+// 	"00021369-l3" : {"onCondition":"!00021369-l2&&!dayLight&&00021369-s1", "offCondition":"!00021369-s1"},
+// 	"00020dba-l3" : {"onCondition":"00020dba-s1", "offCondition":"!00020dba-s1", "manualTime":100, "maxTime":300},
+// 	"0041544e-l3" : {"onCondition":"0041544e-s1", "manualTime":180},
+// 	"0041544e-l4" : {"onCondition":"0041544e-s1", "manualTime":180},
+// 	"0003017c-l5" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
+// 	"0003017c-l2" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
+// }
 if(typeof coordinator == 'undefined')
-	coordinator = new Coordinator({"deviceManager":deviceManager, "nodeConnectionConf":nodeConnectionConf});
+	coordinator = new Coordinator({"deviceManager":deviceManager});
 module.exports = coordinator;
 

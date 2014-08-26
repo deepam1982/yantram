@@ -22,12 +22,15 @@ sudo sed -i "\|T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100|d" /etc/inittab
 echo  \#T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100 | sudo tee -a /etc/inittab
 
 cp /boot/cmdline.txt /boot/cmdline_bkp.txt
+echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" | sudo tee -a /boot/cmdline.txt
 sudo sed -i "\|dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait|d" /boot/cmdline.txt
 sudo sed -i "\|dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait|d" /boot/cmdline.txt
-echo dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait | sudo tee -a /boot/cmdline.txt
 
 echo "------------------ disabled getty ----------------";
 
-sudo useradd -m admin -G sudo
+#sudo useradd -m admin -G sudo
+#sudo passwd admin
 
-echo "------------------ new admin account created ----------------";
+#sudo passwd -l pi
+
+#echo "------------------ new admin account created ----------------";

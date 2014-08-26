@@ -32,18 +32,18 @@ sudo update-rc.d inoho defaults
 
 echo "------------------ added inoho.sh to startup scripts ----------------";
 
-sudo cp /home/admin/inoho/homeController/shellScripts/inoho.sh /etc/init.d/checkIpAlias.sh
+sudo cp /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh /etc/init.d/checkIpAlias.sh
 sudo chmod 755 /etc/init.d/checkIpAlias.sh
 sudo update-rc.d checkIpAlias.sh defaults
 
 sudo chmod 755 /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh
 line="* * * * * sudo /home/admin/inoho/homeController/shellScripts/checkIpAlias.sh > /home/admin/inoho/logs/checkIpAlias.log"
-(crontab -u pi -l; echo "$line" ) | crontab -u pi -
+(crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkIpAlias added to cron ----------------";
 
 sudo chmod 755 /home/admin/inoho/homeController/shellScripts/wifiCheck.sh
 line="* * * * * sudo /home/admin/inoho/homeController/shellScripts/wificheck.sh > /home/admin/inoho/logs/wificheck.log"
-(crontab -u pi -l; echo "$line" ) | crontab -u pi -
+(crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkWifi added to cron ----------------";
