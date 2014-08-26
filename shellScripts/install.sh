@@ -1,11 +1,23 @@
+#!/bin/bash
+DIR1=/home/admin/inoho/homeController
+DIR2=/home/admin/inoho/gitScripts
+DIR3=/home/admin/inoho/gitScripts/shellScripts/upgradeScripts
+REPO=https://github.com/deepam1982/yantram.git
+BRANCH=dev
 
 mkdir /home/admin/inoho
 mkdir /home/admin/inoho/homeController
 mkdir /home/admin/inoho/logs
 mkdir /home/admin/inoho/configs
 
-git clone -b dev https://github.com/deepam1982/yantram.git /home/admin/inoho/homeController
-cp /home/admin/inoho/homeController/package.json /home/admin/inoho/
+git clone -b $BRANCH $REPO $DIR1
+cp $DIR1/package.json $DIR1/../package.json
+
+git init $DIR2
+git --work-tree=$DIR2 --git-dir=$DIR2/.git remote add -f origin $REPO
+git --git-dir=$DIR2/.git config core.sparsecheckout true
+echo "shellScripts" >> $DIR2/.git/info/sparse-checkout
+git --work-tree=$DIR2 --git-dir=$DIR2/.git pull origin $BRANCH
 
 echo "------------------ git clone inoho done ----------------";
 
