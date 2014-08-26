@@ -22,9 +22,9 @@ currentEpoch=`git --work-tree=$DIR1 --git-dir=$DIR1/.git show -s --format=%ct $c
 git --work-tree=$DIR2 --git-dir=$DIR2/.git fetch origin
 git --work-tree=$DIR2 --git-dir=$DIR2/.git reset --hard origin/$BRANCH
 maxTime=currentEpoch
-for filename in $DIR1/*.json 
+for filename in $DIR3/*.sh 
 	do 
-		tStmp=`basename ${filename} .json`
+		tStmp=`basename ${filename} .sh`
 		tStmp=`date --date=$tStmp +%s`
 		if $maxTime < $tStmp ; then 
 			maxTime=$tStmp
