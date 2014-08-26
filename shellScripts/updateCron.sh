@@ -5,7 +5,7 @@ DIR1=$DIR0/homeController
 DIR2=$DIR0/gitScripts
 DIR3=$DIR2/shellScripts/upgradeScripts
 REPO=https://github.com/deepam1982/yantram.git
-BRANCH=V1
+BRANCH=dev
 
 echo date
 
