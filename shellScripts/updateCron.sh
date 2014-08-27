@@ -7,7 +7,8 @@ DIR3=$DIR2/shellScripts/upgradeScripts
 REPO=https://github.com/deepam1982/yantram.git
 BRANCH=dev
 
-echo date
+echo "trying to upgrade from branch $BRANCH"
+echo `date`
 
 # step 1 compare current revision number with latest revision number at repo
 
