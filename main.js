@@ -24,7 +24,8 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
     , io = require('socket.io').listen(server)
 
   //io.set('log level', 1);
-  server.listen(3210);
+//  server.listen(3210);
+  server.listen(80);
 
   app.use(favicon(__rootPath + '/static/images/favicon.ico'));
   //app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
