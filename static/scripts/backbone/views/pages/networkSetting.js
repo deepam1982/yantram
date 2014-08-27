@@ -2,7 +2,7 @@
 NetworkSettingPageView = BaseView.extend({
 	templateSelector:"#networkSettingTemplate",
 	events: {
-		"tap #modifyNwkSecKeyButton" : "_onDone",
+		"tap #modifyNwkSecKeyButton" : "_onDone"
 	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		

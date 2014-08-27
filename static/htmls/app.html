@@ -1,3 +1,5 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,6 +22,7 @@
 			margin:auto;
 			background-color: rgb(255,255,255);
 			text-align:left;
+			overflow: hidden;
 		}
 		#header {
 			padding:20px 20px 0 20px;
@@ -138,7 +141,7 @@
 		<div id='mainCont'>
 			<div style='float: left;width:100%;'>
 				<div id='header'>
-					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;">
+					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
 						<span style="color:gray;">ino</span><span style="">ho</span>
 						<img id='burgerImage' style="float:right; margin:10px 18px 0 0;" src="/static/images/burgericon.png"></img>
 					</div>
@@ -146,17 +149,22 @@
 				</div>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' style='float:left;width:35%;display:none'></div>
+			<div id='sideMenuCont' style='float:left;width:35%;background-color:#EE972D;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
 		</div>		
 
 	</body>
+	<script type="text/javascript" src="/static/scripts/iefix.js"></script>
+<!--	
 	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
+-->
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+	<script>Zepto=$</script>
 	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
 <!--	
 	<script type="text/javascript" src="http://static.mygola.com/static/11262/scripts/jquery-1.7.2.min.js"></script> 
 -->
-	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.5.2.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.7.0.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
 	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
@@ -256,12 +264,12 @@
 		</div>	
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
-		<div style='float:left;background-color:white;'>
+		<div style='float:left;background-color:white;position:relative;'>
 			<div style='width:85px;float:left;text-align:center;'>
-				<div class='toggelSwitch' style="width:85px;height:85px;cursor:pointer;background:url('<%=src%>');background-size: 85px Auto;" devId="<%=devId%>" switchId="<%=switchID%>"/><span><%=name%></span>
+				<img class='toggelSwitch' style="width:85px;height:85px;cursor:pointer;" src='<%=src%>'/><span><%=name%></span>
 			</div>
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross' style='position:absolute; right:5;top:4; cursor:pointer;font-size:20px;height:50px; width:30px; text-align:center;'><b>X</b></div>
+				<div class='cross' style='position:absolute; right:5px;top:4px; cursor:pointer;font-size:20px;height:50px; width:30px; text-align:center;'><b>X</b></div>
 			</div>
 		</div>	
 	</script>

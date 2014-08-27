@@ -3,7 +3,7 @@ MainPageView = BaseView.extend({
 	subViewArrays : [{'viewClassName':'RoomView1', 'reference':'roomViewArray', 'parentSelector':'', 'array':'this.collection'}],
 	initialize: function(obj) {
 		_.bindAll(this, 'onNewRoomAddition');
-//		this.collection = obj.collection; // collection and model both gets attached to view object by default
+		this.collection = obj.collection; // collection and model both gets attached to view object by default
 		BaseView.prototype.initialize.apply(this, arguments);
     },
     render	:	function () {

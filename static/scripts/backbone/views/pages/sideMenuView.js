@@ -1,7 +1,7 @@
 SideMenuView = BaseView.extend({
 	templateSelector:"#sideMenuTemplate",
 	events: {
-		"tap .options" : "optionChange",
+		"tap .options" : "optionChange"
 	},
 	optionChange : function (event) {
 		this.switchPage($(event.target).attr('jsVarNm'));

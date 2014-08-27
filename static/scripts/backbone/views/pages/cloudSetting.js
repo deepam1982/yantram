@@ -2,7 +2,7 @@
 CloudSettingPageView = BaseView.extend({
 	templateSelector:"#cloudSettingTemplate",
 		events: {
-		"tap #modifyCloudAccountButton" : "_onDone",
+		"tap #modifyCloudAccountButton" : "_onDone"
 	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		
