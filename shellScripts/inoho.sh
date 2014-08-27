@@ -9,12 +9,12 @@ case "$1" in
 
 startWithLogs)
 	echo "starting node: $NODE $SERVER_JS_FILE"
-	sudo -u $USER $NODE $SERVER_JS_FILE > $OUT 2>$OUT &
+	sudo $NODE $SERVER_JS_FILE > $OUT 2>$OUT &
 	;;
 
 start)
 	echo "starting node: $NODE $SERVER_JS_FILE"
-	sudo -u $USER $NODE $SERVER_JS_FILE noLogs &
+	sudo $NODE $SERVER_JS_FILE noLogs &
 	;;
 
 stop)
