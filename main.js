@@ -12,7 +12,7 @@ if(noLogs) {
 __rootPath = __dirname;
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
-__remoteDevInfoConf = new (BasicConfigManager.extend({file : '/../configs/remoteDeviceInfoConfig.json'}))();
+__remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
 __userConfig = new UsrCnfMngr({'callback':function (err) {
   __userEmail = __userConfig.get('email');
@@ -24,7 +24,7 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
     , io = require('socket.io').listen(server)
 
   //io.set('log level', 1);
-  server.listen(3210);
+  server.listen(80);
 
   app.use(favicon(__rootPath + '/static/images/favicon.ico'));
   //app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
@@ -52,6 +52,7 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
     socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
     checkConfigurations(socket);
   });
+  setInterval(function () {io.sockets.emit('sudoHeartbeat')}, 1000);
 
 
   var SocketCommandManager = require(__rootPath + '/classes/sockets/commandManager')
@@ -60,6 +61,9 @@ __userConfig = new UsrCnfMngr({'callback':function (err) {
   var SocketRequestManager = require(__rootPath + '/classes/sockets/requestManager')
   var socReqMngr = new SocketRequestManager({'localIo':io});
 
+  var SocketEditManager = require(__rootPath + '/classes/sockets/editManager')
+  var socEdtMngr = new SocketEditManager({'localIo':io});
+  
   var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
   //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
 

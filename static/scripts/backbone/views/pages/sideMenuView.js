@@ -10,6 +10,8 @@ SideMenuView = BaseView.extend({
 		if(this.currentPage)this.currentPage.erase();
 		this.currentPage = window[pageName];
 		this.currentPage.render();
+		if(this.$el.is(':visible'))
+			this.trigger('hideMe');
 	}
 
 });

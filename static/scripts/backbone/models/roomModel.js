@@ -20,6 +20,13 @@ SwitchModel = BaseModel.extend({
 	},
 	setDuty : function (duty, calback) {
 		this.sendActionRequest("setDuty", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
+	},
+	setSwitchParam : function (params) {
+		var devId = this.get('devId'), switchId = this.get('switchID');
+		this.sendActionRequest("setSwitchParam", {"devId":devId, "switchId":switchId, "params":params}, function () {
+			//console.log(arguments);
+		});
+
 	}
 })
 FanModel = SwitchModel.extend({

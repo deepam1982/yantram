@@ -23,14 +23,14 @@
 			background-color: rgb(255,255,255);
 			text-align:left;
 			overflow: hidden;
+			position: relative;
 		}
 		#header {
 			padding:20px 20px 0 20px;
 		}
 		#appCont {
-			min-height:100%;
+			min-height:500px;
 			padding:0 20px 20px 20px;
-			position:relative;
 		}
 		#menuCont {
 			min-height:100%;
@@ -43,7 +43,7 @@
 			position:relative;
 		}
 		#menuCont .options {
-			padding:5px 2px;
+			padding:8px 0px;
 			margin-top:6px;
 			cursor:pointer;
 		}
@@ -64,10 +64,40 @@
 			color: white;
 			font-weight: 200;	
 			font-size: 18px;
+			border-radius: 3px;
 		}
+
+		.editViewCont .roomTitleCont {
+			background:white;
+			color: black;
+			font-size: 15px;
+			margin-bottom: -20px;
+			font-weight:400; 
+		}
+		.editViewCont .groupView {
+			background:white;
+			border:1px solid rgb(244, 183, 104);
+			border-radius: 5px;
+			padding-bottom: 5px;
+		}
+		.editViewCont .powerButton {
+			display: none;
+		}
+		.editButton {
+			display: none;
+			font-size: 12px;
+			cursor: pointer;
+			color: #EE972D;
+			font-weight:100;
+			padding:10px 0;
+			margin-top:-7px;
+		}
+		.editViewCont .editButton {display: block;}
+
 		.switchCont {
 			font-size: 14px;
 		}
+
 		input[type=range] {
 		    -webkit-appearance: none;
 		    background-color: black;
@@ -87,14 +117,14 @@
     padding: 5px;
     border-radius: 20px;
     border: double 10px transparent;
-    background: rgb(71,167,78);
+    background: #EE972D;
     background-clip: padding-box;
 
 		    position:relative;
 		    top:10px;
 		    cursor:pointer;
 		}
-		input[type=password], input[type=text], textarea {
+		input[type=password], input[type=text], input[type=radio], textarea {
 		  @include transition(all 0.30s ease-in-out);
 		  outline: none;
 		  padding: 3px 0px 3px 3px;
@@ -112,6 +142,31 @@
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
+		input[type=radio] {
+			border-radius: 10px;
+		    cursor: pointer;
+		    display: inline-block;
+		    height: 15px;
+		    margin: 0 5px 0 5px;
+		    position: relative;
+		    width: 15px;
+		    -webkit-appearance: none;
+		}
+		input[type="radio"]:checked:after {
+		    border-radius: 25px;
+		    content: '';
+		    display: block;
+		    height: 7px;
+		    position: relative;
+		    width: 7px;
+		}
+		input[type="radio"]:checked:after {
+		    background-color: rgb(255, 233, 166);
+		}​
+		input[type="radio"][disabled="true"], input[type="radio"]:disabled {
+		    background-color: #DDDDDD;
+		}​
+
 
 		.helpText {
 			color:#BBBBBB;
@@ -136,6 +191,23 @@
 			font-size: 12px;
 		}
 
+		#experiment, #experiment1{
+			margin-left: 20px;
+			font-size: 15px;
+			color:red;
+		}
+		.advancePannel .cross {
+			position:absolute; 
+			right:5px;top:4px; 
+			cursor:pointer;
+			font-size:10px;
+			height:35px; width:50px;
+			padding-top:20px;
+			margin: -12px 0px 0 0; 
+			text-align:center;
+			color:black;
+		}
+
 	</style>
 	<body>
 		<div id='mainCont'>
@@ -143,13 +215,15 @@
 				<div id='header'>
 					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
 						<span style="color:gray;">ino</span><span style="">ho</span>
-						<img id='burgerImage' style="float:right; margin:10px 18px 0 0;" src="/static/images/burgericon.png"></img>
+						<div id='burgerImageCont' style='float:right; text-align:right; width:25px; margin:-12px -20px 0 0; padding:10px 20px; cursor:pointer;'>
+							<img id='burgerImage' src="/static/images/burgericon.png"></img>
+						</div>	
 					</div>
 					<hr/>
 				</div>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' style='float:left;width:35%;background-color:#EE972D;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			<div id='sideMenuCont' style='float:left;width:38%;background-color:#EE972D;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
 		</div>		
 
@@ -158,12 +232,9 @@
 <!--	
 	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
 -->
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/jquery/jquery.1.9.0.min.js"></script>
 	<script>Zepto=$</script>
 	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
-<!--	
-	<script type="text/javascript" src="http://static.mygola.com/static/11262/scripts/jquery-1.7.2.min.js"></script> 
--->
 	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.7.0.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
 	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
@@ -171,8 +242,9 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea'>
-			<div class='options mainPannel' jsVarNm='mainPageView'>Main Pannel</div>	
+			<div class='options mainPannel' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
+			<div class='options devStng' jsVarNm='editPageView'>Device Settings</div>
 			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
 			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
@@ -249,35 +321,107 @@
 	</script>
 	
 	<script type="text/template" id="roomTemplate">
-		<div>
-			<br/>
+		<br/>
+		<div class='groupView'>
 			<div class="roomTitleCont">
 				<span style="text-align:left;"><%=name%></span>
 				<img class='powerButton' src="static/images/power.png" style="width:18px;float:right;margin-top:2px;cursor:pointer;"/>
+				<span class='editButton' style='float:right'>edit group</span>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
 			<div class='switchCont'>
 				
 			</div>
+			<div style='clear:both;'></div>
+			<div class='advancePannel editTemplateCont' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+				<div class='cross' style='top:10px;'><b>Done</b></div>
+			</div>
 			<div style='clear:both;'></div>	
 		</div>	
 	</script>
+	<script type="text/template" id="editGroupTemplate">
+		<div class='editGroupCont' style='padding:0px 0px 0px 70px;'>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Name</span>
+			<div><input style='width:180px;max-width:70%;margin:0px;' type='text' class='groupName' value='<%=name%>'></input></div>
+			<br/>
+			<%if(typeof count != 'undefined') {%>
+				<span style='margin-left:-60px;float:left;'>Rank</span>
+				<%for(var i=1 ;i<=count; i++) {%>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
+				<%}%>	
+				<br/><br/>
+			<%}%>
+			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
+			<br/><br/>
+		</div>	
+	</script>
 	<script type="text/template" id="basicSwitchTemplate">
-		<div style='float:left;background-color:white;position:relative;'>
-			<div style='width:85px;float:left;text-align:center;'>
-				<img class='toggelSwitch' style="width:85px;height:85px;cursor:pointer;" src='<%=src%>'/><span><%=name%></span>
+		<div class='basicSwitchTemplate' style='float:left;background-color:white;position:relative;border-radius:3px;overflow:hidden;'>
+			<div class='iconPartition' style='width:75px;float:left;text-align:center;'>
+				<div style='width:75px;height:75px;background-color:<%print((state=="on")?"#FFA200":"white")%>;position:relative;'>
+					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
+					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
+				</div>	
+				<span><%=name%></span>
 			</div>
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross' style='position:absolute; right:5px;top:4px; cursor:pointer;font-size:20px;height:50px; width:30px; text-align:center;'><b>X</b></div>
+				<div class='cross'><b>Done</b></div>
 			</div>
 		</div>	
 	</script>
+	<script type="text/template" id="editPageTemplate">
+		<div style='padding-right:99px'>Long press device icon to edit device parameters
+		<span class='editButton addGroupButton' style='float:right;margin-right:-77px;display:block;'>add group</span>
+		</div>
+		<div class='editViewCont'></div>
+	</script>
+	<script type="text/template" id="editSwitchTemplate">
+		<div style='padding:10px 20px 10px 70px;'>
+			<br/>
+			<span style='margin-left:-50px;float:left;'>Name</span>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
+			<br/><br/>
+			<span style='margin-left:-50px;float:left;'>Type</span>
+			<div>
+				<input id='normal' <% if(type=="normal")print("class='checked'")%>type="radio" name="type" value="normal" <% if(type=='normal')print("checked")%>/><label for='normal'>Normal</label>
+				<span style='<% if(typeof dimmable == 'undefined'||!dimmable) print("display:none")%>;'>
+				<input id='dimmer' <% if(type=="dimmer")print("class='checked'")%> type="radio" name="type" value="dimmer" <% if(type=='dimmer')print("checked")%>/><label for='dimmer'>Dimmer</label>
+				</span>
+			</div>
+			<br/><br/>
+			<span style='margin-left:-50px;float:left;'>Icon</span>
+			<div class='iconCont'></div>
+			 
+		</div>
+	</script>
+	<script type="text/template" id="selectSwitchIconTemplate">
+		<div style="width:45px; height:45px; float:left;background-color:white;" selectionColor="#E5B575">
+			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>'/>
+		</div>	
+	</script>
+	<script type="text/template" id="switchProxyTemplate">
+		<div class='iconPartition' style='width:45px;float:left;text-align:center;'>
+			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;background-color:<% print((selected)?'#E5B575':'white') %>">
+				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
+			</div>
+			<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
+		</div>
+	</script>
+	<script type="text/template" id="deviceGroupTemplate">
+		<div style='size:40px; margin:18px 0 0 -60px; font-size:10px; float:left;'><%=name%></div>
+		<div class="switchProxyCont"></div>
+		<div style='clear:both;'></div>	
+		<br/>
+	</script>	
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/group/view1.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/mainPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
@@ -286,7 +430,7 @@
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		$('#burgerImage').on('tap', function () {
+		$('#burgerImageCont').on('tap', function () {
 			var $menuContPar = $('#menuCont').parent();
 			var $appContPar = $('#appCont').parent();
 			if($menuContPar.css('display') == 'block') {
@@ -295,15 +439,12 @@
 			}
 			else {
 				$menuContPar.show();
-				$appContPar.css('width', '65%');				
+				$appContPar.css('width', '62%');				
 			}
 		});
 	</script>
 	<script>
-	  var ioSocket = io.connect('/');
-	  ioSocket.on('roomConfigUpdated', function (config) {
-	  	rC.add(config, {merge: true});
-	  });
+//	  setInterval(function () {$('#experiment').html(Date().substr(16,8));} , 1000)
 	  var configurationWorkFlow = function (pageName) {
 			var pageObjName;
 			switch(pageName) {
@@ -316,36 +457,57 @@
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
 	  }
-	  ioSocket.on('switchPage', configurationWorkFlow);
+	  var ioSocket, pingTimeStamp = Date.now();;
+	  var connectSocket = function () {
+	  		ioSocket = io.connect('/');
+	  		ioSocket.on('roomConfigUpdated', function (config) {
+				rC.set(config, {merge: true});
+			});
+			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
+			ioSocket.on('switchPage', configurationWorkFlow);
+	  };
+	  connectSocket();
+	  setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	</script>
 	<script>
 		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
+		sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 		sideMenu.render();
 		var backboneAjax = Backbone.ajax;
 		Backbone.ajax = function (obj) {
 			if(!obj.useSocket) return backboneAjax.call(arguments);
-			// var data = (obj.data)?obj.data:{};
-			// data.reqId = new Date().getTime()+''; 
-			// ioSocket.once(data.reqId, obj.success);
-			// ioSocket.emit(obj.url, data);
 			ioSocket.emit(obj.url, obj.data, obj.success);
 		}
 		var RoomCollection = Backbone.Collection.extend({
 			url: '/room/list',
 			model:RoomModel
 		});
+		var DeviceCollection = Backbone.Collection.extend({
+			url: '/device/list'
+		});
 		var rC = new RoomCollection();
+		rC.comparator = function (model) {return parseInt(model.id);};
+		var dC = new DeviceCollection();
+		dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
+		
 		rC.on("add", function(roomModel){
 			roomModel.on('change', function (model, data) {
 				console.log("change called on "+model.get('name'));
 				console.log(model);
 			});
 		})
+		rC.on("sort", function () {console.log(rC.pluck('name'));});
 		rC.fetch({update:true, useSocket:true});
+		dC.fetch({update:true, useSocket:true});
+		deviceCollection = dC;
 		var mainPageView = new MainPageView({'collection':rC});
 		$('#appCont').append(mainPageView.$el);
 		mainPageView.render();
 		sideMenu.currentPage = mainPageView;
+		var editPageView = new EditPageView({'collection':rC});
+		$('#appCont').append(editPageView.$el);
+		// editPageView.render();
+		// sideMenu.currentPage = editPageView;
 		var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
 		$('#appCont').append(configureModulePage.$el);
 		var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});

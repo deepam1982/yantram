@@ -6,7 +6,7 @@
 //  var document = window.document
   var touch = {},
     touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
-    longTapDelay = 750,
+    longTapDelay = 500,
     gesture
 
   function swipeDirection(x1, x2, y1, y2) {
