@@ -53,7 +53,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
           io.sockets.on('connection', function (socket) {
             console.log('Socket connection established!!');
             socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
-            checkConfigurations(socket);
+            if(__systemConfig.get('communicator') != 'tarang') 
+              checkConfigurations(socket);
           });
           setInterval(function () {io.sockets.emit('sudoHeartbeat')}, 1000);
 

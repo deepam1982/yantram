@@ -52,6 +52,7 @@ var CommandManager = BaseClass.extend({
 					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});
 				}
 				groupConfig.set((maxId+1)+"", group);
+				deviceManager.emit('deviceStateChanged');
 				groupConfig.save(callback);
 			}
 			callback(err);
