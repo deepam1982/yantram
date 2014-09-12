@@ -15,6 +15,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 					ctl[key] = val;	
 				});
 				var config = deviceManager.getConfig(ctl.devId); 
+				ctl.disabled = (config)?false:true;
 				ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
 				ctl.state = (ctl.state)?'on':'off';
 				if (ctl.state == 'on' && (ctl.switchID == 0 || ctl.switchID == 1)) {

@@ -98,6 +98,55 @@
 			font-size: 14px;
 		}
 
+		.helpText {
+			color:#BBBBBB;
+			font-size: 12px;
+
+		}
+
+		.button {
+			cursor: pointer;
+		  outline: none;
+		  padding: 5px;
+		  border: 1px solid #EE972D;
+		  color:#EE972D;
+			font-weight: 200;	
+			font-size: 16px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		.errorMsgDiv{
+			display: none;
+			color:#EE972D;	
+			font-weight: 100;	
+			font-size: 12px;
+		}
+
+		#experiment, #experiment1{
+			margin-left: 20px;
+			font-size: 15px;
+			color:red;
+		}
+		.advancePannel .cross {
+			position:absolute; 
+			right:5px;top:4px; 
+			cursor:pointer;
+			font-size:10px;
+			height:35px; width:50px;
+			padding-top:20px;
+			margin: -12px 0px 0 0; 
+			text-align:center;
+			color:black;
+		}
+
+		.disabledScreen {
+			position:absolute; 
+			background-color:#EE972D; 
+			height:100%; width:100%;
+			opacity: 0.2;filter: alpha(opacity=20);
+		}	
+
+
 		input[type=range] {
 		    -webkit-appearance: none;
 		    background-color: black;
@@ -106,24 +155,19 @@
 
 		input[type="range"]::-webkit-slider-thumb {
 		     -webkit-appearance: none;
-		    /*background-color: rgb(71,167,78);
-		    width: 15px;
+		    width: 10px;
 		    height: 60px;
-			border-radius:12px;    
-		    */
-
-    width: 10px;
-    height: 60px;
-    padding: 5px;
-    border-radius: 20px;
-    border: double 10px transparent;
-    background: #EE972D;
-    background-clip: padding-box;
+		    padding: 5px;
+		    border-radius: 20px;
+		    border: double 10px transparent;
+		    background: #EE972D;
+		    background-clip: padding-box;
 
 		    position:relative;
 		    top:10px;
 		    cursor:pointer;
 		}
+		
 		input[type=password], input[type=text], input[type=radio], textarea {
 		  @include transition(all 0.30s ease-in-out);
 		  outline: none;
@@ -167,46 +211,6 @@
 		    background-color: #DDDDDD;
 		}​
 
-
-		.helpText {
-			color:#BBBBBB;
-			font-size: 12px;
-
-		}
-		.button {
-			cursor: pointer;
-		  outline: none;
-		  padding: 5px;
-		  border: 1px solid #EE972D;
-		  color:#EE972D;
-			font-weight: 200;	
-			font-size: 16px;
-		  	-moz-border-radius: 3px; 
-    		-webkit-border-radius: 3px; 			
-		}
-		.errorMsgDiv{
-			display: none;
-			color:#EE972D;	
-			font-weight: 100;	
-			font-size: 12px;
-		}
-
-		#experiment, #experiment1{
-			margin-left: 20px;
-			font-size: 15px;
-			color:red;
-		}
-		.advancePannel .cross {
-			position:absolute; 
-			right:5px;top:4px; 
-			cursor:pointer;
-			font-size:10px;
-			height:35px; width:50px;
-			padding-top:20px;
-			margin: -12px 0px 0 0; 
-			text-align:center;
-			color:black;
-		}
 
 	</style>
 	<body>
@@ -253,6 +257,7 @@
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
 		<div>
+			<img src='/static/images/connected_module.png' style='width:100%;'/>
 			<br/>
 			<div class='moduleAttached' style='display:none;'>
 				<span style='margin-right:10px'>Enter module name</span>
@@ -277,6 +282,8 @@
 			<br/>
 			<div class="titleCont"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
+			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require re-configuration of all the switch board modules.</div>
+			<br/>
 			<span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
 			<br/>
@@ -285,7 +292,6 @@
 			<br/>
 			<span style='margin-right:10px'>Confirm security key</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
-			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require reconfiguration of all the switch board modules.</div>
 			<br/>
 			<div class='errorMsgDiv'><br/><span>error:</span></div>
 			<br/>
@@ -369,7 +375,8 @@
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
 				<div class='cross'><b>Done</b></div>
 			</div>
-		</div>	
+			<div class='disabledScreen' style='<% print((disabled)?"":"display:none")%>'></div>
+		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
 		<div style='padding-right:99px'>Long press device icon to edit device parameters

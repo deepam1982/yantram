@@ -46,7 +46,7 @@ var CommandManager = BaseClass.extend({
 				__remoteDevInfoConf.set(macAdd+"", devInfo);
 				__remoteDevInfoConf.save();
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
-				if(maxId < 0) maxId = 0; 
+				if(!maxId || maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}
 				for(var i=0; i<swCnt; i++) {
 					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});

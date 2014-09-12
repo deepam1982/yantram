@@ -149,7 +149,10 @@ var CC2530Controller = BaseCommunicator.extend({
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
 				callback(err, macId);
-				this.sendQuery(null, {name:"0100"}); // restart coordinator
+				setTimeout(__.bind(function () {
+					this.sendQuery(null, {name:"0100"});
+					console.log('Restarting Coordinator');
+				}, this), 2200);// restart coordinator
 			}, this);
 		}, this));
 	}
