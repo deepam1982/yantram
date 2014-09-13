@@ -19,7 +19,7 @@ GroupView1 = BaseView.extend({
 //		this.model.on('change', _.bind(this.repaint, this));
     },
 	events: {
-		"click .powerButton" : "onPowerOffClick"
+		"tap .powerButton" : "onPowerOffClick"
 	},
 	onPowerOffClick : function () {
 		this.model.powerOff();
@@ -30,7 +30,7 @@ SwitchProxy = BaseView.extend({
 	name : "SwitchProxy",
 	templateSelector:"#switchProxyTemplate",
 	events: {
- 		"click .iconPartition" : "onToggelSwitch"
+ 		"tap .iconPartition" : "onToggelSwitch"
  	},
  	onToggelSwitch : function (event) {
  		this.model.selected = !this.model.selected;
@@ -93,10 +93,12 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  	}),
  	showAdvancePannel : function () {
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
-		this.$el.css('top', '50px');
+		//this.$el.css('top', '50px');
 		this.$el.find('.roomTitleCont').hide();
 		this.$el.find('.switchCont').hide();
 		this.editPannel.render();
+		this.$el.css('top',Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top)+"px");
+		
  	},
  	hideAdvancePannel : function () {
  		this.editPannel.erase();

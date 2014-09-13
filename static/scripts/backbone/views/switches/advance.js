@@ -80,8 +80,10 @@ AdvanceSwitch = BasicSwitch.extend(AdvancePannel).extend({
 		this.showPannelOnrender = false;
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
 		this.$el.css('width', 'auto');
-		$(_.last(this.$el.find('.advancePannel'))).width(0).animate({width:this.$el.parent().width() - this.$el.width()}, {'duration':150})
-		this.$el.animate({left:this.$el.parent().position().left}, {'duration':150});
+		// $(_.last(this.$el.find('.advancePannel'))).width(0).animate({width:this.$el.parent().width() - this.$el.width()}, {'duration':150})
+		// this.$el.animate({left:this.$el.parent().position().left}, {'duration':150});
+		$(_.last(this.$el.find('.advancePannel'))).width(this.$el.parent().width() - this.$el.width());
+		this.$el.css('left',this.$el.parent().position().left);
 	}
 })
 AdvanceFanSwitch = AdvanceSwitch.extend({

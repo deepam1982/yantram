@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	</head>
 	<style>
 		body{
@@ -141,9 +141,11 @@
 
 		.disabledScreen {
 			position:absolute; 
-			background-color:#EE972D; 
 			height:100%; width:100%;
-			opacity: 0.2;filter: alpha(opacity=20);
+			background-image: url("/static/images/Exclamation.png");
+			background-size:40px 40px;
+			background-repeat: no-repeat;
+			background-position: 30px 35px;
 		}	
 
 
@@ -379,7 +381,7 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div style='padding-right:99px'>Long press device icon to edit device parameters
+		<div class='helpText' style='padding-right:99px'>Long press device icon to edit device parameters
 		<span class='editButton addGroupButton' style='float:right;margin-right:-77px;display:block;'>add group</span>
 		</div>
 		<div class='editViewCont'></div>
@@ -404,13 +406,15 @@
 		</div>
 	</script>
 	<script type="text/template" id="selectSwitchIconTemplate">
-		<div style="width:45px; height:45px; float:left;background-color:white;" selectionColor="#E5B575">
+		<div style="width:45px; height:45px; float:left;background-color:white;position:relative;" selectionColor="#E5B575">
 			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>'/>
+			<div style='width:45px; height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
 		</div>	
 	</script>
 	<script type="text/template" id="switchProxyTemplate">
-		<div class='iconPartition' style='width:45px;float:left;text-align:center;'>
-			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;background-color:<% print((selected)?'#E5B575':'white') %>">
+		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
+			<div style='width:15px; height:15px;background-image: url("/static/images/tick.png"); background-size:15px 15px; position:absolute; right:0px; top:0px;<% print((selected)?"":"display:none;") %>' ></div>
+			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;background-color:<% print((selected)?'#CCCCCC':'white') %>">
 				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
 			</div>
 			<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>

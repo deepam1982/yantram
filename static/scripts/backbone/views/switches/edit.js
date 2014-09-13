@@ -12,7 +12,7 @@ EditSwitchParams = BaseView.extend({
 	iconList : ['switch', 'bulb', 'cfl', 'cfl1', 'tubelight', 'fan', 'fan1', 'plug', 'plug1', 'lamp', 'lamp1', 'mosquito coil', 'iron', 'geyser', 'tv', 'tv1', 'ac', 'ac1', 'heater', 'air cooler', 'washing machine', 'water purifier'],
 	subViewArrays : [{'viewClassName':'SelectSwitchIcon', 'reference':'iconViewArray', 'parentSelector':'.iconCont', 'array':'this.iconList'}],
 	events: {
-		"tap .iconCont img"  : "_setIcon",
+		"tap .iconCont .selectSwitch"  : "_setIcon",
 		"change .switchName" : "_nameChange",
 		"change input[type='radio']" : "_typeChange",
 	},
