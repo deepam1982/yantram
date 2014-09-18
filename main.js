@@ -1,4 +1,5 @@
 var __ = require("underscore");
+var fs = require('fs');
 
 var noLogs = false;
 __.each(process.argv, function (argmnt) {
@@ -7,7 +8,22 @@ __.each(process.argv, function (argmnt) {
 if(noLogs) {
   console.log = function () {};
 }
-
+var on=1;
+fs.exists('/sys/class/gpio/gpio18', function (exist) {
+  if(exist) fs.writeFile('/sys/class/gpio/unexport',18, function (err) { if(err) return console.log();})
+  __.defer(function () {
+      fs.writeFile('/sys/class/gpio/export',18, function (err) { if(err) return console.log();
+        console.log('Opened gpio 18');
+        fs.writeFile('/sys/class/gpio/gpio18/direction','out', function(err) { if(err) return console.log(err);
+          console.log('Direction gpio 18 was set');
+          fs.writeFile('/sys/class/gpio/gpio18/value',on, function(err) {if(err)console.log(err);
+            console.log('Starting App Running indication on GPIO');
+            setInterval(function () {on = (on + 1) % 2;fs.writeFile('/sys/class/gpio/gpio18/value',on);}, 800);
+          });  
+        });  
+      });
+  });
+});
 
 __rootPath = __dirname;
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
