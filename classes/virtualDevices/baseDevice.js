@@ -10,7 +10,7 @@ var BaseVirtualDevice = BaseClass.extend({
 		this.followObjs = {};
 	},
 	_onStateChange : function (force) {
-//		console.log("_onStateChange called for "+this.className);
+	//	console.log("_onStateChange called for", this.className, this.id);
 		this.emit("stateChanged", this.state);
 		this.emit("switch"+((this.state)?"On":"Off"));
 	},

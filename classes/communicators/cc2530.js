@@ -28,7 +28,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0301')
-		// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		//   console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 

@@ -5,6 +5,12 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	</head>
 	<style>
+		 <!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3;->
+		.whiteBG{background-color: white;}
+		input[type="range"]::-webkit-slider-thumb, input[type="radio"]:checked:after, 
+		.theamBGColor{background-color: #5ED5F3;}
+		.theamTextColor{color:#5ED5F3;}
+		input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color: #5ED5F3;}
 		body{
 			width:100%;
 			height: 100%;
@@ -35,7 +41,6 @@
 		#menuCont {
 			min-height:100%;
 			padding:20px 0px 0 10px;
-			background-color: #EE972D;
 			font-size: 14px;
 			color: white;
 			font-weight: 400;
@@ -60,7 +65,6 @@
 		}
 		.titleCont, .roomTitleCont {
 			padding:5px 20px;
-			background:#EE972D;
 			color: white;
 			font-weight: 200;	
 			font-size: 18px;
@@ -76,7 +80,8 @@
 		}
 		.editViewCont .groupView {
 			background:white;
-			border:1px solid rgb(244, 183, 104);
+			border-width:1px; 
+			border-style:solid;
 			border-radius: 5px;
 			padding-bottom: 5px;
 		}
@@ -87,7 +92,6 @@
 			display: none;
 			font-size: 12px;
 			cursor: pointer;
-			color: #EE972D;
 			font-weight:100;
 			padding:10px 0;
 			margin-top:-7px;
@@ -108,16 +112,15 @@
 			cursor: pointer;
 		  outline: none;
 		  padding: 5px;
-		  border: 1px solid #EE972D;
-		  color:#EE972D;
-			font-weight: 200;	
+		  border-width:1px; 
+		  border-style:solid;
+		  	font-weight: 200;	
 			font-size: 16px;
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
 		.errorMsgDiv{
 			display: none;
-			color:#EE972D;	
 			font-weight: 100;	
 			font-size: 12px;
 		}
@@ -141,11 +144,21 @@
 
 		.disabledScreen {
 			position:absolute; 
-			height:100%; width:100%;
-			background-image: url("/static/images/Exclamation.png");
+			height:40px; width:40px;
+			background-image: url("/static/images/transparentExclamation.png");
 			background-size:40px 40px;
 			background-repeat: no-repeat;
-			background-position: 30px 35px;
+			right: 0px;
+			bottom: 15px;
+			border-radius: 22px;
+		}
+
+		.tick {
+			width:20px; height:20px;
+			background-image: url("/static/images/transparentTick.png"); 
+			background-size:20px 20px; 
+			position:absolute; right:0px; top:0px;
+			border-radius: 10px;
 		}	
 
 
@@ -162,7 +175,6 @@
 		    padding: 5px;
 		    border-radius: 20px;
 		    border: double 10px transparent;
-		    background: #EE972D;
 		    background-clip: padding-box;
 
 		    position:relative;
@@ -175,7 +187,8 @@
 		  outline: none;
 		  padding: 3px 0px 3px 3px;
 		  margin: 5px 1px 3px 0px;
-		  border: 1px solid rgb(255, 233, 166);
+		  border-width: 1px; 
+		  border-style:solid;
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
@@ -184,7 +197,6 @@
 		  @include box-shadow(0 0 5px #EE972D);
 		  padding: 3px 0px 3px 3px;
 		  margin: 5px 1px 3px 0px;
-		  border: 1px solid #EE972D;
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
@@ -207,7 +219,6 @@
 		    width: 7px;
 		}
 		input[type="radio"]:checked:after {
-		    background-color: rgb(255, 233, 166);
 		}​
 		input[type="radio"][disabled="true"], input[type="radio"]:disabled {
 		    background-color: #DDDDDD;
@@ -219,17 +230,17 @@
 		<div id='mainCont'>
 			<div style='float: left;width:100%;'>
 				<div id='header'>
-					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
-						<span style="color:gray;">ino</span><span style="">ho</span>
+					<div style="font-weight:200;font-size:36px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
+						<span style="color:gray;">ino</span><span class="theamTextColor">ho</span>
 						<div id='burgerImageCont' style='float:right; text-align:right; width:25px; margin:-12px -20px 0 0; padding:10px 20px; cursor:pointer;'>
-							<img id='burgerImage' src="/static/images/burgericon.png"></img>
+							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
 						</div>	
 					</div>
 					<hr/>
 				</div>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' style='float:left;width:38%;background-color:#EE972D;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
 		</div>		
 
@@ -247,7 +258,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
-		<div id='menuCont' class='menuArea'>
+		<div id='menuCont' class='menuArea theamBGColor'>
 			<div class='options mainPannel' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng' jsVarNm='editPageView'>Device Settings</div>
@@ -266,15 +277,15 @@
 				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
 				<div class='helpText'>e.g. module1. You can change the name of the module any time latter.</div>
 				<br/>
-				<div class='errorMsgDiv'><br/><span>error:</span></div>
+				<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 				<br/>
-				<span class='button' id='configureNewModuleButton'>Configure</span>
+				<span class='button theamBorderColor theamTextColor' id='configureNewModuleButton'>Configure</span>
 			</div>
 			<div class='moduleNotAttached'>
 				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
 				<span class='retryMsg' style='display:none;'>Oh no!! Home controller still cannot communicate with Switchboard module. Check the connections of serial cable and then retry.</span>
 				<br/><br/>
-				<span class='button' id='retryButton'>Try now</span>
+				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
 			</div>	
 			
 		</div>
@@ -282,7 +293,7 @@
 	<script type="text/template" id="networkSettingTemplate">
 		<div>
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Network Settings</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
 			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require re-configuration of all the switch board modules.</div>
 			<br/>
@@ -295,9 +306,9 @@
 			<span style='margin-right:10px'>Confirm security key</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
 			<br/>
-			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/>
-			<span class='button' id='modifyNwkSecKeyButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
 
 			
 		</div>
@@ -305,7 +316,7 @@
 	<script type="text/template" id="cloudSettingTemplate">
 		<div>
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Cloud Settings</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
 			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
@@ -320,9 +331,9 @@
 			<span style='margin-right:10px'>Confirm password</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwdCnf'></input>
 
-			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/><br/>
-			<span class='button' id='modifyCloudAccountButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
 			<br/><br/>
 			
 		</div>
@@ -330,11 +341,11 @@
 	
 	<script type="text/template" id="roomTemplate">
 		<br/>
-		<div class='groupView'>
-			<div class="roomTitleCont">
+		<div class='groupView theamBorderColor'>
+			<div class="roomTitleCont theamBGColor">
 				<span style="text-align:left;"><%=name%></span>
 				<img class='powerButton' src="static/images/power.png" style="width:18px;float:right;margin-top:2px;cursor:pointer;"/>
-				<span class='editButton' style='float:right'>edit group</span>
+				<span class='editButton theamTextColor' style='float:right'>edit group</span>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
@@ -368,7 +379,7 @@
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style='float:left;background-color:white;position:relative;border-radius:3px;overflow:hidden;'>
 			<div class='iconPartition' style='width:75px;float:left;text-align:center;'>
-				<div style='width:75px;height:75px;background-color:<%print((state=="on")?"#FFA200":"white")%>;position:relative;'>
+				<div style='width:75px;height:75px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
 					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
@@ -377,7 +388,7 @@
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
 				<div class='cross'><b>Done</b></div>
 			</div>
-			<div class='disabledScreen' style='<% print((disabled)?"":"display:none")%>'></div>
+			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
@@ -406,14 +417,15 @@
 		</div>
 	</script>
 	<script type="text/template" id="selectSwitchIconTemplate">
-		<div style="width:45px; height:45px; float:left;background-color:white;position:relative;" selectionColor="#E5B575">
+		<div style="width:45px; height:45px; float:left;position:relative;">
+			<div class='tick theamBGColor' style='display:none;'></div>
 			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>'/>
 			<div style='width:45px; height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
 		</div>	
 	</script>
 	<script type="text/template" id="switchProxyTemplate">
 		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
-			<div style='width:15px; height:15px;background-image: url("/static/images/tick.png"); background-size:15px 15px; position:absolute; right:0px; top:0px;<% print((selected)?"":"display:none;") %>' ></div>
+			<div class='tick theamBGColor' style='<% print((selected)?"":"display:none;") %>' ></div>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;background-color:<% print((selected)?'#CCCCCC':'white') %>">
 				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
 			</div>

@@ -39,7 +39,8 @@ EditSwitchParams = BaseView.extend({
 		this.currentIcon = iconName;
 		idx = _.indexOf(this.iconList, iconName);
 		var $div = this.iconViewArray[idx].$el.find('img').parent();
-		$div.css('background-color', $div.attr('selectionColor'));
+		$div.addClass('theamBGColor');
+		$div.find('.tick').show();
 	}
 });
 
