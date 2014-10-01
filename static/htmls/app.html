@@ -480,12 +480,15 @@
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
 	  }
-	  var showBurgerMenu = function () {$('#burgerImageCont').show();setAppTheamColor("#EE972D");};
+	  var showBurgerMenu = function () {
+	  	$('#burgerImageCont').show();
+	  	setAppTheamColor("#EE972D");
+	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
+	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
 	  		if(!color) color="#69C1A8";
-	  		var sheet = document.createElement('style');
-	  		sheet.innerHTML = "\
+	  		var $sheet = $("<style>\
 			hr {\
 				border-top-color: "+color+"\
 			}\
@@ -494,8 +497,8 @@
 			.theamBGColor{background-color: "+color+";}\
 			.theamTextColor{color:"+color+";}\
 			input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+color+";}\
-			";
-	  		document.body.appendChild(sheet);	
+			</style>");
+	  		$('body').append($sheet);	
 	  }
 	  setAppTheamColor();
 	  var ioSocket, pingTimeStamp = Date.now();;
@@ -509,7 +512,6 @@
 			ioSocket.on('showBurgerMenu', showBurgerMenu)
 	  };
 	  connectSocket();
-	  setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	</script>
 	<script>
 		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
