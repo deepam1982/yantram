@@ -68,6 +68,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
           }
           io.sockets.on('connection', function (socket) {
             console.log('Socket connection established!!');
+            socket.emit('showBurgerMenu');
             socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
             if(__systemConfig.get('communicator') != 'tarang') 
               checkConfigurations(socket);

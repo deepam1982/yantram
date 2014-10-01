@@ -97,7 +97,7 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
 		this.$el.find('.roomTitleCont').hide();
 		this.$el.find('.switchCont').hide();
 		this.editPannel.render();
-		this.$el.css('top',Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top)+"px");
+		this.$el.css('top',Math.max(10,Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top))+"px");
 		
  	},
  	hideAdvancePannel : function () {

@@ -3,14 +3,7 @@
 <HTML>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	</head>
 	<style>
-		 <!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3;->
-		.whiteBG{background-color: white;}
-		input[type="range"]::-webkit-slider-thumb, input[type="radio"]:checked:after, 
-		.theamBGColor{background-color: #5ED5F3;}
-		.theamTextColor{color:#5ED5F3;}
-		input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color: #5ED5F3;}
 		body{
 			width:100%;
 			height: 100%;
@@ -58,16 +51,12 @@
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
-*/		hr {
-			border:0;
-			border-top: 1px solid #eeeeee;
-			border-bottom: 1px solid #ffffff;
-		}
+*/
 		.titleCont, .roomTitleCont {
-			padding:5px 20px;
+			padding:2px 5px;
 			color: white;
 			font-weight: 200;	
-			font-size: 18px;
+			font-size: 16px;
 			border-radius: 3px;
 		}
 
@@ -77,6 +66,9 @@
 			font-size: 15px;
 			margin-bottom: -20px;
 			font-weight:400; 
+		}
+		.groupView {
+			margin: 10px 0px 25px;
 		}
 		.editViewCont .groupView {
 			background:white;
@@ -105,7 +97,6 @@
 		.helpText {
 			color:#BBBBBB;
 			font-size: 12px;
-
 		}
 
 		.button {
@@ -155,12 +146,14 @@
 
 		.tick {
 			width:20px; height:20px;
-			background-image: url("/static/images/transparentTick.png"); 
-			background-size:20px 20px; 
+			background-image: url("/static/images/transparentTick.png");
+			background-size: cover; 
 			position:absolute; right:0px; top:0px;
 			border-radius: 10px;
-		}	
+			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale');
+		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale')";
 
+		}	
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -218,26 +211,34 @@
 		    position: relative;
 		    width: 7px;
 		}
-		input[type="radio"]:checked:after {
-		}​
-		input[type="radio"][disabled="true"], input[type="radio"]:disabled {
-		    background-color: #DDDDDD;
-		}​
 
+		hr {
+			border:0;
+			margin: 0px;
+			border-top: 1px solid #eeeeee;
+			border-bottom: 1px solid #ffffff;
+		}
+		input[type='radio']:checked:after {}​
+		input[type='radio'][disabled='true'],
+		input[type='radio']:disabled {
+			background-color: #DDDDDD;
+		}​
 
 	</style>
+	</head>
+
 	<body>
 		<div id='mainCont'>
 			<div style='float: left;width:100%;'>
 				<div id='header'>
-					<div style="font-weight:200;font-size:36px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
-						<span style="color:gray;">ino</span><span class="theamTextColor">ho</span>
-						<div id='burgerImageCont' style='float:right; text-align:right; width:25px; margin:-12px -20px 0 0; padding:10px 20px; cursor:pointer;'>
+					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
+						<a href='/' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
+						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
 						</div>	
 					</div>
-					<hr/>
 				</div>
+				<br/>
 				<div id='appCont' class='appArea'></div>
 			</div>
 			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
@@ -340,11 +341,10 @@
 	</script>
 	
 	<script type="text/template" id="roomTemplate">
-		<br/>
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor">
 				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style="width:18px;float:right;margin-top:2px;cursor:pointer;"/>
+				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;"/>
 				<span class='editButton theamTextColor' style='float:right'>edit group</span>
 				<div style='clear:both;'></div>
 			</div>
@@ -378,7 +378,7 @@
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style='float:left;background-color:white;position:relative;border-radius:3px;overflow:hidden;'>
-			<div class='iconPartition' style='width:75px;float:left;text-align:center;'>
+			<div class='iconPartition' style='width:75px;float:left;text-align:center;cursor:pointer;'>
 				<div style='width:75px;height:75px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
 					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
@@ -480,6 +480,24 @@
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
 	  }
+	  var showBurgerMenu = function () {$('#burgerImageCont').show();setAppTheamColor("#EE972D");};
+	  var setAppTheamColor = function (color) {
+	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
+	  		if(!color) color="#69C1A8";
+	  		var sheet = document.createElement('style');
+	  		sheet.innerHTML = "\
+			hr {\
+				border-top-color: "+color+"\
+			}\
+			.whiteBG{background-color: white;}\
+			input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+color+";}\
+			.theamBGColor{background-color: "+color+";}\
+			.theamTextColor{color:"+color+";}\
+			input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+color+";}\
+			";
+	  		document.body.appendChild(sheet);	
+	  }
+	  setAppTheamColor();
 	  var ioSocket, pingTimeStamp = Date.now();;
 	  var connectSocket = function () {
 	  		ioSocket = io.connect('/');
@@ -488,6 +506,7 @@
 			});
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
+			ioSocket.on('showBurgerMenu', showBurgerMenu)
 	  };
 	  connectSocket();
 	  setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
