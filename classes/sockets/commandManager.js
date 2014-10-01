@@ -7,8 +7,8 @@ var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
-		__.bindAll(this, "onLocalConnection", "onCloudConnection", "onLocalToggleSwitchCommand", 
-			"onLocalSetDutyCommand", "onModifyNetworkSecurityKey");
+		__.bindAll(this, "onLocalConnection", "onCloudConnection", "onToggleSwitchCommand", 
+			"onSetDutyCommand", "onModifyNetworkSecurityKey");
 		this.localIo = obj.localIo;
 		this.localIo.sockets.on('connection', this.onLocalConnection);
 	},
@@ -22,8 +22,8 @@ var CommandManager = BaseClass.extend({
 		this.cloudSocketConnectionDone = true;
 	},
 	onCommonConnection : function (socket) {
-		socket.on('toggleSwitch', this.onLocalToggleSwitchCommand);
-		socket.on('setDuty', this.onLocalSetDutyCommand);		
+		socket.on('toggleSwitch', this.onToggleSwitchCommand);
+		socket.on('setDuty', this.onSetDutyCommand);		
 	},
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
@@ -36,17 +36,24 @@ var CommandManager = BaseClass.extend({
 	configureConnectedModule : function (commandData, callback) {
 		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd){
 			if(!err){
+				if(__remoteDevInfoConf.get(macAdd+"")) return callback();
 				var noDim=2, swCnt=5;
-				__remoteDevInfoConf.set(macAdd+"", {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "deviceCode":"xxx"});
+				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "loadInfo":{},"deviceCode":"xxx"};
+				for(var i=0; i<swCnt; i++) {
+					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
+					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
+				}
+				__remoteDevInfoConf.set(macAdd+"", devInfo);
 				__remoteDevInfoConf.save();
-				var maxId = __.max(__.keys(groupConfig.data), function (id) {return parseInt(id);});
-				if(maxId < 0) maxId = 0; 
+				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
+				if(!maxId || maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}
 				for(var i=0; i<swCnt; i++) {
-					group.controls.push({"id":i+1, "name":"Device-"+(i+1), "type":"normal", "icon":"bulb", "devId":macAdd, "switchID":i});
+					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});
 				}
-				groupConfig.set(""+(maxId+1), group);
-				groupConfig.save();
+				groupConfig.set((maxId+1)+"", group);
+				deviceManager.emit('deviceStateChanged');
+				groupConfig.save(callback);
 			}
 			callback(err);
 		}, this));
@@ -115,7 +122,7 @@ var CommandManager = BaseClass.extend({
 			});	
 		},this));
 	},
-	onLocalSetDutyCommand : function (commandData) {
+	onSetDutyCommand : function (commandData) {
 		console.log('setDuty called');
 		var devId = commandData.devId, switchId = commandData.switchId, duty=commandData.duty;
 		var device = deviceManager.getDevice(devId);
@@ -133,7 +140,7 @@ var CommandManager = BaseClass.extend({
 		device.setDimmer(switchId, duty)
 		
 	},
-	onLocalToggleSwitchCommand	: function (commandData) {
+	onToggleSwitchCommand	: function (commandData) {
 		var devId = commandData.devId, switchId = commandData.switchId;
 		var device = deviceManager.getDevice(devId);
 		if(!device) {

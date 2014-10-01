@@ -1,7 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-	</head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<style>
 		body{
 			width:100%;
@@ -20,19 +21,19 @@
 			margin:auto;
 			background-color: rgb(255,255,255);
 			text-align:left;
+			overflow: hidden;
+			position: relative;
 		}
 		#header {
 			padding:20px 20px 0 20px;
 		}
 		#appCont {
-			min-height:100%;
+			min-height:500px;
 			padding:0 20px 20px 20px;
-			position:relative;
 		}
 		#menuCont {
 			min-height:100%;
 			padding:20px 0px 0 10px;
-			background-color: #EE972D;
 			font-size: 14px;
 			color: white;
 			font-weight: 400;
@@ -40,7 +41,7 @@
 			position:relative;
 		}
 		#menuCont .options {
-			padding:5px 2px;
+			padding:8px 0px;
 			margin-top:6px;
 			cursor:pointer;
 		}
@@ -50,21 +51,110 @@
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
-*/		hr {
-			border:0;
-			border-top: 1px solid #eeeeee;
-			border-bottom: 1px solid #ffffff;
-		}
+*/
 		.titleCont, .roomTitleCont {
-			padding:5px 20px;
-			background:#EE972D;
+			padding:2px 5px;
 			color: white;
 			font-weight: 200;	
-			font-size: 18px;
+			font-size: 16px;
+			border-radius: 3px;
 		}
+
+		.editViewCont .roomTitleCont {
+			background:white;
+			color: black;
+			font-size: 15px;
+			margin-bottom: -20px;
+			font-weight:400; 
+		}
+		.groupView {
+			margin: 10px 0px 25px;
+		}
+		.editViewCont .groupView {
+			background:white;
+			border-width:1px; 
+			border-style:solid;
+			border-radius: 5px;
+			padding-bottom: 5px;
+		}
+		.editViewCont .powerButton {
+			display: none;
+		}
+		.editButton {
+			display: none;
+			font-size: 12px;
+			cursor: pointer;
+			font-weight:100;
+			padding:10px 0;
+			margin-top:-7px;
+		}
+		.editViewCont .editButton {display: block;}
+
 		.switchCont {
 			font-size: 14px;
 		}
+
+		.helpText {
+			color:#BBBBBB;
+			font-size: 12px;
+		}
+
+		.button {
+			cursor: pointer;
+		  outline: none;
+		  padding: 5px;
+		  border-width:1px; 
+		  border-style:solid;
+		  	font-weight: 200;	
+			font-size: 16px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		.errorMsgDiv{
+			display: none;
+			font-weight: 100;	
+			font-size: 12px;
+		}
+
+		#experiment, #experiment1{
+			margin-left: 20px;
+			font-size: 15px;
+			color:red;
+		}
+		.advancePannel .cross {
+			position:absolute; 
+			right:5px;top:4px; 
+			cursor:pointer;
+			font-size:10px;
+			height:35px; width:50px;
+			padding-top:20px;
+			margin: -12px 0px 0 0; 
+			text-align:center;
+			color:black;
+		}
+
+		.disabledScreen {
+			position:absolute; 
+			height:40px; width:40px;
+			background-image: url("/static/images/transparentExclamation.png");
+			background-size:40px 40px;
+			background-repeat: no-repeat;
+			right: 0px;
+			bottom: 15px;
+			border-radius: 22px;
+		}
+
+		.tick {
+			width:20px; height:20px;
+			background-image: url("/static/images/transparentTick.png");
+			background-size: cover; 
+			position:absolute; right:0px; top:0px;
+			border-radius: 10px;
+			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale');
+		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale')";
+
+		}	
+
 		input[type=range] {
 		    -webkit-appearance: none;
 		    background-color: black;
@@ -73,30 +163,25 @@
 
 		input[type="range"]::-webkit-slider-thumb {
 		     -webkit-appearance: none;
-		    /*background-color: rgb(71,167,78);
-		    width: 15px;
+		    width: 10px;
 		    height: 60px;
-			border-radius:12px;    
-		    */
-
-    width: 10px;
-    height: 60px;
-    padding: 5px;
-    border-radius: 20px;
-    border: double 10px transparent;
-    background: rgb(71,167,78);
-    background-clip: padding-box;
+		    padding: 5px;
+		    border-radius: 20px;
+		    border: double 10px transparent;
+		    background-clip: padding-box;
 
 		    position:relative;
 		    top:10px;
 		    cursor:pointer;
 		}
-		input[type=password], input[type=text], textarea {
+		
+		input[type=password], input[type=text], input[type=radio], textarea {
 		  @include transition(all 0.30s ease-in-out);
 		  outline: none;
 		  padding: 3px 0px 3px 3px;
 		  margin: 5px 1px 3px 0px;
-		  border: 1px solid rgb(255, 233, 166);
+		  border-width: 1px; 
+		  border-style:solid;
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
@@ -105,66 +190,79 @@
 		  @include box-shadow(0 0 5px #EE972D);
 		  padding: 3px 0px 3px 3px;
 		  margin: 5px 1px 3px 0px;
-		  border: 1px solid #EE972D;
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
+		input[type=radio] {
+			border-radius: 10px;
+		    cursor: pointer;
+		    display: inline-block;
+		    height: 15px;
+		    margin: 0 5px 0 5px;
+		    position: relative;
+		    width: 15px;
+		    -webkit-appearance: none;
+		}
+		input[type="radio"]:checked:after {
+		    border-radius: 25px;
+		    content: '';
+		    display: block;
+		    height: 7px;
+		    position: relative;
+		    width: 7px;
+		}
 
-		.helpText {
-			color:#BBBBBB;
-			font-size: 12px;
-
+		hr {
+			border:0;
+			margin: 0px;
+			border-top: 1px solid #eeeeee;
+			border-bottom: 1px solid #ffffff;
 		}
-		.button {
-			cursor: pointer;
-		  outline: none;
-		  padding: 5px;
-		  border: 1px solid #EE972D;
-		  color:#EE972D;
-			font-weight: 200;	
-			font-size: 16px;
-		  	-moz-border-radius: 3px; 
-    		-webkit-border-radius: 3px; 			
-		}
-		.errorMsgDiv{
-			display: none;
-			color:#EE972D;	
-			font-weight: 100;	
-			font-size: 12px;
-		}
+		input[type='radio']:checked:after {}​
+		input[type='radio'][disabled='true'],
+		input[type='radio']:disabled {
+			background-color: #DDDDDD;
+		}​
 
 	</style>
+	</head>
+
 	<body>
 		<div id='mainCont'>
 			<div style='float: left;width:100%;'>
 				<div id='header'>
-					<div style="font-weight:200;font-size:36px;color:#EE972D; margin-bottom:18px;">
-						<span style="color:gray;">ino</span><span style="">ho</span>
-						<img id='burgerImage' style="float:right; margin:10px 18px 0 0;" src="/static/images/burgericon.png"></img>
+					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
+						<a href='/' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
+						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
+							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
+						</div>	
 					</div>
-					<hr/>
 				</div>
+				<br/>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' style='float:left;width:35%;display:none'></div>
+			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
 		</div>		
 
 	</body>
-	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
-	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
+	<script type="text/javascript" src="/static/scripts/iefix.js"></script>
 <!--	
-	<script type="text/javascript" src="http://static.mygola.com/static/11262/scripts/jquery-1.7.2.min.js"></script> 
+	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
 -->
-	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.5.2.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/jquery/jquery.1.9.0.min.js"></script>
+	<script>Zepto=$</script>
+	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.7.0.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
 	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
-		<div id='menuCont' class='menuArea'>
-			<div class='options mainPannel' jsVarNm='mainPageView'>Main Pannel</div>	
+		<div id='menuCont' class='menuArea theamBGColor'>
+			<div class='options mainPannel' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
+			<div class='options devStng' jsVarNm='editPageView'>Device Settings</div>
 			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
 			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
@@ -173,21 +271,22 @@
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
 		<div>
+			<img src='/static/images/connected_module.png' style='width:100%;'/>
 			<br/>
 			<div class='moduleAttached' style='display:none;'>
 				<span style='margin-right:10px'>Enter module name</span>
 				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
 				<div class='helpText'>e.g. module1. You can change the name of the module any time latter.</div>
 				<br/>
-				<div class='errorMsgDiv'><br/><span>error:</span></div>
+				<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 				<br/>
-				<span class='button' id='configureNewModuleButton'>Configure</span>
+				<span class='button theamBorderColor theamTextColor' id='configureNewModuleButton'>Configure</span>
 			</div>
 			<div class='moduleNotAttached'>
 				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
 				<span class='retryMsg' style='display:none;'>Oh no!! Home controller still cannot communicate with Switchboard module. Check the connections of serial cable and then retry.</span>
 				<br/><br/>
-				<span class='button' id='retryButton'>Try now</span>
+				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
 			</div>	
 			
 		</div>
@@ -195,7 +294,9 @@
 	<script type="text/template" id="networkSettingTemplate">
 		<div>
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Network Settings</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
+			<br/>
+			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require re-configuration of all the switch board modules.</div>
 			<br/>
 			<span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
@@ -205,11 +306,10 @@
 			<br/>
 			<span style='margin-right:10px'>Confirm security key</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
-			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require reconfiguration of all the switch board modules.</div>
 			<br/>
-			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/>
-			<span class='button' id='modifyNwkSecKeyButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
 
 			
 		</div>
@@ -217,7 +317,7 @@
 	<script type="text/template" id="cloudSettingTemplate">
 		<div>
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Cloud Settings</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
 			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
@@ -232,44 +332,119 @@
 			<span style='margin-right:10px'>Confirm password</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwdCnf'></input>
 
-			<div class='errorMsgDiv'><br/><span>error:</span></div>
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/><br/>
-			<span class='button' id='modifyCloudAccountButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
 			<br/><br/>
 			
 		</div>
 	</script>
 	
 	<script type="text/template" id="roomTemplate">
-		<div>
-			<br/>
-			<div class="roomTitleCont">
+		<div class='groupView theamBorderColor'>
+			<div class="roomTitleCont theamBGColor">
 				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style="width:18px;float:right;margin-top:2px;cursor:pointer;"/>
+				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;"/>
+				<span class='editButton theamTextColor' style='float:right'>edit group</span>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
 			<div class='switchCont'>
 				
 			</div>
+			<div style='clear:both;'></div>
+			<div class='advancePannel editTemplateCont' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+				<div class='cross' style='top:10px;'><b>Done</b></div>
+			</div>
 			<div style='clear:both;'></div>	
 		</div>	
 	</script>
-	<script type="text/template" id="basicSwitchTemplate">
-		<div style='float:left;background-color:white;'>
-			<div style='width:85px;float:left;text-align:center;'>
-				<div class='toggelSwitch' style="width:85px;height:85px;cursor:pointer;background:url('<%=src%>');background-size: 85px Auto;" devId="<%=devId%>" switchId="<%=switchID%>"/><span><%=name%></span>
-			</div>
-			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross' style='position:absolute; right:5;top:4; cursor:pointer;font-size:20px;height:50px; width:30px; text-align:center;'><b>X</b></div>
-			</div>
+	<script type="text/template" id="editGroupTemplate">
+		<div class='editGroupCont' style='padding:0px 0px 0px 70px;'>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Name</span>
+			<div><input style='width:180px;max-width:70%;margin:0px;' type='text' class='groupName' value='<%=name%>'></input></div>
+			<br/>
+			<%if(typeof count != 'undefined') {%>
+				<span style='margin-left:-60px;float:left;'>Rank</span>
+				<%for(var i=1 ;i<=count; i++) {%>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
+				<%}%>	
+				<br/><br/>
+			<%}%>
+			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
+			<br/><br/>
 		</div>	
 	</script>
+	<script type="text/template" id="basicSwitchTemplate">
+		<div class='basicSwitchTemplate' style='float:left;background-color:white;position:relative;border-radius:3px;overflow:hidden;'>
+			<div class='iconPartition' style='width:75px;float:left;text-align:center;cursor:pointer;'>
+				<div style='width:75px;height:75px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
+					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
+					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
+				</div>	
+				<span><%=name%></span>
+			</div>
+			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
+				<div class='cross'><b>Done</b></div>
+			</div>
+			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
+		</div>
+	</script>
+	<script type="text/template" id="editPageTemplate">
+		<div class='helpText' style='padding-right:99px'>Long press device icon to edit device parameters
+		<span class='editButton addGroupButton' style='float:right;margin-right:-77px;display:block;'>add group</span>
+		</div>
+		<div class='editViewCont'></div>
+	</script>
+	<script type="text/template" id="editSwitchTemplate">
+		<div style='padding:10px 20px 10px 70px;'>
+			<br/>
+			<span style='margin-left:-50px;float:left;'>Name</span>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
+			<br/><br/>
+			<span style='margin-left:-50px;float:left;'>Type</span>
+			<div>
+				<input id='normal' <% if(type=="normal")print("class='checked'")%>type="radio" name="type" value="normal" <% if(type=='normal')print("checked")%>/><label for='normal'>Normal</label>
+				<span style='<% if(typeof dimmable == 'undefined'||!dimmable) print("display:none")%>;'>
+				<input id='dimmer' <% if(type=="dimmer")print("class='checked'")%> type="radio" name="type" value="dimmer" <% if(type=='dimmer')print("checked")%>/><label for='dimmer'>Dimmer</label>
+				</span>
+			</div>
+			<br/><br/>
+			<span style='margin-left:-50px;float:left;'>Icon</span>
+			<div class='iconCont'></div>
+			 
+		</div>
+	</script>
+	<script type="text/template" id="selectSwitchIconTemplate">
+		<div style="width:45px; height:45px; float:left;position:relative;">
+			<div class='tick theamBGColor' style='display:none;'></div>
+			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>'/>
+			<div style='width:45px; height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
+		</div>	
+	</script>
+	<script type="text/template" id="switchProxyTemplate">
+		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
+			<div class='tick theamBGColor' style='<% print((selected)?"":"display:none;") %>' ></div>
+			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;background-color:<% print((selected)?'#CCCCCC':'white') %>">
+				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
+			</div>
+			<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
+		</div>
+	</script>
+	<script type="text/template" id="deviceGroupTemplate">
+		<div style='size:40px; margin:18px 0 0 -60px; font-size:10px; float:left;'><%=name%></div>
+		<div class="switchProxyCont"></div>
+		<div style='clear:both;'></div>	
+		<br/>
+	</script>	
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/room/view1.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/group/view1.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/mainPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
@@ -278,7 +453,7 @@
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		$('#burgerImage').on('tap', function () {
+		$('#burgerImageCont').on('tap', function () {
 			var $menuContPar = $('#menuCont').parent();
 			var $appContPar = $('#appCont').parent();
 			if($menuContPar.css('display') == 'block') {
@@ -287,15 +462,12 @@
 			}
 			else {
 				$menuContPar.show();
-				$appContPar.css('width', '65%');				
+				$appContPar.css('width', '62%');				
 			}
 		});
 	</script>
 	<script>
-	  var ioSocket = io.connect('/');
-	  ioSocket.on('roomConfigUpdated', function (config) {
-	  	rC.add(config, {merge: true});
-	  });
+//	  setInterval(function () {$('#experiment').html(Date().substr(16,8));} , 1000)
 	  var configurationWorkFlow = function (pageName) {
 			var pageObjName;
 			switch(pageName) {
@@ -308,36 +480,76 @@
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
 	  }
-	  ioSocket.on('switchPage', configurationWorkFlow);
+	  var showBurgerMenu = function () {$('#burgerImageCont').show();setAppTheamColor("#EE972D");};
+	  var setAppTheamColor = function (color) {
+	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
+	  		if(!color) color="#69C1A8";
+	  		var sheet = document.createElement('style');
+	  		sheet.innerHTML = "\
+			hr {\
+				border-top-color: "+color+"\
+			}\
+			.whiteBG{background-color: white;}\
+			input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+color+";}\
+			.theamBGColor{background-color: "+color+";}\
+			.theamTextColor{color:"+color+";}\
+			input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+color+";}\
+			";
+	  		document.body.appendChild(sheet);	
+	  }
+	  setAppTheamColor();
+	  var ioSocket, pingTimeStamp = Date.now();;
+	  var connectSocket = function () {
+	  		ioSocket = io.connect('/');
+	  		ioSocket.on('roomConfigUpdated', function (config) {
+				rC.set(config, {merge: true});
+			});
+			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
+			ioSocket.on('switchPage', configurationWorkFlow);
+			ioSocket.on('showBurgerMenu', showBurgerMenu)
+	  };
+	  connectSocket();
+	  setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	</script>
 	<script>
 		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
+		sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 		sideMenu.render();
 		var backboneAjax = Backbone.ajax;
 		Backbone.ajax = function (obj) {
 			if(!obj.useSocket) return backboneAjax.call(arguments);
-			// var data = (obj.data)?obj.data:{};
-			// data.reqId = new Date().getTime()+''; 
-			// ioSocket.once(data.reqId, obj.success);
-			// ioSocket.emit(obj.url, data);
 			ioSocket.emit(obj.url, obj.data, obj.success);
 		}
 		var RoomCollection = Backbone.Collection.extend({
 			url: '/room/list',
 			model:RoomModel
 		});
+		var DeviceCollection = Backbone.Collection.extend({
+			url: '/device/list'
+		});
 		var rC = new RoomCollection();
+		rC.comparator = function (model) {return parseInt(model.id);};
+		var dC = new DeviceCollection();
+		dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
+		
 		rC.on("add", function(roomModel){
 			roomModel.on('change', function (model, data) {
 				console.log("change called on "+model.get('name'));
 				console.log(model);
 			});
 		})
+		rC.on("sort", function () {console.log(rC.pluck('name'));});
 		rC.fetch({update:true, useSocket:true});
+		dC.fetch({update:true, useSocket:true});
+		deviceCollection = dC;
 		var mainPageView = new MainPageView({'collection':rC});
 		$('#appCont').append(mainPageView.$el);
 		mainPageView.render();
 		sideMenu.currentPage = mainPageView;
+		var editPageView = new EditPageView({'collection':rC});
+		$('#appCont').append(editPageView.$el);
+		// editPageView.render();
+		// sideMenu.currentPage = editPageView;
 		var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
 		$('#appCont').append(configureModulePage.$el);
 		var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});

@@ -93,8 +93,16 @@ var DeviceManager = BaseClass.extend({
 
 var TarangController = require(__rootPath+'/classes/communicators/tarang');
 var Cc2530Controller = require(__rootPath+'/classes/communicators/cc2530');
-//var communicator = new TarangController;
-var communicator = new Cc2530Controller;
+
+if(__systemConfig.get('communicator') == 'tarang'){
+	var communicator = new TarangController;
+	console.log('communicator is tarang');
+}
+else {
+	var communicator = new Cc2530Controller;
+	console.log('communicator is cc2530', __systemConfig.get('communicator'));
+}
+
 if(typeof deviceManager == 'undefined') 
 	deviceManager = new DeviceManager(communicator);
 module.exports = deviceManager;

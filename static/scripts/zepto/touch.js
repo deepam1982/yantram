@@ -3,9 +3,10 @@
 //     Zepto.js may be freely distributed under the MIT license.
 
 ;(function($){
+//  var document = window.document
   var touch = {},
     touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
-    longTapDelay = 750,
+    longTapDelay = 500,
     gesture
 
   function swipeDirection(x1, x2, y1, y2) {
@@ -167,6 +168,7 @@
 
 
 ;(function($) {
+    var document = window.document
     // only do this if not on a touch device
     if (!('ontouchend' in window)) {
         $(document).delegate('body', 'mousedown', function(e) {

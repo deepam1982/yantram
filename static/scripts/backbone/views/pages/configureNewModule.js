@@ -3,7 +3,7 @@ ConfigureNewModuleView = BaseView.extend({
 	templateSelector:"#addNewModuleTemplate",
 	events: {
 		"tap .moduleNotAttached #retryButton" : "tryCommunication",
-		"tap .moduleAttached #configureNewModuleButton" : "configureModule",
+		"tap .moduleAttached #configureNewModuleButton" : "configureModule"
 	},
 	configureModule : function (event) {
 		var moduleName = this.$el.find('.moduleName').val();

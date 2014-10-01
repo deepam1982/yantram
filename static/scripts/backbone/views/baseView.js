@@ -18,7 +18,9 @@
 
 var BaseView = Backbone.View.extend({
     name : 'BasicViewClass',
+    bindFunctions : [],
     initialize: function(obj) {
+        _.each(this.bindFunctions, function(funcName){_.bind(this[funcName], this);}, this);
 //        _.extend(this, obj);
         this._attachModelEvents();
         this._attachCollectionEvents();
@@ -39,8 +41,37 @@ var BaseView = Backbone.View.extend({
             	params.index = indx; params.model=model;
             	newArr.push(new window[params.viewClassName](_.omit(params,'events')));}, this);
             this[params.reference] = newArr;
+            if(typeof arr.on == 'function') {
+                arr.on('add', _.bind(this._onNewModelInSubViewArray, this, params), this);
+                arr.on('remove', _.bind(this._onModelRemovalFromSubViewArray, this, params), this);
+                arr.on('change', _.bind(this._onModelChangeOfSubViewArray, this, params), this);
+            }
         }, this);
 	},
+    _onModelChangeOfSubViewArray : function (params, model) {
+        _.each(this[params.reference], function (view) {
+            if(view.model !== model) return;
+            view.repaint();
+        }, this);
+    },
+    _onModelRemovalFromSubViewArray : function (params, model) {
+        _.each(this[params.reference], function (view) {
+            if(view.model !== model) return;
+            this[params.reference] = _.without(this[params.reference], view);
+            view.removeView();
+        }, this);
+    },
+    //TODO write function similar to following for remove and change as well.
+    _onNewModelInSubViewArray : function (params, model) {
+        params.model=model;
+        var view = new window[params.viewClassName](_.omit(params,'events'));
+        var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
+        if (!$parent || !$parent.length) $parent=this.$el;
+        $parent.append(view.$el);
+        if(this.rendered) view.render();
+        this[params.reference].push(view);
+        return view;
+    },
     _attachModelEvents:function(){
         _.each(this.modelEvents, function (value, key) {
             if (this.model) this.model.on(key, this[value], this);
@@ -58,6 +89,11 @@ var BaseView = Backbone.View.extend({
     modelEvents : {},
     collectionEvents : {},
     _getJsonToRenderTemplate : function () {return (this.model)?this.model.toJSON():{};},
+    _reDelegateEvents : function () {
+        _.each(this.subViews, function (params) { this[params.reference].delegateEvents();}, this);
+        _.each(this.subViewArrays, function (params) {_.each(this[params.reference], function (viewObj) {viewObj.delegateEvents();}, this);}, this);
+        this.delegateEvents();
+    },
 	render	:	function () {
 		var template = (typeof this.template != 'undefined')?this.template:
                         (this.templateSelector)?_.template($(this.templateSelector).html()):null;
@@ -68,7 +104,7 @@ var BaseView = Backbone.View.extend({
             var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
             if (!$parent || !$parent.length) $parent=this.$el; 
             $parent.append(ref.$el);
-            if (!params.supressRender) ref.render();
+            if (!params.supressRender && !ref.rendered) ref.render()
             var events = params.events;
             if (events) for(var eventName in events) {ref.on(eventName, this[events[eventName]], this)}
         }, this);
@@ -79,10 +115,12 @@ var BaseView = Backbone.View.extend({
             	var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
             	if (!$parent || !$parent.length) $parent=this.$el; 
                 $parent.append(viewObj.$el);
-                if (!params.supressRender) viewObj.render();
+                if (!params.supressRender && !viewObj.rendered) viewObj.render();
                 if (events) for(var eventName in events) {viewObj.on(eventName, this[events[eventName]], this)}
             }, this);
         }, this);
+        this._reDelegateEvents();
+        this.rendered = true;
 		return this;
 	},
     removeView	:	function () {
@@ -96,6 +134,12 @@ var BaseView = Backbone.View.extend({
         _.each(this.subViewArrays, function (params) {
             if(!params) return;
             _.each(this[params.reference], function (viewObj) {viewObj.removeView();});
+            if(params.array && _.isString(params.array)) eval('var arr='+params.array);
+            if(arr && typeof arr.on == 'function') {
+                arr.off('add', null, this);
+                arr.off('remove', null, this);
+                arr.off('change', null, this);
+            }
         }, this);
         _.each(this.subViews, function (params) {
             if(!params) return;
@@ -109,16 +153,17 @@ var BaseView = Backbone.View.extend({
             var events = params.events;
             _.each(this[params.reference], function (viewObj) {
                 if (events) for(var eventName in events){viewObj.off(eventName, this[events[eventName]], this)}
-                viewObj.erase();
+                viewObj.rendered && viewObj.erase();
             }, this);
         }, this);
         _.each(this.subViews, function (params) {
             if(!params) return;
             var events = params.events,viewObj=this[params.reference];
             if (events) for(var eventName in events){viewObj.off(eventName, this[events[eventName]], this)}
-            viewObj.erase();
+            viewObj.rendered && viewObj.erase();
         }, this);
     	this.$el.html("");
+        this.rendered = false;
     	return this;
     },
     _detachModelEvents:function(){
@@ -132,6 +177,7 @@ var BaseView = Backbone.View.extend({
         }, this);
     },
     repaint	:	function () {
+        if(!this.rendered) return this;
         this._detachModelEvents();
         this._detachCollectionEvents();
     	this.erase().render();

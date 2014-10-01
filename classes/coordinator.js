@@ -32,7 +32,9 @@ var Coordinator = BaseClass.extend({
 		return __.extend(nodeMap, __.pick(this.utilNodes, nodeIdArr));
 	},
 	onNewNodesFound : function (nodes) {
-		__.each(devCoordConf.toJSON(), function (conf, nodeId) {
+		
+	//TODO __.each(devCoordConf.toJSON(), function (conf, nodeId) {
+		__.each(devCoordConf.data, function (conf, nodeId) {
 			if (!conf.conditionApplied) {
 				try {
 					var nodeIdArr = []

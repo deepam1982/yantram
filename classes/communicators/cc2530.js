@@ -28,7 +28,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0301')
-		// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		//   console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 
@@ -149,7 +149,10 @@ var CC2530Controller = BaseCommunicator.extend({
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
 				callback(err, macId);
-					this.sendQuery(null, {name:"0100"}); // restart coordinator
+				setTimeout(__.bind(function () {
+					this.sendQuery(null, {name:"0100"});
+					console.log('Restarting Coordinator');
+				}, this), 2200);// restart coordinator
 			}, this);
 		}, this));
 	}
