@@ -482,12 +482,12 @@
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
-	  	setAppTheamColor("#EE972D");
+	  	setAppTheamColor("#9E171D");
 	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
-	  		if(!color) color="#9E171D";
+	  		if(!color) color="#69C1A8";
 	  		var $sheet = $("<style>\
 			hr {\
 				border-top-color: "+color+"\
@@ -510,6 +510,14 @@
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
 			ioSocket.on('showBurgerMenu', showBurgerMenu)
+			ioSocket.on('homeControllerLocalIpAddress', function (add) {
+				var arr = window.location.href.split("/");
+				if(arr[2] == add) return;
+				$.ajax({crossDomain: true,dataType: "jsonp",
+					"url":"http://"+add+"/apptest", success:function (rsp){
+					if(rsp && rsp.success) window.location.href="http://"+add
+				}});
+			});
 	  };
 	  connectSocket();
 	</script>
