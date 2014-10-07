@@ -39,9 +39,14 @@ AdvancePannel = {
  		return this;
  	},
 	events: {
-		"tap .advancePannel .cross" : "hideAdvancePannel"
+		"tap .advancePannel .cross" : "done"
+	},
+	done : function () {
+		this.animateAdvancePannel=true;
+		this.hideAdvancePannel();
 	},
 	showAdvancePannel : function () {
+		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
 		if(this.bd) return;
 		this.bd = new Backdrop({'$parent':$('#mainCont')});
 		this.bd.render();
