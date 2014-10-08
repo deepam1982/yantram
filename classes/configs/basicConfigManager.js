@@ -13,6 +13,16 @@ var BasicConfigManager = BaseClass.extend({
 	save : function (callback) {
 		fs.writeFile(__rootPath+this.file, JSON.stringify(this.data, null, 4), callback);
 	}, 
+	has : function (path) {
+		path = path.split('.');
+		var obj = this.data;
+		while(obj && path.length) {
+			var key = path.shift();
+			if(!__.has(obj, key)) return false;
+			obj = obj[key]
+		}
+		return !path.length;
+	},
 	get : function (path) {
 		path = path.split('.');
 		var val = this.data;
