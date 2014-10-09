@@ -26,6 +26,7 @@ var Coordinator = BaseClass.extend({
         console.log("#### evening = "+this.utilNodes['evening'].state);
         console.log("#### weekday = "+this.utilNodes['weekday'].state);
         console.log("#### weekend = "+this.utilNodes['weekend'].state);
+        console.log(new Date());
 	},
 	getNodeMap : function (nodeIdArr) {
 		var nodeMap = this.deviceManager.getDeviceNodes(nodeIdArr);
@@ -65,6 +66,16 @@ var Coordinator = BaseClass.extend({
 // 	"0003017c-l5" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
 // 	"0003017c-l2" : {"onCondition":"evening&&00030180-s0", "manualTime":600},
 // }
+/*
+{ 
+	"A7734501004B1200-l0" : {"onCondition":"A7734501004B1200-s0", "offCondition":"!A7734501004B1200-s0", "manualTime":100, "maxTime":300},
+	"27B54C01004B1200-l0" : {"onCondition":"27B54C01004B1200-s1", "offCondition":"!27B54C01004B1200-s1", "manualTime":100, "maxTime":300},
+	"27B54C01004B1200-l1" : {"onCondition":"27B54C01004B1200-s1", "offCondition":"!27B54C01004B1200-s1", "manualTime":100, "maxTime":300},
+	"96424501004B1200-l1" : {"onCondition":"evening&&(27B54C01004B1200-s0||96424501004B1200-s1||35B24C01004B1200-s0)", "manualTime":600},
+	"96424501004B1200-l2" : {"onCondition":"evening&&(27B54C01004B1200-s0||96424501004B1200-s1||35B24C01004B1200-s0)", "manualTime":600}
+}
+
+*/
 if(typeof coordinator == 'undefined')
 	coordinator = new Coordinator({"deviceManager":deviceManager});
 module.exports = coordinator;

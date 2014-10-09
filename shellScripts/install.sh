@@ -46,6 +46,11 @@ sudo update-rc.d inoho defaults
 
 echo "------------------ added inoho.sh to startup scripts ----------------";
 
+sudo cp $DIR1/shellScripts/syncSystemClock.sh /etc/init.d/syncSystemClock
+sudo chmod 755 /etc/init.d/syncSystemClock
+
+echo "------------------ added syncSystemClock.sh to init.d ----------------";
+
 sudo cp $DIR1/shellScripts/checkIpAlias.sh /etc/init.d/checkIpAlias.sh
 sudo chmod 755 /etc/init.d/checkIpAlias.sh
 sudo update-rc.d checkIpAlias.sh defaults

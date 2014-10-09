@@ -19,7 +19,7 @@ var SwitchBoardV1 = BaseDevice.extend({
 		this._super(msg);
 		if (oldDm0St != this.dimmerState[0] || oldDm1St != this.dimmerState[1]) this.emit('stateChanged', 'dimmer');
 		var changebits = oldSwSt ^ this._binStateToInt(this.switchState)
-		if (changebits) this.emit('stateChanged', 'switch', changebits);	
+		if (changebits) this.emit('stateChanged', 'load', changebits);	
 	},
 	_logDVST : function (msg) {
 		console.log("#### DVST of "+this.id+" is " + this.switchState + " " + this.dimmerState);
