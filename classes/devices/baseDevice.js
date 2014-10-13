@@ -18,6 +18,7 @@ var BaseDevice = BaseClass.extend({
 	numberOfSensors : 0,
 	id : null,
 	init : function (deviceId, router) {
+		this.reachable = true;
 		this.switchState = [];
 		this.dimmerState = [];
 		this.sensorState = [];
@@ -142,7 +143,10 @@ var BaseDevice = BaseClass.extend({
 	setSwitch : function (switchNo, state, callback) {},
 	setDimmer : function(dimmerNo, value) {},
 	getConfig : function () {
-		if (this.stateJson) return this.stateJson;
+		if (this.stateJson) {
+			this.stateJson.reachable = this.reachable;
+			return this.stateJson;
+		}
 		this._makeStateJson();
 		return this.stateJson;
 	},
@@ -159,7 +163,7 @@ var BaseDevice = BaseClass.extend({
 		__(this.numberOfSensors).times(function (i) {
 			sensorState[i+""] = {"state":this.sensorState[i], "Active":this.isSensorActive[i]};
 		}, this);
-		var retObj = {};
+		var retObj = {reachable : this.reachable};
 		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState};
 		this.stateJson = retObj;
 	},

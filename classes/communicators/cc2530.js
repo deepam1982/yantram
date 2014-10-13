@@ -7,6 +7,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._send("\x2B0301FFFF\x0D", function () { // "\x2B0302FFFF"
 //			console.log('##### Sent broadcast')
 		});
+		this._super()
 	},
 	_hexCharToInt: function(str) {
 		var intt = str.charCodeAt(0);
@@ -46,7 +47,7 @@ var CC2530Controller = BaseCommunicator.extend({
 			default 	: 	return;
 		}
 //		console.log(msgId);
-		if (msgTypeCode == '0301') this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); 
+		if (msgTypeCode == '0301') {} //this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); 
 		else if (__.contains(['\x00\x01', '\x00\x20', '\x00\x40'], msgTypeCode)) 
 			this.emit('msgRecieved', msg.substr(0,4), msg.substr(4), this.byteStrToHexStr(sourceAdd));
  
@@ -71,7 +72,13 @@ var CC2530Controller = BaseCommunicator.extend({
 	},
 	_handleBroadcastResponse :function (macAdd, nwkAdd, deviceName) {
 		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
-		if (listItem) __.extend(listItem, {'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+		if (listItem) {
+			if(listItem.unreachable) {
+				listItem.unreachable = false;
+				this.emit("deviceReachable", listItem.macAdd);
+			}
+			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+		}
 		else {
 			this.deviceList.push({'macAdd':macAdd, 'deviceId':macAdd, 'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
 			console.log('device with macId:'+macAdd+" found at netAdd:"+nwkAdd);
@@ -150,6 +157,7 @@ var CC2530Controller = BaseCommunicator.extend({
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
 				callback(err, macId);
 				setTimeout(__.bind(function () {
+					this.sendQuery(null, {name:"0200"}); // restart connected device to disable UART
 					this.sendQuery(null, {name:"0100"});
 					console.log('Restarting Coordinator');
 				}, this), 2200);// restart coordinator

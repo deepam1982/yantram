@@ -12,7 +12,14 @@ var DeviceManager = BaseClass.extend({
 		this.communicator = communicator;
 		this.communicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
 		this.communicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
+		this.communicator.on('deviceReachable', __.bind(this._updateDeviceRechability, this, true));
+		this.communicator.on('deviceUnreachable', __.bind(this._updateDeviceRechability, this, false));
 		__.each(this.communicator.getDeviceIds(), __.bind(this._onNewDeviceFound, this));
+	},
+	_updateDeviceRechability : function  (reachable, deviceId) {
+		console.log("_updateDeviceRechability", reachable);
+		this._deviceMap[deviceId].reachable = reachable;
+		this.emit('deviceStateChanged', deviceId);
 	},
 	restoreDeviceStatus : function (stateMap) {
 		this._virtualNodesOldState = stateMap;
