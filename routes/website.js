@@ -3,7 +3,12 @@ var express = require('express');
 module.exports = function(app) {
 	
 	app.get('/', function(req, res) {
-		res.sendFile(__rootPath + '/static/htmls/app.html');
+		try {
+			res.sendFile(__rootPath + '/static/htmls/app.html');
+		}
+		catch(err) {
+			res.sendfile(__rootPath + '/static/htmls/app.html');	
+		}
 		//response.render(template, data);
 	});
 	app.get('/apptest', function (req, res) {

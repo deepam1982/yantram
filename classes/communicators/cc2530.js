@@ -28,8 +28,8 @@ var CC2530Controller = BaseCommunicator.extend({
 	_processPacket : function (data) {
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
-		// if(msgTypeCode != '0301')
-		//   console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		//	if(msgTypeCode != '0301')
+		//		console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 
@@ -125,7 +125,13 @@ var CC2530Controller = BaseCommunicator.extend({
 		var qry="0106"+networkKey
 		console.log(qry)
 		this.sendQuery(null, {name:qry});
-		this._pendingReqCallbackMap["0106"] = callback;
+		this._pendingReqCallbackMap["0106"] = __.bind(function (err, msg){
+			__.each(this.deviceList, function (listItem){
+				listItem.unreachable = true;
+				this.emit("deviceUnreachable", listItem.macAdd);
+			}, this);
+			callback && callback(err, msg);
+		}, this);
 	}, 
 
 	checkCommunication : function (retrying) {
