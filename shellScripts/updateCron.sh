@@ -36,9 +36,10 @@ for filename in $DIR3/*.sh
 	done
 if [ -n "$upgradeFile" ] ; then 
         sudo sh $upgradeFile
-        exit 0
+        echo "hardupgrade done, starting softupgrade"
+else
+	echo "hardupgrade file not found, starting softupgrade"
 fi
-echo "hardupgrade file not found, starting softupgrade"
 
 #step 3 soft update
 git --work-tree=$DIR1 --git-dir=$DIR1/.git fetch origin
