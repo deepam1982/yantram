@@ -69,7 +69,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 
             var checkConfigurations = function (socket){
               if(!__userConfig.get('zigbeeNetworkName') || !__userConfig.get('zigbeeNetworkKey'))
-                socket.emit('switchPage', 'networkSetting');
+                socket.emit('switchPage', 'welcomeScreen'); //socket.emit('switchPage', 'networkSetting');
               else if(!__userConfig.get('email') || !__userConfig.get('password'))
                 socket.emit('switchPage', 'cloudSetting');
               else if(!__.keys(__remoteDevInfoConf.data).length)

@@ -293,23 +293,43 @@
 	</script>
 	<script type="text/template" id="networkSettingTemplate">
 		<div>
-			<br/>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
-			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require re-configuration of all the switch board modules.</div>
+			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change your network password, you must do it for all the devices in your inoho network.</div>
 			<br/>
-			<span style='margin-right:10px'>Enter network name</span>&nbsp;
+			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
-			<br/>
-			<span style='margin-right:10px'>Enter security key</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<br/> -->
+			<span style='margin-right:10px'>Network Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKey'></input>
 			<br/>
-			<span style='margin-right:10px'>Confirm security key</span>
+			<span style='margin-right:10px'>Confirm Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
 			<br/>
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/>
 			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
+
+			
+		</div>
+	</script>
+	<script type="text/template" id="welcomeScreenTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Congratulations!!</span></div>
+			<br/>
+			
+			<span class='helpText'>We will now take you through 3 step installation of your inoho.</span>
+			<br/><br/>
+			<span>Step 1 Network Configuration.</span><br/>
+			<span class='helpText'>inoho home controller comes with default network settings, we highly recommend you to configure the network with your own password.</span>
+			<br/><br/>
+			<span>Step 2 Cloud Configuration.</span><br/>
+			<span class='helpText'>In order to use your inoho while you are travelling, you will have to create an account, for your home controller, in inoho cloud.</span>
+			<br/><br/>
+			<span>Step 3 Module Configuration.</span>
+			<br/><span class='helpText'>Each switch board module comes with default network settings, they need to have same network settings which you set to your home controller in step 1.</span>
+			<br/><br/><br/>
+			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
 
 			
 		</div>
@@ -392,9 +412,11 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div class='helpText' style='padding-right:99px'>Long press device icon to edit device parameters
-		<span class='editButton addGroupButton' style='float:right;margin-right:-77px;display:block;'>add group</span>
-		</div>
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+		<br/>
+		<span class='helpText' style=''>Long press device icon to edit device parameters</span>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
+		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editSwitchTemplate">
@@ -447,6 +469,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
@@ -471,6 +494,7 @@
 	  var configurationWorkFlow = function (pageName) {
 			var pageObjName;
 			switch(pageName) {
+				case "welcomeScreen" : pageObjName = 'welcomeScreenPage'; break;
 				case "networkSetting" : pageObjName = 'networkSettingPage'; break;
 				case "cloudSetting" : pageObjName = 'cloudSettingPage'; break;
 				case "configureModule" : pageObjName = 'configureModulePage'; break;
@@ -566,6 +590,8 @@
 		$('#appCont').append(cloudSettingPage.$el);
 		var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
 		$('#appCont').append(networkSettingPage.$el);
+		var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});
+		$('#appCont').append(welcomeScreenPage.$el);
 
 	</script>
 	

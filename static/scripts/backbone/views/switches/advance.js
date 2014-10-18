@@ -109,19 +109,20 @@ AdvanceFanSwitch = AdvanceSwitch.extend({
 	},
 	render	:	function () {
  		AdvanceSwitch.prototype.render.apply(this, arguments);
- 		this.$slider = $('<input type="range" class="inside" min="10" max="86" value="30" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
+ 		this.$slider = $('<input type="range" class="inside" min="30" max="95" value="50" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
  		this.$el.find('.advancePannel').append(this.$slider);
  		this.$slider.width(Math.max(120,this.$el.parent().width() - 2*this.$el.find('.toggelSwitch').width() - 20));
  		var duty = parseInt(100*parseInt(this.model.get('duty'))/255);
- 		this.$slider.val(Math.min(Math.max(duty, 10), 86));
+ 		this.$slider.val(Math.min(Math.max(duty, 30), 95));
  		this.$slider.on("input change", this._onDutyChange);
  		return this;
  	},
  	onDutyChange : function (event) {
  		var duty = parseInt(this.$slider.val());
- 		if(duty == 86) duty=100;
+ 		if(duty == 95) duty=100;
  		console.log(duty);
  		duty = parseInt(255*duty/100);
+ 		console.log(duty);
  		this.model.setDuty(duty);
  	}, 
  	erase	: function () {
