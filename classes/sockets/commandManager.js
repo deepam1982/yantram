@@ -28,7 +28,9 @@ var CommandManager = BaseClass.extend({
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
+		socket.on('getNetworkSettings', __.bind(this.getNetworkSettings, this));
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
+		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		console.log('Added Command Listners!!')
@@ -62,6 +64,9 @@ var CommandManager = BaseClass.extend({
 		deviceManager.communicator.checkSerialCable(function (err) {
 			callback && callback((!err)?true:false);	
 		});		
+	},
+	getCloudSettings	: function (commandData, callback) {
+		callback({'success':true, 'email':__userConfig.get('email')})
 	},
 	modifyCloudSettings : function (commandData, callback) {
 		var email = __userConfig.get('email');
@@ -105,6 +110,9 @@ var CommandManager = BaseClass.extend({
 			createAccount(commandData.email, commandData.password)
 
 
+	},
+	getNetworkSettings	: function (commandData, callback) {
+		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
 	},
 	onModifyNetworkSecurityKey : function (commandData, callback) {
 		//TODO consider network name as well

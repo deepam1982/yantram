@@ -5,6 +5,7 @@ WelcomeScreenPageView = BaseView.extend({
 		"tap #startConfigurationButton" : "start"
 	},
 	start : function (rsp) {
-		$('#menuCont .nwkStng').trigger('tap');		
+		configurationWorkFlow('networkSetting');
+//		$('#menuCont .nwkStng').trigger('tap');		
 	}
 });

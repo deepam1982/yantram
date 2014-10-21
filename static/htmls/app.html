@@ -295,7 +295,7 @@
 		<div>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
-			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change your network password, you must do it for all the devices in your inoho network.</div>
+			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
 			<br/>
 			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
@@ -324,10 +324,10 @@
 			<span class='helpText'>inoho home controller comes with default network settings, we highly recommend you to configure the network with your own password.</span>
 			<br/><br/>
 			<span>Step 2 Cloud Configuration.</span><br/>
-			<span class='helpText'>In order to use your inoho while you are travelling, you will have to create an account, for your home controller, in inoho cloud.</span>
+			<span class='helpText'>In order to use inoho over the internet, you will have to create an account with inoho cloud services.</span>
 			<br/><br/>
 			<span>Step 3 Module Configuration.</span>
-			<br/><span class='helpText'>Each switch board module comes with default network settings, they need to have same network settings which you set to your home controller in step 1.</span>
+			<br/><span class='helpText'>Each switch board module comes with default network settings, they need to be configured with your inoho home controller.</span>
 			<br/><br/><br/>
 			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
 
@@ -339,14 +339,15 @@
 			<br/>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
-			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
+			<br/>
+			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
 			<br/>
-			<span style='margin-right:10px'>Confirm email id</span>
+	<!--	<span style='margin-right:10px'>Confirm email id</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmailCnf'></input>
-			<div class='helpText'>While you are away from home, you can access your home controller using this email id through http://cloud.inoho.com. You will be able to change cloud settings when you are not on move, and connected directly to home controller.</div>
-						<br/>
-			<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<br/>
+	-->		<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwd'></input>
 			<br/>
 			<span style='margin-right:10px'>Confirm password</span>
@@ -506,7 +507,7 @@
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
-	  	setAppTheamColor("#9E171D");
+	  	setAppTheamColor("#EE972D");
 	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	  };
 	  var setAppTheamColor = function (color) {

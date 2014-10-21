@@ -4,6 +4,15 @@ NetworkSettingPageView = BaseView.extend({
 	events: {
 		"tap #modifyNwkSecKeyButton" : "_onDone"
 	},
+	render: function() {
+		this.options.socket.emit("getNetworkSettings", null, _.bind(function (rsp) {
+			if(rsp.name) {
+				this.$el.find('.nwkSecKey').val('dummypassword');
+				this.$el.find('.nwkSecKeyCnf').val('dummypassword');
+			}
+		}, this));
+		BaseView.prototype.render.apply(this, arguments);
+	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		
 	},
@@ -15,6 +24,7 @@ NetworkSettingPageView = BaseView.extend({
 		// 	return;			
 		// }
 		var securityKey = this.$el.find('.nwkSecKey').val();
+		if(securityKey == 'dummypassword') return this.onDone();
 		var confirmKey = this.$el.find('.nwkSecKeyCnf').val();
 		if(!securityKey || securityKey != confirmKey) {
 			this.$el.find('.errorMsgDiv span').html("Enter network password in first row and then re-enter same key in second row.");

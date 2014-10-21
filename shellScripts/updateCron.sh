@@ -25,17 +25,19 @@ currentEpoch=`git --work-tree=$DIR1 --git-dir=$DIR1/.git show -s --format=%ct $c
 git --work-tree=$DIR2 --git-dir=$DIR2/.git fetch origin
 git --work-tree=$DIR2 --git-dir=$DIR2/.git reset --hard origin/$BRANCH
 maxTime=$currentEpoch
-for filename in $DIR3/*.sh 
+arr1=( $(for el in $DIR3/*.sh; do echo "$el"; done | sort))
+for filename in "${arr1[@]}" # it will traverse files in assending order by name.
 	do 
 		tStmp=`basename ${filename} .sh`
 		tStmp=`date --date=$tStmp +%s`
 		if [ "$maxTime" -lt "$tStmp" ] ; then 
-			maxTime=$tStmp
+#			maxTime=$tStmp	#run all upgrade files having greater date in assending order.
 			upgradeFile=${filename}
+			sudo bash $upgradeFile	
 		fi		
 	done
 if [ -n "$upgradeFile" ] ; then 
-        sudo sh $upgradeFile
+#        sudo bash $upgradeFile
         echo "hardupgrade done, starting softupgrade"
 else
 	echo "hardupgrade file not found, starting softupgrade"

@@ -68,6 +68,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             websiteRoutes(app);
 
             var checkConfigurations = function (socket){
+              //socket.emit('switchPage', 'welcomeScreen');
               if(!__userConfig.get('zigbeeNetworkName') || !__userConfig.get('zigbeeNetworkKey'))
                 socket.emit('switchPage', 'welcomeScreen'); //socket.emit('switchPage', 'networkSetting');
               else if(!__userConfig.get('email') || !__userConfig.get('password'))
