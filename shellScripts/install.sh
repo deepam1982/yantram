@@ -56,19 +56,19 @@ sudo chmod 755 /etc/init.d/checkIpAlias.sh
 sudo update-rc.d checkIpAlias.sh defaults
 
 sudo chmod 755 $DIR1/shellScripts/checkIpAlias.sh
-line="* * * * * sudo $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkIpAlias.log"
+line="* * * * * sudo bash $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkIpAlias.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkIpAlias added to cron ----------------";
 
 sudo chmod 755 $DIR1/shellScripts/wifiCheck.sh
-line="* * * * * sudo $DIR1/shellScripts/wificheck.sh > $DIR0/logs/wificheck.log"
+line="* * * * * sudo bash $DIR1/shellScripts/wifiCheck.sh > $DIR0/logs/wificheck.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkWifi added to cron ----------------";
 
 sudo chmod 755 $DIR1/shellScripts/updateCron.sh
-line="0 0 * * * sudo $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCron.log"
+line="0 0 * * * sudo bash $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCron.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ updateCron added to cron ----------------";
