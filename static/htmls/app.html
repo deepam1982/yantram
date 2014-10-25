@@ -266,7 +266,8 @@
 			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
 			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
-			<br/><br/>
+			<br/><br/><br/>
+			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
@@ -332,6 +333,15 @@
 			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
 
 			
+		</div>
+	</script>
+	<script type="text/template" id="checkUpdateTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Check Updates</span></div>
+			<br/><br/>
+			<div class="loader" style="text-align:center;"><img src="static/images/loading.gif"/></div>
+			<div class="msgBox helpText" style="display:none;"></div>
+			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
 		</div>
 	</script>
 	<script type="text/template" id="cloudSettingTemplate">
@@ -470,6 +480,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/update.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
@@ -507,7 +518,7 @@
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
-	  	setAppTheamColor("#5ED5F3");
+	  	setAppTheamColor("#9E171D");
 	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	  };
 	  var setAppTheamColor = function (color) {
@@ -593,6 +604,8 @@
 		$('#appCont').append(networkSettingPage.$el);
 		var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});
 		$('#appCont').append(welcomeScreenPage.$el);
+		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
+		$('#appCont').append(checkUpdatePage.$el);
 
 	</script>
 	

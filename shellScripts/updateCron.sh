@@ -50,7 +50,6 @@ git --work-tree=$DIR1 --git-dir=$DIR1/.git reset --hard origin/$BRANCH
 echo "softupgrade done, restarting home controller"
 #step 4 restart homeController
 
-sudo /etc/init.d/inoho stop
-sudo /etc/init.d/inoho start
+sudo /etc/init.d/inoho restart
 
 echo "upgrade complete"
