@@ -27,6 +27,9 @@ sudo cp /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 echo "------------------ localtime set to Kolkata ----------------";
 
+sudo apt-get install avahi-daemon
+
+echo "------------------ installation of avahi-daemon done ----------------";
 
 #sudo useradd -m admin -G sudo
 #sudo passwd admin
