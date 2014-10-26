@@ -43,8 +43,8 @@ var CommandManager = BaseClass.extend({
 		var foo = function(error, stdout, stderr) {
 			console.log(error, stdout, stderr);
 		}
-		exec("sudo service inoho restart", foo);	
-		// exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh", foo);	
+//		exec("sudo service inoho restart", foo);	
+		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh", foo);	
 		console.log('starting update now')
 	},
 	checkUpdates : function (commandData, callback) {
