@@ -1,10 +1,15 @@
 sudo apt-get update
 echo "------------------ os update done ----------------";
 
+sudo apt-get install at
+
+echo "------------------ installed at commands ----------------";
+
 #sudo sed -i "\|T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100|d" /etc/inittab
 #echo  \#T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100 | sudo tee -a /etc/inittab
 
 #cp /boot/cmdline.txt /boot/cmdline_bkp.txt
+#dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait
 #echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" | sudo tee -a /boot/cmdline.txt
 #sudo sed -i "\|dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait|d" /boot/cmdline.txt
 #sudo sed -i "\|dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait|d" /boot/cmdline.txt
@@ -37,3 +42,5 @@ echo "------------------ installation of avahi-daemon done ----------------";
 #sudo passwd -l pi
 
 #echo "------------------ new admin account created ----------------";
+
+echo "#################### Disable getty and pi account manually ################################";

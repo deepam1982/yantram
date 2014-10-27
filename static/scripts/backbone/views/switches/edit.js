@@ -18,14 +18,18 @@ EditSwitchParams = BaseView.extend({
 	},
 	bindFunctions :_.union(BaseView.prototype.bindFunctions,['_setIcon', '_nameChange']),
 	_typeChange : function (event) {
-		this.model.setSwitchParam({'type':$(event.target).val()});
+		this.model.setSwitchParam({'type':$(event.target).val()}, _.bind(function () {
+
+		}, this));
 	},
 	_nameChange : function (event) {
-		this.model.setSwitchParam({'name':$(event.target).val()});
+		this.model.setSwitchParam({'name':$(event.target).val()}, _.bind(function () {
+			console.log("name changed on server", this.model.attributes);
+		}, this));
 	},
 	_setIcon : function (event) {
 		var iconName = $(event.target).attr('icon');
-		this.setIcon(iconName);
+//		this.setIcon(iconName);
 		this.model.setSwitchParam({'icon':iconName});
 	},
 	render	:	function () {
@@ -51,7 +55,10 @@ EditableSwitch = AdvanceSwitch.extend({
 		this.$el.find('.iconPartition').hide();
 		AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
 		this.$el.css('top', '50px');
-		this.editView.render();
+		this.editView.render();		
+		var top = this.$el.closest('.groupView').offset().top
+		top = top - Math.max(150+top + this.editView.$el.height(), $('body').height()) + $('body').height()
+		this.$el.css('top', top+'px');
 		setTimeout(_.bind(function () {this.$el.find('.checked').prop("checked", true);}, this), 20);
 	},
 	hideAdvancePannel : function () {

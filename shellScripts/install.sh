@@ -62,7 +62,7 @@ line="* * * * * sudo bash $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkI
 echo "------------------ checkIpAlias added to cron ----------------";
 
 sudo chmod 755 $DIR1/shellScripts/wifiCheck.sh
-line="* * * * * sudo bash $DIR1/shellScripts/wifiCheck.sh > $DIR0/logs/wificheck.log"
+line="* * * * * sudo bash $DIR1/shellScripts/wifiCheck.sh > $DIR0/logs/wifiCheck.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkWifi added to cron ----------------";
