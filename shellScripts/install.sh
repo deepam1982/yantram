@@ -5,7 +5,7 @@ DIR1=$DIR0/homeController
 DIR2=$DIR0/gitScripts
 DIR3=$DIR0/gitScripts/shellScripts/upgradeScripts
 REPO=https://github.com/deepam1982/yantram.git
-BRANCH=dev
+BRANCH=`git --work-tree=$DIR1 --git-dir=$DIR1/.git rev-parse --abbrev-ref HEAD`
 
 mkdir $DIR0
 mkdir $DIR1
