@@ -266,7 +266,8 @@
 			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
 			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
-			<br/><br/>
+			<br/><br/><br/>
+			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
@@ -293,18 +294,17 @@
 	</script>
 	<script type="text/template" id="networkSettingTemplate">
 		<div>
-			<br/>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
-			<div class='helpText'>Network name and key are used to encrypt data in inoho zigbee network. Modifying them will require re-configuration of all the switch board modules.</div>
+			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
 			<br/>
-			<span style='margin-right:10px'>Enter network name</span>&nbsp;
+			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
-			<br/>
-			<span style='margin-right:10px'>Enter security key</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<br/> -->
+			<span style='margin-right:10px'>Network Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKey'></input>
 			<br/>
-			<span style='margin-right:10px'>Confirm security key</span>
+			<span style='margin-right:10px'>Confirm Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
 			<br/>
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
@@ -314,19 +314,50 @@
 			
 		</div>
 	</script>
+	<script type="text/template" id="welcomeScreenTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Congratulations!!</span></div>
+			<br/>
+			
+			<span class='helpText'>We will now take you through 3 step installation of your inoho.</span>
+			<br/><br/>
+			<span>Step 1 Network Configuration.</span><br/>
+			<span class='helpText'>inoho home controller comes with default network settings, we highly recommend you to configure the network with your own password.</span>
+			<br/><br/>
+			<span>Step 2 Cloud Configuration.</span><br/>
+			<span class='helpText'>In order to use inoho over the internet, you will have to create an account with inoho cloud services.</span>
+			<br/><br/>
+			<span>Step 3 Module Configuration.</span>
+			<br/><span class='helpText'>Each switch board module comes with default network settings, they need to be configured with your inoho home controller.</span>
+			<br/><br/><br/>
+			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
+
+			
+		</div>
+	</script>
+	<script type="text/template" id="checkUpdateTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Check Updates</span></div>
+			<br/><br/>
+			<div class="loader" style="text-align:center;"><img src="static/images/loading.gif"/></div>
+			<div class="msgBox helpText" style="display:none;"></div>
+			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
+		</div>
+	</script>
 	<script type="text/template" id="cloudSettingTemplate">
 		<div>
 			<br/>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
-			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
+			<br/>
+			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
 			<br/>
-			<span style='margin-right:10px'>Confirm email id</span>
+	<!--	<span style='margin-right:10px'>Confirm email id</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmailCnf'></input>
-			<div class='helpText'>While you are away from home, you can access your home controller using this email id through http://cloud.inoho.com. You will be able to change cloud settings when you are not on move, and connected directly to home controller.</div>
-						<br/>
-			<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<br/>
+	-->		<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwd'></input>
 			<br/>
 			<span style='margin-right:10px'>Confirm password</span>
@@ -392,9 +423,11 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div class='helpText' style='padding-right:99px'>Long press device icon to edit device parameters
-		<span class='editButton addGroupButton' style='float:right;margin-right:-77px;display:block;'>add group</span>
-		</div>
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+		<br/>
+		<span class='helpText' style=''>Long press device icon to edit device parameters</span>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
+		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editSwitchTemplate">
@@ -447,6 +480,8 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/update.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
@@ -471,6 +506,7 @@
 	  var configurationWorkFlow = function (pageName) {
 			var pageObjName;
 			switch(pageName) {
+				case "welcomeScreen" : pageObjName = 'welcomeScreenPage'; break;
 				case "networkSetting" : pageObjName = 'networkSettingPage'; break;
 				case "cloudSetting" : pageObjName = 'cloudSettingPage'; break;
 				case "configureModule" : pageObjName = 'configureModulePage'; break;
@@ -480,12 +516,15 @@
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
 	  }
-	  var showBurgerMenu = function () {$('#burgerImageCont').show();setAppTheamColor("#EE972D");};
+	  var showBurgerMenu = function () {
+	  	$('#burgerImageCont').show();
+	  	setAppTheamColor("#EE972D");
+	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
+	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
 	  		if(!color) color="#69C1A8";
-	  		var sheet = document.createElement('style');
-	  		sheet.innerHTML = "\
+	  		var $sheet = $("<style>\
 			hr {\
 				border-top-color: "+color+"\
 			}\
@@ -494,8 +533,8 @@
 			.theamBGColor{background-color: "+color+";}\
 			.theamTextColor{color:"+color+";}\
 			input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+color+";}\
-			";
-	  		document.body.appendChild(sheet);	
+			</style>");
+	  		$('body').append($sheet);	
 	  }
 	  setAppTheamColor();
 	  var ioSocket, pingTimeStamp = Date.now();;
@@ -507,9 +546,16 @@
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
 			ioSocket.on('showBurgerMenu', showBurgerMenu)
+			ioSocket.on('homeControllerLocalIpAddress', function (add) {
+				var arr = window.location.href.split("/");
+				if(arr[2] == add) return;
+				$.ajax({crossDomain: true,dataType: "jsonp",
+					"url":"http://"+add+"/apptest", success:function (rsp){
+					if(rsp && rsp.success) window.location.href="http://"+add
+				}});
+			});
 	  };
 	  connectSocket();
-	  setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
 	</script>
 	<script>
 		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
@@ -556,6 +602,10 @@
 		$('#appCont').append(cloudSettingPage.$el);
 		var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
 		$('#appCont').append(networkSettingPage.$el);
+		var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});
+		$('#appCont').append(welcomeScreenPage.$el);
+		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
+		$('#appCont').append(checkUpdatePage.$el);
 
 	</script>
 	

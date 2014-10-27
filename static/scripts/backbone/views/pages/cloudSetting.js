@@ -4,12 +4,22 @@ CloudSettingPageView = BaseView.extend({
 		events: {
 		"tap #modifyCloudAccountButton" : "_onDone"
 	},
+	render: function() {
+		this.options.socket.emit("getCloudSettings", null, _.bind(function (rsp) {
+			if(rsp.email) {
+				this.$el.find('.cloudEmail').val(rsp.email);
+				this.$el.find('.cloudPwd').val('dummypassword');
+				this.$el.find('.cloudPwdCnf').val('dummypassword');
+			}
+		}, this));
+		BaseView.prototype.render.apply(this, arguments);
+	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		
 	},
 	_onDone : function (event) {
 		var cloudEmail = this.$el.find('.cloudEmail').val();
-		var cloudEmailCnf = this.$el.find('.cloudEmailCnf').val();
+		var cloudEmailCnf = cloudEmail;//this.$el.find('.cloudEmailCnf').val();
 		if(!cloudEmail || cloudEmail != cloudEmailCnf) {
 			this.$el.find('.errorMsgDiv span').html("Enter your email in the first row, and then re-enter the same in second row.");
 			this.$el.find('.errorMsgDiv').show();
@@ -17,6 +27,7 @@ CloudSettingPageView = BaseView.extend({
 		}
 		var cloudPwd = this.$el.find('.cloudPwd').val();
 		var cloudPwdCnf = this.$el.find('.cloudPwdCnf').val();
+		if(cloudPwd == 'dummypassword') return this.onDone();
 		if(!cloudPwd || cloudPwd != cloudPwdCnf) {
 			this.$el.find('.errorMsgDiv span').html("Enter password in third row, and then re-enter the same in last row.");
 			this.$el.find('.errorMsgDiv').show();

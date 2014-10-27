@@ -49,27 +49,40 @@ var BaseView = Backbone.View.extend({
         }, this);
 	},
     _onModelChangeOfSubViewArray : function (params, model) {
+        if(params.recreateOnRepaint) {
+            var index = this._onModelRemovalFromSubViewArray(params, model);
+            this._onNewModelInSubViewArray(params, model, index);
+        }
+        else    
         _.each(this[params.reference], function (view) {
             if(view.model !== model) return;
             view.repaint();
         }, this);
     },
     _onModelRemovalFromSubViewArray : function (params, model) {
+        var index = -1, retindx = -1;
         _.each(this[params.reference], function (view) {
+            index++;
             if(view.model !== model) return;
             this[params.reference] = _.without(this[params.reference], view);
             view.removeView();
+            retindx = index
         }, this);
+        return retindx;
     },
     //TODO write function similar to following for remove and change as well.
-    _onNewModelInSubViewArray : function (params, model) {
+    _onNewModelInSubViewArray : function (params, model, index) {
         params.model=model;
         var view = new window[params.viewClassName](_.omit(params,'events'));
         var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
         if (!$parent || !$parent.length) $parent=this.$el;
         $parent.append(view.$el);
+        if(typeof index == 'number') $parent.children().eq(index).before($parent.children().last())
         if(this.rendered) view.render();
-        this[params.reference].push(view);
+        if(typeof index == 'number') 
+            this[params.reference].splice(index, 0, view);
+        else 
+            this[params.reference].push(view);
         return view;
     },
     _attachModelEvents:function(){

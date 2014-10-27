@@ -12,11 +12,29 @@ var DeviceManager = BaseClass.extend({
 		this.communicator = communicator;
 		this.communicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
 		this.communicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
+		this.communicator.on('deviceReachable', __.bind(this._updateDeviceRechability, this, true));
+		this.communicator.on('deviceUnreachable', __.bind(this._updateDeviceRechability, this, false));
 		__.each(this.communicator.getDeviceIds(), __.bind(this._onNewDeviceFound, this));
+	},
+	_updateDeviceRechability : function  (reachable, deviceId) {
+		console.log("_updateDeviceRechability", reachable);
+		this._deviceMap[deviceId].reachable = reachable;
+		this.emit('deviceStateChanged', deviceId);
+	},
+	restoreDeviceStatus : function (stateMap) {
+		this._virtualNodesOldState = stateMap;
+		__.each(this._virtualNodes, function (node, id) {
+			__.has(this._virtualNodesOldState, id) && node.setState(this._virtualNodesOldState[id]);
+		}, this);
 	},
 	getDeviceNodes	: function (nodeIds) {
 		return __.pick(this._virtualNodes, nodeIds);
 	}, 
+	getDeviceStateMap : function () {
+		var stateMap = {};
+		__.each(this._virtualNodes, function (node, id) {stateMap[id] = node.state}, this);
+		return stateMap;
+	},
 	_registrationCheck : {},
 	_onNewDeviceFound : function (deviceId, count) {
 		if(this._deviceMap[deviceId] || typeof this._deviceMap[deviceId] != 'undefined' && !count) return;
@@ -65,11 +83,14 @@ var DeviceManager = BaseClass.extend({
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);
-		device.on('stateChanged', __.bind(function (device) {
-			this.emit('deviceStateChanged', device.id, device.getConfig());
+		device.on('stateChanged', __.bind(function (device, nodeType, changebits) {
+			this.emit('deviceStateChanged', device.id, device.getConfig(), nodeType);
 		}, this, device));
 		this._deviceMap[deviceId] = device;
 		__.extend(this._virtualNodes, device.virtualNodes);
+		if(this._virtualNodesOldState ) __.each(device.virtualNodes, function (node, id) {
+				__.has(this._virtualNodesOldState, id) && node.setState(this._virtualNodesOldState[id]);
+			}, this)
 		this.emit('newNodesFound', device.virtualNodes);
 		
 		// device.getConfig();

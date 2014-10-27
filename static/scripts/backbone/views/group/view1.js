@@ -8,7 +8,8 @@ SwitchViewFactory = function (options) {
 GroupView1 = BaseView.extend({
 	name : "GroupView1",
 	templateSelector:"#roomTemplate",
-	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection'}],
+	// recreateOnRepaint because ViewClass is a ViewFactory
+	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':true}],
 	initialize: function(obj) {
 		var ColClass = Backbone.Collection.extend({model:SwitchModel});
 		this.switchCollection = new ColClass(obj.model.get("controls"));

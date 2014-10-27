@@ -44,6 +44,7 @@ module.exports = function (callback) {
 	* Authenticate first, doing a post to some url 
 	* with the credentials for instance
 	*/
+	var pingTimeStamp, pingTimer, socket;
 	var foo = function () {
 		if(!__userConfig.get('email')) return setTimeout(foo, 30000);
 		console.log("Trying to login to cloud");
@@ -54,15 +55,27 @@ module.exports = function (callback) {
 	 			console.log('Found no response from cloud, probably internet is down!!')
 	 		}
 	 		if(!err && resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
-	 		if (!resp || err || resp.statusCode != 200) {console.log("will retry connecting cloud in 30 sec."); setTimeout(foo, 30000); return;}
+	 		if (!resp || err || resp.statusCode != 200) {console.log("will retry connecting cloud in 60 sec."); setTimeout(foo, 60000); return;}
 
 			/*
 			* now we can connect.. and socket.io will send the cookies!
 			*/
-			var socket = io.connect('http://cloud.inoho.com/inoho-home-controller');
-			socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
-			socket.on('disconnect', function(){console.log('connection broken!!');});
-			callback(null, socket);
+			pingTimeStamp = Date.now();
+			if(!socket){
+				socket = io.connect('http://cloud.inoho.com/inoho-home-controller');
+				socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
+				socket.on('disconnect', function(){console.log('connection broken!!');});
+				socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
+				callback(null, socket);
+			}
+			else 
+				socket.socket.reconnect();
+			pingTimer = setInterval(function () {
+				if(Date.now()-pingTimeStamp < 6*60*1000) return;
+				console.log('stoped recieving sudoHeartbeat from cloud ... trying to reconnect now.') 
+				clearInterval(pingTimer);
+				foo();
+			}, 3*60*1000);
 		});	
 	}
 	foo();

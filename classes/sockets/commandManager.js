@@ -28,10 +28,39 @@ var CommandManager = BaseClass.extend({
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
+		socket.on('getNetworkSettings', __.bind(this.getNetworkSettings, this));
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
+		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
+		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
+		socket.on('updateNow', __.bind(this.updateNow, this));
 		console.log('Added Command Listners!!')
+	},
+	updateNow : function () {
+		var sys = require('sys');
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			console.log(error, stdout, stderr);
+		}
+//		exec("sudo service inoho restart", foo);	
+		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh", foo);	
+		console.log('starting update now')
+	},
+	checkUpdates : function (commandData, callback) {
+		require('dns').resolve('www.google.com', function(err) {
+			if (err) return callback({'success':false, 'msg':'Connection to internet is down.'})
+			var sys = require('sys');
+            var exec = require('child_process').exec;
+            var foo = function(error, stdout, stderr) {
+				console.log(error, stdout, stderr);
+				if(error || !stdout) return callback({'success':false, 'msg':stderr});
+				if(stdout.indexOf("nothing to update") + 1) return callback({'success':false, 'msg':"No Updates."});
+				if(stdout.indexOf("updates available") + 1) return callback({'success':true, 'msg':"Update available."});
+				return callback({'success':false, 'msg':stdout});
+            }
+            exec("sudo bash "+__rootPath+"/shellScripts/checkUpdate.sh", foo);	
+		});
 	},
 	configureConnectedModule : function (commandData, callback) {
 		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd){
@@ -62,6 +91,9 @@ var CommandManager = BaseClass.extend({
 		deviceManager.communicator.checkSerialCable(function (err) {
 			callback && callback((!err)?true:false);	
 		});		
+	},
+	getCloudSettings	: function (commandData, callback) {
+		callback({'success':true, 'email':__userConfig.get('email')})
 	},
 	modifyCloudSettings : function (commandData, callback) {
 		var email = __userConfig.get('email');
@@ -105,6 +137,9 @@ var CommandManager = BaseClass.extend({
 			createAccount(commandData.email, commandData.password)
 
 
+	},
+	getNetworkSettings	: function (commandData, callback) {
+		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
 	},
 	onModifyNetworkSecurityKey : function (commandData, callback) {
 		//TODO consider network name as well

@@ -53,6 +53,14 @@ var BaseCommunicator = BaseClass.extend({
 		this._broadcast();
 		setInterval(__.bind(this._broadcast, this), 8000);
 	},
+	_checkConnectivity : function () {
+		__.each(this.deviceList, function (dev) {
+			if(dev.lastSeenAt < (Date.now()/1000) - 20 && !dev.unreachable) {
+				dev.unreachable = true;
+				this.emit("deviceUnreachable", dev.macAdd);
+			}
+		}, this)
+	},
 	_onDataArrival : function (data) {
 		data = this.byteDataToStr(data);
 		this._processArrivedData(data);
@@ -64,7 +72,7 @@ var BaseCommunicator = BaseClass.extend({
 
 	},
 	_broadcast : function () {
-	
+		this._checkConnectivity();	
 	},
 	_send : function (command, callback) {
 		this.serialPort.write(__.map(command, function (c){return c.charCodeAt(0);}), function(err, results) {

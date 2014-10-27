@@ -21,8 +21,14 @@ stop)
 	killall $NODE
 	;;
 
+restart)
+	killall $NODE	
+	echo "starting node: $NODE $SERVER_JS_FILE"
+	sudo -u $USER $NODE $SERVER_JS_FILE noLogs &
+	;;
+
 *)
-	echo "usage: $0 (start|stop)"
+	echo "usage: $0 (start|stop|restart)"
 esac
 
 exit 0

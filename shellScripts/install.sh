@@ -5,7 +5,7 @@ DIR1=$DIR0/homeController
 DIR2=$DIR0/gitScripts
 DIR3=$DIR0/gitScripts/shellScripts/upgradeScripts
 REPO=https://github.com/deepam1982/yantram.git
-BRANCH=V1
+BRANCH=`git --work-tree=$DIR1 --git-dir=$DIR1/.git rev-parse --abbrev-ref HEAD`
 
 mkdir $DIR0
 mkdir $DIR1
@@ -46,24 +46,29 @@ sudo update-rc.d inoho defaults
 
 echo "------------------ added inoho.sh to startup scripts ----------------";
 
+sudo cp $DIR1/shellScripts/syncSystemClock.sh /etc/init.d/syncSystemClock
+sudo chmod 755 /etc/init.d/syncSystemClock
+
+echo "------------------ added syncSystemClock.sh to init.d ----------------";
+
 sudo cp $DIR1/shellScripts/checkIpAlias.sh /etc/init.d/checkIpAlias.sh
 sudo chmod 755 /etc/init.d/checkIpAlias.sh
 sudo update-rc.d checkIpAlias.sh defaults
 
 sudo chmod 755 $DIR1/shellScripts/checkIpAlias.sh
-line="* * * * * sudo $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkIpAlias.log"
+line="* * * * * sudo bash $DIR1/shellScripts/checkIpAlias.sh > $DIR0/logs/checkIpAlias.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkIpAlias added to cron ----------------";
 
 sudo chmod 755 $DIR1/shellScripts/wifiCheck.sh
-line="* * * * * sudo $DIR1/shellScripts/wificheck.sh > $DIR0/logs/wificheck.log"
+line="* * * * * sudo bash $DIR1/shellScripts/wifiCheck.sh > $DIR0/logs/wifiCheck.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ checkWifi added to cron ----------------";
 
 sudo chmod 755 $DIR1/shellScripts/updateCron.sh
-line="0 0 * * * sudo $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCron.log"
+line="0 0 * * * sudo bash $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCron.log"
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ updateCron added to cron ----------------";

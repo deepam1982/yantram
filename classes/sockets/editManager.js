@@ -54,7 +54,7 @@ var EditManager = BaseClass.extend({
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
 		__.each(obj.params, function (val, key) {
-			if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId+'.'+key)) 
+			if(!deviceInfoConfig.has(obj.devId+".loadInfo."+obj.switchId+'.'+key)) 
 				return callback && callback({'success':false, 'msg':'invalid key'});;
 			deviceInfoConfig.set(obj.devId+".loadInfo."+obj.switchId+'.'+key, val)
 		});
