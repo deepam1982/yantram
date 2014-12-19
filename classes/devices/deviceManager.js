@@ -27,6 +27,10 @@ var DeviceManager = BaseClass.extend({
 			__.has(this._virtualNodesOldState, id) && node.setState(this._virtualNodesOldState[id]);
 		}, this);
 	},
+	getVirtualLoad : function (deviceId, loadIndx) {
+		var dev = this._deviceMap[deviceId];
+		if(dev) return dev.getVirtualLoad(loadIndx);
+	},
 	getDeviceNodes	: function (nodeIds) {
 		return __.pick(this._virtualNodes, nodeIds);
 	}, 
@@ -91,7 +95,7 @@ var DeviceManager = BaseClass.extend({
 		if(this._virtualNodesOldState ) __.each(device.virtualNodes, function (node, id) {
 				__.has(this._virtualNodesOldState, id) && node.setState(this._virtualNodesOldState[id]);
 			}, this)
-		this.emit('newNodesFound', device.virtualNodes);
+		this.emit('newNodesFound', device.virtualNodes, deviceId);
 		
 		// device.getConfig();
 		// this.emit('newDeviceFound', deviceId);

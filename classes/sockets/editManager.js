@@ -3,7 +3,7 @@ var BaseClass = require(__rootPath+"/classes/baseClass");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
-
+var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 
 var EditManager = BaseClass.extend({
 	init : function (obj) {
@@ -50,12 +50,29 @@ var EditManager = BaseClass.extend({
 		});
 
 	},
+	allowedSwitchParams : ["type", "icon", "devId", "name"],
 	modifySwitchParam : function (obj, callback) {
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
+		if(obj.params.autoOff) { //TODO this piece of code should not be along with deviceInfoConfig
+			return timerConfig.setAutoOffParams(obj.devId, obj.switchId, obj.params.autoOff, function (err) {
+				if(err) return (callback && callback({'success':false, 'msg':err}));
+				callback && callback({'success':true});
+				deviceManager.emit('deviceStateChanged');
+			});
+		}
+		if(obj.params.schedule) { //TODO this piece of code should not be along with deviceInfoConfig
+			return timerConfig.setSchedule(obj.devId, obj.switchId, obj.params.schedule, function (err) {
+				if(err) return (callback && callback({'success':false, 'msg':err}));
+				callback && callback({'success':true});
+				deviceManager.emit('deviceStateChanged');
+			});
+		}
 		__.each(obj.params, function (val, key) {
-			if(!deviceInfoConfig.has(obj.devId+".loadInfo."+obj.switchId+'.'+key)) 
-				return callback && callback({'success':false, 'msg':'invalid key'});;
+			if(__.indexOf(this.allowedSwitchParams, key) == -1) 
+				return callback && callback({'success':false, 'msg':'invalid key'});
+		});
+		__.each(obj.params, function (val, key) {
 			deviceInfoConfig.set(obj.devId+".loadInfo."+obj.switchId+'.'+key, val)
 		});
 		deviceInfoConfig.save(function (err) {

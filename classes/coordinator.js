@@ -2,17 +2,24 @@ var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var CronDevice = require(__rootPath+"/classes/virtualDevices/cronDevice");
+var AutoOffTimer = require(__rootPath+"/classes/virtualDevices/autoOffTimer");
+var Stabilizer = require(__rootPath+"/classes/virtualDevices/stabilizer");
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
-var devCoordConf = new (BasicConfigManager.extend({file : '/../configs/deviceCoordinatorConfig.json'}))();
+var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
+var devCoordConf = new (BasicConfigManager.extend({file : '/../configs/deviceCoordinatorConfig.json'}))({"callback":function () {
+	coordinator.populateUtilNodes();
+}});
 
 
 var Coordinator = BaseClass.extend({
 	utilNodes : {},
 	init : function (obj) {
 		__.bindAll(this, "onNewNodesFound");
-		this.populateUtilNodes();
 		this.deviceManager = obj.deviceManager;
 		this.deviceManager.on("newNodesFound", this.onNewNodesFound);
+		timerConfig.on('timerModified', __.bind(function (devId, loadId) {
+			this.manageTimersOnLoad(this.deviceManager.getVirtualLoad(devId, loadId));
+		}, this));
 	},
 	populateUtilNodes : function () {
 		this.utilNodes['dayLight'] = new CronDevice({'switchOnAt':'00 30 6 * * *', 'switchOffAt':'00 00 17 * * *', 'id':'dayLight'});
@@ -27,12 +34,108 @@ var Coordinator = BaseClass.extend({
         console.log("#### weekday = "+this.utilNodes['weekday'].state);
         console.log("#### weekend = "+this.utilNodes['weekend'].state);
         console.log(new Date());
+        __.each(devCoordConf.data, function (conf, nodeId) {
+			if(1+nodeId.indexOf("autoOffTimer"))
+				this.utilNodes[nodeId] = new AutoOffTimer({"switchOffAfter":conf.turnOffAfter, 'id':nodeId});
+			if(1+nodeId.indexOf("stabilizer"))
+				this.utilNodes[nodeId] = new Stabilizer({"switchOffAfter":conf.offAfter, 'id':nodeId});
+		}, this);
 	},
 	getNodeMap : function (nodeIdArr) {
 		var nodeMap = this.deviceManager.getDeviceNodes(nodeIdArr);
 		return __.extend(nodeMap, __.pick(this.utilNodes, nodeIdArr));
 	},
-	onNewNodesFound : function (nodes) {
+	// suspendAutoOff : function (loadId, callback) {
+	// 	var tmrId = loadId+'-autoOffTimer';
+	// 	var nodeIdArr = [].concat(loadId).concat(tmrId);
+	// 	var nodeMap = this.getNodeMap(nodeIdArr);
+	// 	if(__.size(nodeMap) == 2){
+	// 		__.each(nodeMap, function (node, id) {node.unfollowAll()});
+	// 	}
+	// 	callback && callback();
+	// },
+	// setAutoOff : function (loadId, timeInSec, callback) {
+	// 	var tmrId = loadId+'-autoOffTimer';
+	// 	var nodeIdArr = [].concat(loadId).concat(tmrId);
+	// 	var nodeMap = this.getNodeMap(nodeIdArr);
+	// 	if(!nodeMap[loadId]) {
+	// 		console.log("#### cannot set autoOffTimer on", loadId, "not found, will retry in 10 sec");
+	// 		return setTimeout(__.bind(this.setAutoOffOnLoad, this, loadId, timeInSec, callback), 10*1000);
+	// 	}
+	// 	if(!nodeMap[tmrId]){
+	// 		this.utilNodes[tmrId] = nodeMap[tmrId] = new AutoOffTimer({"switchOffAfter":timeInSec, 'id':tmrId});
+	// 	}
+	// 	else {
+	// 		__.each(nodeMap, function (node, id) {node.unfollowAll()});
+	// 		nodeMap[tmrId].setSwitchOffAfter(timeInSec);
+	// 	}
+	// 	nodeMap[tmrId].follow(nodeMap[loadId], loadId, null);
+	// 	nodeMap[loadId].follow(nodeMap[tmrId], null, '!'+tmrId);						
+	// },
+	// manageAutoOff : function (conf) {
+	// 	if(!conf.enabled) 
+	// 		this.suspendAutoOff(conf.devId+'-l'+conf.loadId);
+	// 	else
+	// 		this.setAutoOff(conf.devId+'-l'+conf.loadId, conf.time);
+	// },
+	putTimers : function (vNode, onTimers, offTimers, autoOffTimer) {
+	//	this.suspendAutoOff(vNode.id);
+		vNode.unfollowAll();
+		var nodeIdArr = [vNode.id];
+		var thisObj = this
+		var makeFollowLogic = function(timerArr, type) {
+			var logic = null;
+			__.each(timerArr, function (timer, indx) {
+				var id = vNode.id+'-'+type+'Timer-'+indx;
+				nodeIdArr.push(id);
+				console.log(timer.minute, timer.hour, timer.amPm)
+				var min = parseInt(timer.minute); 
+				var hour = parseInt(timer.hour)+((timer.amPm == 'AM')?0:12); 
+				var onPattern = "00 "+min+" "+hour+" * * *";
+				var offPattern ="00 "+((min+10)%60)+" "+((hour+parseInt((min+10)/60))%24)+" * * *";
+				console.log(onPattern, offPattern);
+				if(!this.utilNodes[id]) 
+					this.utilNodes[id] = new CronDevice({'switchOnAt':onPattern, 'switchOffAt':offPattern, 'id':id});
+				else {
+					this.utilNodes[id].switchOnAt(onPattern);
+					this.utilNodes[id].switchOffAt(offPattern);
+				}
+				if (!logic) logic = id;
+				else logic += '||'+id;
+			}, thisObj);
+			return logic;
+		};
+		if(autoOffTimer) {
+			var autOffTmrId = vNode.id+'-autoOffTimer', timeInSec=parseInt(autoOffTimer.time);	
+			nodeIdArr.push(autOffTmrId);
+			if(!this.utilNodes[autOffTmrId])
+				this.utilNodes[autOffTmrId] = new AutoOffTimer({"switchOffAfter":timeInSec, 'id':autOffTmrId});
+			else {
+				this.utilNodes[autOffTmrId].unfollowAll();
+				this.utilNodes[autOffTmrId].setSwitchOffAfter(timeInSec);
+			}
+			this.utilNodes[autOffTmrId].follow(vNode, vNode.id, '!'+vNode.id);
+		}
+
+		var onCondition = makeFollowLogic(onTimers, 'on');
+		var offCondition = makeFollowLogic(offTimers, 'off');
+		autoOffTimer && (offCondition = ((offCondition)?(offCondition+'||'):'')+'!'+autOffTmrId);
+		var nodeMap = this.getNodeMap(__.without(nodeIdArr, vNode.id));
+		vNode.follow(__.values(nodeMap), onCondition, offCondition);
+
+	},
+	manageTimersOnLoad : function (vNode) {
+		if(vNode.className != 'Load') return;
+		var nodeIndx = parseInt(vNode.id.substring(vNode.deviceId.length+2));
+		var timers = timerConfig.getTimers(vNode.deviceId, nodeIndx);
+		var onTimers = __.where(timers.schedules, {'type':'on', 'loadId':nodeIndx, 'enabled':true});
+		var offTimers = __.where(timers.schedules, {'type':'off', 'loadId':nodeIndx, 'enabled':true});
+		var autoOffTimer = __.where(timers.autoOff, {'loadId':nodeIndx, 'enabled':true});
+		autoOffTimer = (autoOffTimer.length)?autoOffTimer[0]:null;
+		this.putTimers(vNode, onTimers, offTimers, autoOffTimer);
+	},
+	onNewNodesFound : function (vNodes, deviceId) {
+		__.each(vNodes, function (vNode) {this.manageTimersOnLoad(vNode)}, this);
 		
 	//TODO __.each(devCoordConf.toJSON(), function (conf, nodeId) {
 		__.each(devCoordConf.data, function (conf, nodeId) {
@@ -45,8 +148,20 @@ var Coordinator = BaseClass.extend({
 						nodeIdArr = nodeIdArr.concat(conf.offCondition.replace(/(&&)|(\|\|)|(\()|(\)|(!))/g, " ").replace(/ +(?= )/g,"").trim().split(" "));
 					nodeIdArr = __.uniq(nodeIdArr)
 					nodeMap = this.getNodeMap(nodeIdArr = nodeIdArr.concat(nodeId))
-					if(nodeIdArr.length != __.keys(nodeMap).length) return;
-					nodeMap[nodeId].follow(__.values(__.omit(nodeMap, nodeId)), conf.onCondition, conf.offCondition);
+					if(nodeIdArr.length != __.keys(nodeMap).length) {
+						// if ('27B54C01004B1200-l3' == nodeId) 
+						// 	console.log(nodeIdArr, nodeIdArr.length, __.keys(nodeMap).length, __.keys(nodeMap));
+						return;
+					}
+					var offCond = conf.offCondition;
+					if(conf.turnOffAfter) {
+						var tmrId = nodeId+'-autoOffTimer';
+						this.utilNodes[tmrId] = new AutoOffTimer({"switchOffAfter":conf.turnOffAfter, 'id':tmrId});
+						this.utilNodes[tmrId].follow(nodeMap[nodeId], nodeId, null);
+						nodeMap = this.getNodeMap(nodeIdArr = nodeIdArr.concat(tmrId));
+						offCond=((offCond)?'||':'')+'!'+tmrId;
+					}
+					nodeMap[nodeId].follow(__.values(__.omit(nodeMap, nodeId)), conf.onCondition, offCond);
 					nodeMap[nodeId].manualTime = conf.manualTime;
 					nodeMap[nodeId].maxTime = conf.maxTime;
 					conf.conditionApplied = true;
