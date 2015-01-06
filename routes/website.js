@@ -14,4 +14,7 @@ module.exports = function(app) {
 	app.get('/apptest', function (req, res) {
     	res.end(req.query.callback+'('+JSON.stringify({'success':true})+')');
 	});
+	app.get('/inohocontroller', function (req, res) {
+    	res.end(JSON.stringify({'success':true}));
+	});
 };

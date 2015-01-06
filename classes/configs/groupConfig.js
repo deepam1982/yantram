@@ -4,6 +4,17 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var GroupConfigManager = BasicConfigManager.extend({
 	file : '/../configs/groupConfig.json',
+	getGroupInfo : function (devId, switchId) {
+		var data = this.toJSON();
+		for (var id in data) {
+			for (var idx=0; idx < data[id].controls.length; idx++){
+				var ctl = data[id].controls[idx];
+				if(ctl.devId == devId && ctl.switchID == switchId)
+					return {'id':id, 'name':data[id].name};
+			}
+		}
+		return null;
+	},
 	getList : function () {
 		var data = [];
 		var count = __.keys(this.data).length;

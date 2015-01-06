@@ -34,7 +34,14 @@ SwitchProxy = BaseView.extend({
  		"tap .iconPartition" : "onToggelSwitch"
  	},
  	onToggelSwitch : function (event) {
- 		this.model.selected = !this.model.selected;
+ 		if(this.model.task == 'moodSelection') {
+	 		if(!this.model.selected) {
+		 		this.model.selected = !this.model.selected;
+ 				this.model.setOn = true;
+	 		}
+ 			else if(this.model.setOn) this.model.setOn = false;
+ 			else this.model.selected = !this.model.selected;
+ 		}else this.model.selected = !this.model.selected;
  		this.repaint();
  	},
 	_getJsonToRenderTemplate : function () {
@@ -54,7 +61,7 @@ EditGroupPannel = BaseView.extend({
 	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editGroupCont', 'array':'deviceCollection'}],
 	render : function () {
 		deviceCollection.each(function (dev) {
-			_.each(dev.get('loadInfo'), function (sw, key) {sw.selected=false;}, this);
+			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
 		}, this);
 		_.each(this.model.get('controls'), function (obj) {
 			deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;

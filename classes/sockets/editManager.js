@@ -1,6 +1,7 @@
 var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
+var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
@@ -14,6 +15,31 @@ var EditManager = BaseClass.extend({
 	onLocalConnection : function (socket) {
 		socket.on('setSwitchParam', __.bind(this.modifySwitchParam, this));
 		socket.on('modifyGroup', __.bind(this.modifyGroup, this));
+		socket.on('modifyMood', __.bind(this.modifyMood, this));
+	},
+	modifyMood : function (obj, callback) {
+		if((parseInt(obj.id) && !moodConfig.get(obj.id)) || !obj.name || !obj.icon || !obj.controls || !__.isArray(obj.controls))
+			return callback && callback({'success':false, 'msg':'invalid parameters'});
+		var invalidParams = false, controls=[], id=0;
+		__.each(obj.controls, function (ctrl) {
+			if(!ctrl.devId || typeof ctrl.switchId == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchId))
+				return invalidParams = true;
+			controls.push({"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state)?"on":"off"})
+		}, this);
+		if(invalidParams) return callback && callback({'success':false, 'msg':'invalid parameters1'});
+		obj.id = Math.max(parseInt(obj.id), 0);
+		if(!obj.id) obj.id = 1 + __.max(__.map(moodConfig.data, function (val, key){return parseInt(key)}));
+		obj.id = Math.max(obj.id, 1);
+		if(controls.length)
+			moodConfig.set(obj.id+"", {"name":obj.name, "controls":controls, "icon":obj.icon});
+		else
+			moodConfig.data = __.omit(moodConfig.data, obj.id+"");
+		moodConfig.save(function (err) {
+			if(err) return callback && callback({'success':false, 'msg':err});
+			callback && callback({'success':true});
+			deviceManager.emit('moodConfigChanged', moodConfig.data);
+		});
+
 	},
 	modifyGroup : function (obj, callback) {
 		if((parseInt(obj.id) && !groupConfig.get(obj.id)) || !obj.name || !obj.controls || !__.isArray(obj.controls))

@@ -30,6 +30,7 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConfig.json'});
 __systemConfig = new SystemConfigMngr({'callback':function(err){
         var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
+        var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
@@ -126,6 +127,10 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                 __deviceStateConf.save();
               }
             });
+
+            deviceManager.on('moodConfigChanged', function (conf) {
+              io.sockets.emit('moodConfigUpdated', moodConfig.getList());
+            });  
 
             require(__rootPath + '/classes/sockets/initClientSocket')(function (err, cloudSocket) {
               theCloudSocket = cloudSocket;

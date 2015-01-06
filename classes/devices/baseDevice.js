@@ -172,6 +172,15 @@ var BaseDevice = BaseClass.extend({
 		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState};
 		this.stateJson = retObj;
 	},
+	applyConfig : function (conf) {
+		__.each(conf, function (value, id) {
+			if(parseInt(id)>this.numberOfSwitches) return;
+			//this.virtualNodes[this.id+"-l"+id].setState((value)?true:false);
+			this.setSwitch(parseInt(id), (value)?true:false);
+			if(parseInt(id)>this.numberOfDimmers || !__.isNumber(value)) return;
+			this.setDimmer(parseInt(id), value);
+		}, this);
+	}
 // 	applyConfig : function (conf) {
 // 		console.log("###### applyConfig called");
 // 		__.each(__.keys(conf), function (key){

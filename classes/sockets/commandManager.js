@@ -3,6 +3,7 @@ var BaseClass = require(__rootPath+"/classes/baseClass");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
+var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 
 
 var CommandManager = BaseClass.extend({
@@ -35,6 +36,8 @@ var CommandManager = BaseClass.extend({
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
 		socket.on('updateNow', __.bind(this.updateNow, this));
+		socket.on('applyMood', __.bind(this.activateMood, this));
+
 		console.log('Added Command Listners!!')
 	},
 	updateNow : function () {
@@ -190,9 +193,25 @@ var CommandManager = BaseClass.extend({
 	        'state':(commandData.state == 'off')?true:false // log new state
 	    });
 		device.toggleSwitch(switchId);
-		console.log("@@@@@@@@@ switch toggelled by "+commandData.deviceType+" @@@@@@@@@@@");
 	
-	} 
+	},
+	activateMood : function (commandData) {
+	    moodData = moodConfig.get(commandData.id+"");
+	    if(!moodData || !moodData.controls || moodData.icon != commandData.icon)
+	    	return console.log("invalid mood command from client");
+		eventLogger.addEvent("activateMood", {
+	        'moodId':commandData.id, 
+	        'moodIcon':commandData.icon,
+	        'remoteDevice':commandData.deviceType, 
+	    });
+	    var conf = {};
+	    __.each(__.groupBy(moodData.controls, function(ctl){ return ctl.devId;}), function (controls, devId) {
+	    	var state = {};
+	    	__.each(controls, function (ctl) {state[""+ctl.switchId]=(ctl.state=='on')?true:false}); //in case of dimmer state will be number fom 0 to 255
+	    	conf[devId]=state;
+	    });
+	    deviceManager.applyConfig(conf);
+	}
 });
 
 module.exports = CommandManager;
