@@ -24,7 +24,8 @@ var CommandManager = BaseClass.extend({
 	},
 	onCommonConnection : function (socket) {
 		socket.on('toggleSwitch', this.onToggleSwitchCommand);
-		socket.on('setDuty', this.onSetDutyCommand);		
+		socket.on('setDuty', this.onSetDutyCommand);
+		socket.on('groupOff', __.bind(this.groupOff, this));
 	},
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
@@ -196,13 +197,13 @@ var CommandManager = BaseClass.extend({
 	
 	},
 	activateMood : function (commandData) {
-	    moodData = moodConfig.get(commandData.id+"");
+	    var moodData = moodConfig.get(commandData.id+"");
 	    if(!moodData || !moodData.controls || moodData.icon != commandData.icon)
 	    	return console.log("invalid mood command from client");
 		eventLogger.addEvent("activateMood", {
 	        'moodId':commandData.id, 
 	        'moodIcon':commandData.icon,
-	        'remoteDevice':commandData.deviceType, 
+	        'remoteDevice':commandData.deviceType 
 	    });
 	    var conf = {};
 	    __.each(__.groupBy(moodData.controls, function(ctl){ return ctl.devId;}), function (controls, devId) {
@@ -211,6 +212,23 @@ var CommandManager = BaseClass.extend({
 	    	conf[devId]=state;
 	    });
 	    deviceManager.applyConfig(conf);
+	},
+	groupOff : function (commandData) {
+		var groupData = groupConfig.get(commandData.id+"");
+		if(!groupData || !groupData.controls)
+	    	return console.log("invalid group off command from client");
+	    eventLogger.addEvent("groupOff", {
+	        'groupId':commandData.id, 
+	        'remoteDevice':commandData.deviceType
+	    });
+	    var conf = {};
+	    __.each(__.groupBy(groupData.controls, function(ctl){ return ctl.devId;}), function (controls, devId) {
+	    	var state = {};
+	    	__.each(controls, function (ctl) {state[""+ctl.switchID]=false});
+	    	conf[devId]=state;
+	    });
+	    deviceManager.applyConfig(conf);
+
 	}
 });
 

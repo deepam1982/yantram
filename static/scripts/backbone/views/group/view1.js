@@ -22,8 +22,10 @@ GroupView1 = BaseView.extend({
 	events: {
 		"tap .powerButton" : "onPowerOffClick"
 	},
-	onPowerOffClick : function () {
-		this.model.powerOff();
+	onPowerOffClick : function (event) {
+		var $loader;
+		$(event.target).closest('.roomTitleCont').append($loader=$('<img src="static/images/loading.gif" style="position:absolute;right:-11px;top:-13px;"/>'))
+		this.model.powerOff(function () {setTimeout(function (){$loader.remove()}, 1000)});
 	}
 });
 

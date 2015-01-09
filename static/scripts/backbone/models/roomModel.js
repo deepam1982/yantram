@@ -1,10 +1,10 @@
 RoomModel = BaseModel.extend({
 	urlRoot		:	'/room/model/',
-	powerOff	:	function () {
-		_.each(_.filter(this.attributes.controls, function (obj){return obj.state != 'off';}), function(obj){
-			this.toggleSwitch(obj.devId, obj.switchID, obj.state);
-		}, this);
-//		this.sendActionRequest("powerOff/");
+	powerOff	:	function (calback) {
+		// _.each(_.filter(this.attributes.controls, function (obj){return obj.state != 'off';}), function(obj){
+		// 	this.toggleSwitch(obj.devId, obj.switchID, obj.state);
+		// }, this);
+		this.sendActionRequest("groupOff", {'id':this.id}, calback);
 	},
 	toggleSwitch : function (devId, switchId, state, calback) {
 		this.sendActionRequest("toggleSwitch", {"devId":devId, "switchId":switchId, "state":state}, calback);	
