@@ -53,13 +53,16 @@
 		}
 */
 		.moodWidgetArea {
-			min-height:60px;
+			min-height:50px;
 			width:100%;
 			max-width:500px;
 			position: fixed;
 			bottom: 0px;
-			border-top: 1px solid white;
-			z-index: 100;
+			border:0px;
+/*			border-top: 1px solid white;
+*/			z-index: 100;
+			border-top-width:2px; 
+			border-style:solid;
 		}
 		.moodTitleCont, .titleCont, .roomTitleCont {
 			padding:2px 5px;
@@ -110,7 +113,7 @@
 			padding:10px 0;
 			margin-top:-7px;
 		}
-		.editMood, .editViewCont .editButton {display: block;}
+		.deleteMood, .editMood, .editViewCont .editButton {display: block;}
 
 		.switchCont {
 			font-size: 14px;
@@ -171,15 +174,19 @@
 			width:20px; height:20px;
 			background-image: url("/static/images/transparentTick.png");
 			background-size: cover; 
-			position:absolute; right:0px; top:13px;
+			position:absolute; right:0px; top:13px; z-index: 1;
 			border-radius: 10px;
 			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale');
 		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale')";
 
 		}
 		.tickLable {
-			position:absolute; right:0px; top:38px;font-weight:bold;
-		}	
+			position:absolute; right:0px; top:38px; z-index: 1; font-weight:bold;
+		}
+		.editMoodCont .toggelSwitchBackgroundDiv{
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+		}
 
 		.basicSwitchTemplate {
 			float:left;background-color:white;position:relative;border-radius:3px;
@@ -203,7 +210,8 @@
 		.font12 {font-size:12px;}
 		.font10 {font-size:10px;}
 
-
+		.whiteBG{background-color: white;}
+		.whiteBorderColor{border-color:white;}
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -279,7 +287,7 @@
 
 	<body>
 		<div id='mainCont'>
-			<div style='float: left;width:100%;padding-bottom:50px;'>
+			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
 						<a href='/' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
@@ -293,7 +301,7 @@
 			</div>
 			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
-			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer'></div>
+			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
 		</div>		
 
 	</body>
@@ -423,13 +431,13 @@
 		</div>
 	</script>
 	<script type="text/template" id="moodProxyTemplate">
-		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='float:left;margin:0px 8px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
-			<div style='width:40px; height:40px; background-image:url("static/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
+		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block;margin:0px 5px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
+			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
 			<span><%=name%></span>
 		</div>
 	</script>
 	<script type="text/template" id="moodStripTemplate">
-		<div class="moodProxyCont" style='padding:5px 15px'></div>
+		<div class="moodProxyCont" style='padding:0px 15px; text-align:center;'></div>
 	</script>
 	<script type="text/template" id="moodViewTemplate">
 		<div class='popupPannel editTemplateCont theamBorderColor' style='display:none; width:100%;position:relative;margin-top:-20px;'>
@@ -440,7 +448,8 @@
 			<div class="moodTitleCont theamBGColor" style=''>
 				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
 				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
-				<span class='editButton editMood' style='float:right;margin:0px 10px;'>edit</span>
+				<span class='editButton deleteMood' style='float:right;margin:0px; padding:10px;'>delete</span>
+				<span class='editButton editMood' style='float:right;margin:0px; padding:10px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
 			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
@@ -477,6 +486,13 @@
 				<div style='clear:both'></div>
 			</div>
 			<br/>
+			<%if(typeof count != 'undefined') {%>
+				<span style='margin-left:-60px;float:left;'>Rank</span>
+				<%for(var i=1 ;i<=count; i++) {%>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
+				<%}%>	
+				<br/><br/>
+			<%}%>
 			<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
 			<br/><br/>
 		</div>	
@@ -486,7 +502,8 @@
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
 				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
-				<span class='editButton theamTextColor' style='float:right'>edit group</span>
+				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
+				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
@@ -653,10 +670,10 @@
 			<% if(task == "moodSelection" && selected){%>
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
 			<%}%>
-			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:45px;">
+			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
 				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
+				<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
 			</div>
-			<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
 		</div>
 	</script>
 	<script type="text/template" id="deviceGroupTemplate">
@@ -698,10 +715,16 @@
 				$appContPar.css('width', '62%');				
 			}
 		});
-		fixMoodStrip = false;
+		fixMoodStrip = false; //true; //false;
 		lastScrollTop=0;
+		hideMoodStrip = function () {
+			$('.footer').animate({'bottom':-parseInt($('.footer').height())}, 300);
+		};
+		hideMoodStripTimer = setTimeout(hideMoodStrip, 5000);
 		$(window).scroll(function (){
-			if(fixMoodStrip) return;
+			if(fixMoodStrip || !moodStrip || !moodStrip.rendered) return ;//hideMoodStrip();
+			hideMoodStripTimer && clearTimeout(hideMoodStripTimer);
+			hideMoodStripTimer = setTimeout(hideMoodStrip, 5000);
 			var curScrollTop = $(window).scrollTop(), delta = curScrollTop-lastScrollTop;
 			var ftrBtmPos = parseInt($('.footer').css('bottom'), 10)+delta;
 			ftrBtmPos = Math.min(0, Math.max(ftrBtmPos, -parseInt($('.footer').height(), 10)));
@@ -728,7 +751,7 @@
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
 	  	setAppTheamColor("#EE972D");
-//	  	setInterval(function () {if(Date.now()-pingTimeStamp < 5000)return; location.reload();}, 1000);
+	  	setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
 	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
@@ -738,6 +761,7 @@
 				border-top-color: "+color+"\
 			}\
 			.whiteBG{background-color: white;}\
+			.whiteBorderColor{border-color:white;}\
 			input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+color+";}\
 			.theamBGColor{background-color: "+color+";}\
 			.theamTextColor{color:"+color+";}\
@@ -800,7 +824,7 @@
 				console.log("change called on "+model.get('name'));
 				console.log(model);
 			});
-			if(gC.models.length<5)fixMoodStrip=true;
+			(gC.models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
 		})
 //		gC.on("sort", function () {console.log(gC.pluck('name'));});
 		mC.on("add", function(model){
@@ -809,10 +833,10 @@
 		gC.fetch({update:true, useSocket:true});
 		dC.fetch({update:true, useSocket:true});
 		mC.fetch({update:true, useSocket:true});
-		var moodStrip = new MoodStripView({'collection':mC, 'el':$('.moodWidgetArea')});
-		moodStrip.render();
+		
 		deviceCollection = dC;
 		var mainPageView = new MainPageView({'collection':gC});
+		var moodStrip = mainPageView.moodStrip = new MoodStripView({'collection':mC, 'el':$('.moodWidgetArea')});
 		$('#appCont').append(mainPageView.$el);
 		mainPageView.render();
 		sideMenu.currentPage = mainPageView;

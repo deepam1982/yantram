@@ -4,17 +4,22 @@ MoodView = BaseView.extend(Popup).extend({
 	templateSelector:"#moodViewTemplate",
 	subViews : [{'viewClassName':'EditMoodPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'supressRender':true}],
 	events: _.extend(Popup.events, {
- 		"tap .editMood" : "showPopUp"
+ 		"tap .editMood" : "showPopUp",
+ 		"tap .deleteMood" : "deleteMood"
  	}),
  	showPopUp : function () {
 		this.editPannel.render();
-		var retObj = Popup.showPopUp.apply(this, arguments);
-//		this.$el.css('top',Math.max(10,Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top))+"px");
-		return retObj;
+		return Popup.showPopUp.apply(this, arguments);
  	},
  	hidePopUp : function () {
  		this.editPannel.erase();
 		return Popup.hidePopUp.apply(this, arguments);
+ 	},
+ 	deleteMood : function () {
+ 		var moodInfo = this.model.toJSON();
+		moodInfo.rank = moodInfo.id;
+		moodInfo.controls = [];
+		ioSocket.emit("modifyMood", moodInfo, function (err){if(err)console.log(err)});
  	},
 	_getJsonToRenderTemplate : function () {
 		var moodJson = (this.model)?this.model.toJSON():{};

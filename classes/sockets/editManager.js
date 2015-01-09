@@ -34,6 +34,16 @@ var EditManager = BaseClass.extend({
 			moodConfig.set(obj.id+"", {"name":obj.name, "controls":controls, "icon":obj.icon});
 		else
 			moodConfig.data = __.omit(moodConfig.data, obj.id+"");
+		var rank = parseInt(obj.rank || 0), rankObj=null;
+		if(rank && rank != parseInt(obj.id)) rankObj = moodConfig.get(obj.id+"");
+		var newData = {}, nwId=1;
+		__.each(moodConfig.data, function (group, key) {
+			if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
+			if(rankObj !== group) newData[""+(nwId++)] = group;
+		});
+		if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
+
+		moodConfig.data = newData;
 		moodConfig.save(function (err) {
 			if(err) return callback && callback({'success':false, 'msg':err});
 			callback && callback({'success':true});

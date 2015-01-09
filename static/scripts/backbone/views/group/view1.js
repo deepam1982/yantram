@@ -97,8 +97,15 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  		return this;
  	},
  	events: _.extend(GroupView1.prototype.events,AdvancePannel.events, {
- 		"tap .editButton" : "showAdvancePannel"
+ 		"tap .editGroup" : "showAdvancePannel",
+ 		"tap .deleteGroup" : "deleteGroup"
  	}),
+ 	deleteGroup : function () {
+ 		var groupInfo = this.model.toJSON();
+		groupInfo.rank = groupInfo.id;
+		groupInfo.controls = [];
+		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+ 	},
  	showAdvancePannel : function () {
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
 		//this.$el.css('top', '50px');

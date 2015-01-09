@@ -1,6 +1,6 @@
 EditMoodPannel = BaseView.extend({
 	name : "EditMoodPannel",
-	iconNameArray : ['coffee','meditate', 'ideate', 'wine', 'converce', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
+	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
 	templateSelector:"#editMoodTemplate",
 	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editMoodCont', 'array':'deviceCollection'}],
 		events : {
@@ -46,6 +46,7 @@ EditMoodPannel = BaseView.extend({
 				sw.selected=true;sw.setOn=(obj.state=='on'||obj.state==true)?true:false;
 			}, this);
 		BaseView.prototype.render.apply(this, arguments);
+		setTimeout(_.bind(function(){this.$el.find('input[type="radio"][checked]').prop("checked", true);},this),200);
 		return this;
 	},
 	erase : function () {

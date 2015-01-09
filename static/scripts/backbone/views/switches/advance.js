@@ -43,7 +43,7 @@ Popup = {
 		this.bd.cloneOnPullup = true;
 		var $last = $(_.last(this.$el.find('.popupPannel'))).show();
 		this.bd.pullItOver($last);
-		console.log($last.css('top'));
+		$last[0].scrollIntoView();
 	},
 	hidePopUp : function () {
 		if(!this.bd) return;
@@ -74,7 +74,7 @@ AdvancePannel = {
 		this.bd.cloneOnPullup = true;
 		this.bd.render();
 		this.bd.pullItOver(this.$el);
-		$(_.last(this.$el.find('.advancePannel'))).show(); 
+		$(_.last(this.$el.find('.advancePannel'))).show().focus();
 
 	},
 	hideAdvancePannel : function () {

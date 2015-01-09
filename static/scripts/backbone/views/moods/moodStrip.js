@@ -1,5 +1,6 @@
 MoodProxy = BaseView.extend({
 	name : "MoodProxy",
+	tagName : 'span',
 	templateSelector:"#moodProxyTemplate"
 });
 
@@ -14,8 +15,11 @@ MoodStripView = BaseView.extend({
 		var $elm = $(event.target).closest('.moodIcon');
 		var moodModel = this.collection.get($elm.attr('moodId'));
 		console.log(moodModel);
-		moodModel.sendActionRequest("applyMood", {'id':$elm.attr('moodId'), 'icon':$elm.attr('moodIconName')}, function (err){if(err)console.log(err)});
-//		ioSocket.emit("applyMood", {'id':$elm.attr('moodId'), 'icon':$elm.attr('moodIconName')}, function (err){if(err)console.log(err)});
+		$elm.append('<img src="static/images/loading.gif" style="position:absolute;left:-6px;top:0px;"/>')
+		moodModel.sendActionRequest("applyMood", {'id':$elm.attr('moodId'), 'icon':$elm.attr('moodIconName')}, function (err){
+			setTimeout(function (){$elm.find('img').remove()}, 1000);
+			if(err)console.log(err)
+		});
 
 	}
 })

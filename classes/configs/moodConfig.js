@@ -8,6 +8,7 @@ var MoodConfigManager = BasicConfigManager.extend({
 		var count = __.keys(this.data).length;
 		__.each(this.toJSON(), function (conf, id) {
 			var mood = JSON.parse(JSON.stringify(conf));
+			mood.count = count;
 			mood.id=id;
 			__.each(mood.controls, function (ctrl, indx){
 				ctrl.groupInfo = groupConfig.getGroupInfo(ctrl.devId, ctrl.switchId);	
