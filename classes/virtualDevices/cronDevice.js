@@ -14,6 +14,7 @@ var CronDevice = BaseVirtualDevice.extend({
 	},
 	cancleSwitchOnAt : function () {
 		this.switchOnJob && this.switchOnJob.stop();
+		this.switchOnJob = null;
 	},
 	switchOnAt : function (pattern, callback) {	// '00 30 11 * * 1-5' 11:30, 5 days a week
 		this.cancleSwitchOnAt();
@@ -25,6 +26,7 @@ var CronDevice = BaseVirtualDevice.extend({
 	},
 	cancleSwitchOffAt : function () {
 		this.switchOffJob && this.switchOffJob.stop();
+		this.switchOffJob=null;
 	},
 	switchOffAt : function (pattern, callback) {	// '00 30 11 * * 1-5' 11:30, 5 days a week
 		this.cancleSwitchOffAt();
@@ -34,6 +36,16 @@ var CronDevice = BaseVirtualDevice.extend({
 			start: true
 		});
 	},
+	getRemainingTimeToToggle :function () { // in seconds
+		var time = this._super.apply(this, arguments);
+		if(this.state && this.switchOffJob) {
+			return Math.min(time, 1+parseInt(this.switchOffJob.cronTime.getTimeout()/1000))
+		}
+		if(!this.state && this.switchOnJob) {
+			return Math.min(time, 1+parseInt(this.switchOnJob.cronTime.getTimeout()/1000))
+		}
+		return time;
+	}
 })
 
 module.exports = CronDevice;

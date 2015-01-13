@@ -37,10 +37,13 @@ var BaseDevice = BaseClass.extend({
 	_initSwitches : function () {
 		__.times(this.numberOfSwitches, function(indx){
 			this.switchState.push(0);
-			var vl = new Load({'state':0, 'id':this.id+"-l"+indx});
+			var vl = new Load({'state':0, 'id':this.id+"-l"+indx, 'deviceId':this.id});
 			this.virtualNodes[vl.id] = vl;
 			this._bindWithVirtualLoad(indx, vl);
 		}, this);		
+	},
+	getVirtualLoad : function (indx) {
+		return this.virtualNodes[this.id+"-l"+indx];
 	},
 	_initDimmers : function () {
 		__.times(this.numberOfDimmers, function(){this.dimmerState.push(0)}, this);
@@ -91,7 +94,7 @@ var BaseDevice = BaseClass.extend({
 		this._logDVST(msg);
 		var callback;
 		__.times(this.numberOfSwitches, function(indx){
-			var vDev = this.virtualNodes[this.id+"-l"+indx];
+			var vDev = this.getVirtualLoad(indx);//this.virtualNodes[this.id+"-l"+indx];
 			if(vDev._initSyncDone && !vDev.syncPending && vDev.state ^ this.switchState[indx]) {
 				console.log("@@@@@@@@@ switch manually toggelled @@@@@@@@@@@");
 				//TODO get rid of following hack.
@@ -153,7 +156,9 @@ var BaseDevice = BaseClass.extend({
 	_makeStateJson : function () {
 		var switchState = {}
 		__(this.numberOfSwitches).times(function (i) {
-			switchState[i+""] = {"state":this.switchState[i]};
+			switchState[i+""] = {"state":this.switchState[i]}
+//			var vDev = this.virtualNodes[this.id+"-l"+i];
+//			switchState[i+""] = {"state":this.switchState[i], "followCount":__.keys(vDev.followObjs).length};
 		}, this);
 		var dimmerState = {}
 		__(this.numberOfDimmers).times(function (i) {
@@ -167,6 +172,15 @@ var BaseDevice = BaseClass.extend({
 		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState};
 		this.stateJson = retObj;
 	},
+	applyConfig : function (conf) {
+		__.each(conf, function (value, id) {
+			if(parseInt(id)>this.numberOfSwitches) return;
+			//this.virtualNodes[this.id+"-l"+id].setState((value)?true:false);
+			this.setSwitch(parseInt(id), (value)?true:false);
+			if(parseInt(id)>this.numberOfDimmers || !__.isNumber(value)) return;
+			this.setDimmer(parseInt(id), value);
+		}, this);
+	}
 // 	applyConfig : function (conf) {
 // 		console.log("###### applyConfig called");
 // 		__.each(__.keys(conf), function (key){

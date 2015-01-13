@@ -5,6 +5,7 @@ var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
+var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 
 var RequestManager = BaseClass.extend({
 	init : function (obj) {
@@ -24,10 +25,14 @@ var RequestManager = BaseClass.extend({
 	onLocalConnection : function (socket) {
 		socket.on('/room/list', __.bind(this.onRoomListRequest, this, socket));
 		socket.on('/device/list', __.bind(this.onDeviceListRequest, this, socket));
+		socket.on('/mood/list', __.bind(this.onMoodListRequest, this, socket));
 //		console.log('Added Request Listners!!');
 	},
 	onDeviceListRequest : function (socket, reqData, calback) {
 		calback(deviceInfoConfig.getList());
+	},
+	onMoodListRequest : function (socket, reqData, calback) {
+		calback(moodConfig.getList());
 	},
 	onRoomListRequest : function (socket, reqData, calback) {
 		console.log('recieved room list request!!');

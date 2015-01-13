@@ -8,7 +8,8 @@ Backdrop = BaseView.extend({
 	},
 	pullItOver : function ($elm) {
 		if(!this.elmArr) this.elmArr = [];
-		$elm.after($elm.clone());
+		$elm.attr('oldStyle', $elm.attr('style'));
+		if(this.cloneOnPullup) $elm.after($elm.clone());
 		var left = $elm.offset().left - this.$el.offset().left;
 		var top = $elm.offset().top - this.$el.offset().top;
 		$elm.css('left', left);
@@ -24,14 +25,35 @@ Backdrop = BaseView.extend({
 	erase : function () {
 		_.each(this.elmArr, function ($elm) {
 			$elm.css('width', $elm.attr('cssWidth'));
-			$next = $elm.next()
-			$elm.attr('style', $next.attr('style'));
-			$next.remove();
+			$elm.attr('style', $elm.attr('oldStyle'));
+			if(this.cloneOnPullup) $elm.next().remove();
 		}, this);
 		this.$el.remove();
 		return this;
 	}
 });
+
+Popup = {
+	events: {
+		"tap .popupPannel .cross" : "hidePopUp"
+	},
+	showPopUp : function () {
+		this.bd = new Backdrop({'$parent':$('#mainCont')});
+		this.bd.render();
+		this.bd.cloneOnPullup = true;
+		var $last = $(_.last(this.$el.find('.popupPannel'))).show();
+		this.bd.pullItOver($last);
+		$last[0].scrollIntoView();
+	},
+	hidePopUp : function () {
+		if(!this.bd) return;
+		this.bd.removeView();
+		this.bd = null;
+		var $last = $(_.last(this.$el.find('.popupPannel'))).hide();
+		$last.css('position', 'inherit');
+	}
+
+}
 
 AdvancePannel = {
  	render	:	function () {
@@ -49,9 +71,10 @@ AdvancePannel = {
 		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
 		if(this.bd) return;
 		this.bd = new Backdrop({'$parent':$('#mainCont')});
+		this.bd.cloneOnPullup = true;
 		this.bd.render();
 		this.bd.pullItOver(this.$el);
-		$(_.last(this.$el.find('.advancePannel'))).show(); 
+		$(_.last(this.$el.find('.advancePannel'))).show().focus();
 
 	},
 	hideAdvancePannel : function () {

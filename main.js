@@ -30,6 +30,7 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConfig.json'});
 __systemConfig = new SystemConfigMngr({'callback':function(err){
         var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
+        var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
@@ -111,9 +112,15 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }
             restoreState();
             //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
-
+            var theCloudSocket = null
+            var publishGroupConfig = __.throttle(function () {
+              var groupConfigList = groupConfig.getList();
+              io.sockets.emit('roomConfigUpdated', groupConfigList);
+              theCloudSocket && theCloudSocket.emit('roomConfigUpdated', groupConfigList);
+            }, 100, {leading: false});
+            
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType) {
-              io.sockets.emit('roomConfigUpdated', groupConfig.getList())
+              publishGroupConfig();
               if(nodeType == 'load'){
                 __deviceStateConf.data = deviceManager.getDeviceStateMap();
                 __deviceStateConf.set('epoch', Date.now());
@@ -121,11 +128,13 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               }
             });
 
+            deviceManager.on('moodConfigChanged', function (conf) {
+              io.sockets.emit('moodConfigUpdated', moodConfig.getList());
+            });  
+
             require(__rootPath + '/classes/sockets/initClientSocket')(function (err, cloudSocket) {
-              cloudSocket.emit('roomConfigUpdated', groupConfig.getList())
-              deviceManager.on('deviceStateChanged', function () {
-                cloudSocket.emit('roomConfigUpdated', groupConfig.getList())
-              });  
+              theCloudSocket = cloudSocket;
+              publishGroupConfig();
               socComMngr.setCloudSocket(cloudSocket);
               socReqMngr.setCloudSocket(cloudSocket);
             })

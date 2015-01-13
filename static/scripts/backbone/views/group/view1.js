@@ -22,8 +22,10 @@ GroupView1 = BaseView.extend({
 	events: {
 		"tap .powerButton" : "onPowerOffClick"
 	},
-	onPowerOffClick : function () {
-		this.model.powerOff();
+	onPowerOffClick : function (event) {
+		var $loader;
+		$(event.target).closest('.roomTitleCont').append($loader=$('<img src="static/images/loading.gif" style="position:absolute;right:-11px;top:-13px;"/>'))
+		this.model.powerOff(function () {setTimeout(function (){$loader.remove()}, 1000)});
 	}
 });
 
@@ -34,7 +36,14 @@ SwitchProxy = BaseView.extend({
  		"tap .iconPartition" : "onToggelSwitch"
  	},
  	onToggelSwitch : function (event) {
- 		this.model.selected = !this.model.selected;
+ 		if(this.model.task == 'moodSelection') {
+	 		if(!this.model.selected) {
+		 		this.model.selected = !this.model.selected;
+ 				this.model.setOn = true;
+	 		}
+ 			else if(this.model.setOn) this.model.setOn = false;
+ 			else this.model.selected = !this.model.selected;
+ 		}else this.model.selected = !this.model.selected;
  		this.repaint();
  	},
 	_getJsonToRenderTemplate : function () {
@@ -54,7 +63,7 @@ EditGroupPannel = BaseView.extend({
 	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editGroupCont', 'array':'deviceCollection'}],
 	render : function () {
 		deviceCollection.each(function (dev) {
-			_.each(dev.get('loadInfo'), function (sw, key) {sw.selected=false;}, this);
+			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
 		}, this);
 		_.each(this.model.get('controls'), function (obj) {
 			deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;
@@ -90,8 +99,15 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  		return this;
  	},
  	events: _.extend(GroupView1.prototype.events,AdvancePannel.events, {
- 		"tap .editButton" : "showAdvancePannel"
+ 		"tap .editGroup" : "showAdvancePannel",
+ 		"tap .deleteGroup" : "deleteGroup"
  	}),
+ 	deleteGroup : function () {
+ 		var groupInfo = this.model.toJSON();
+		groupInfo.rank = groupInfo.id;
+		groupInfo.controls = [];
+		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+ 	},
  	showAdvancePannel : function () {
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
 		//this.$el.css('top', '50px');

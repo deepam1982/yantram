@@ -5,9 +5,11 @@ var BaseVirtualDevice = BaseClass.extend({
 	init : function(obj) {
 		__.bindAll(this, 'setState', '_setStateAsPerFollowLogic');
 		this.id=(obj && obj.id)?obj.id:new Date().getTime();
+		this.deviceId=(obj && obj.deviceId)?obj.deviceId:null;
 		this.state=(obj && obj.state)?obj.state:false;
 		this.onStateChange = this._onStateChange		 // user may reimplement this.
 		this.followObjs = {};
+		this.avoidFollow = false;
 	},
 	_onStateChange : function (force) {
 	//	console.log("_onStateChange called for", this.className, this.id);
@@ -35,12 +37,44 @@ var BaseVirtualDevice = BaseClass.extend({
 	_switchOff : function () {
 		this._setState(false);
 	},
+	getRemainingTimeToToggle :function () { // in seconds
+		if(!__.size(this.followObjs) || this.timeCalculationIsOn) return Infinity;
+		this.timeCalculationIsOn = true;
+		var objectTimeMap = {};
+		var sudoFollowObjs = {};
+		__.each(this.followObjs, function (obj){
+			objectTimeMap[obj.id] = obj.getRemainingTimeToToggle();
+			sudoFollowObjs[obj.id] = {'state':obj.state};
+		}, this)
+		objectTimeMap = __.object(__.sortBy(__.pairs(objectTimeMap), function (val){return val[1]}));
+		for(var objId in objectTimeMap) {
+			if(objectTimeMap[objId] == Infinity) {
+				this.timeCalculationIsOn = false; 
+				return Infinity;
+			}
+			sudoFollowObjs[objId].state = !sudoFollowObjs[objId].state
+			if(this.state ^ this._simulateState(sudoFollowObjs)) {
+				this.timeCalculationIsOn = false; 
+				return objectTimeMap[objId];
+			}
+		}
+		this.timeCalculationIsOn = false;
+		return Infinity;
+	},
+	_simulateState : function (sudoFollowObjs) {
+		var actualFollowObjects = this.followObjs;
+		this.followObjs = sudoFollowObjs;
+		eval("var state=("+this.followLogic+")");
+		this.followObjs = actualFollowObjects;
+		return state;
+	},
 	_setStateAsPerFollowLogic : function (state) {
 		try {
 			if(this.followLogic)
 				eval("state=("+this.followLogic+")");
-			__.defer(__.bind(this._setState, this, state));
-		} catch (err) {console.log(err);}
+			if(!this.avoidFollow)
+				__.defer(__.bind(this._setState, this, state));
+		} catch (err) {console.log(err);console.log(this.followLogic); console.log(__.keys(this.followObjs));}
 	},
 	follow : function (objs, onLogic, offLogic) {
 		if (!onLogic) onLogic=false; if (!offLogic) offLogic=false;
@@ -62,9 +96,12 @@ var BaseVirtualDevice = BaseClass.extend({
 	unfollow : function (objs) {
 		objs = [].concat(objs);
 		__.each(objs, function (obj){
-			obj.on("stateChanged", this._setStateAsPerFollowLogic);
+			obj.off("stateChanged", this._setStateAsPerFollowLogic);
 			this.followObjs = __.omit(this.followObjs, obj.id);
 		}, this);
+	},
+	unfollowAll : function () {
+		this.unfollow(__.values(this.followObjs));
 	}
 
 });
