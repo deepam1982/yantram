@@ -53,13 +53,13 @@ var CommandManager = BaseClass.extend({
 	},
 	checkUpdates : function (commandData, callback) {
 		require('dns').resolve('www.google.com', function(err) {
-			if (err) return callback({'success':false, 'msg':'Connection to internet is down.'})
+			if (err) return callback({'success':false, 'msg':'Internet connection is down.'})
 			var sys = require('sys');
             var exec = require('child_process').exec;
             var foo = function(error, stdout, stderr) {
 				console.log(error, stdout, stderr);
 				if(error || !stdout) return callback({'success':false, 'msg':stderr});
-				if(stdout.indexOf("nothing to update") + 1) return callback({'success':false, 'msg':"No Updates."});
+//				if(stdout.indexOf("nothing to update") + 1) return callback({'success':false, 'msg':"No Updates."});
 				if(stdout.indexOf("updates available") + 1) return callback({'success':true, 'msg':"Update available."});
 				return callback({'success':false, 'msg':stdout});
             }
