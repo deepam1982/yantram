@@ -59,7 +59,7 @@ var CommandManager = BaseClass.extend({
             var foo = function(error, stdout, stderr) {
 				console.log(error, stdout, stderr);
 				if(error || !stdout) return callback({'success':false, 'msg':stderr});
-//				if(stdout.indexOf("nothing to update") + 1) return callback({'success':false, 'msg':"No Updates."});
+				if(stdout.indexOf("No updates") + 1) return callback({'success':false, 'msg':stdout.substr(stdout.indexOf("No updates"))});
 				if(stdout.indexOf("updates available") + 1) return callback({'success':true, 'msg':"Update available."});
 				return callback({'success':false, 'msg':stdout});
             }

@@ -14,7 +14,7 @@ currentRev=`git --work-tree=$DIR1 --git-dir=$DIR1/.git rev-parse origin/$BRANCH`
 echo "$currentRev"
 if git --work-tree=$DIR1 --git-dir=$DIR1/.git ls-remote $REPO $BRANCH | grep $currentRev ; then
 	msg=`git --work-tree=$DIR1 --git-dir=$DIR1/.git log --oneline -n 1` 
-	echo "No Updates. $msg"
+	echo "No updates, $msg"
 	exit 0
 else 
 	echo "updates available"
