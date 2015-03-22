@@ -126,11 +126,12 @@ var CC2530Controller = BaseCommunicator.extend({
 		console.log(qry)
 		this.sendQuery(null, {name:qry});
 		this._pendingReqCallbackMap["0106"] = __.bind(function (err, msg){
+			console.log(msg);
 			__.each(this.deviceList, function (listItem){
 				listItem.unreachable = true;
 				this.emit("deviceUnreachable", listItem.macAdd);
 			}, this);
-			callback && callback(err, msg);
+			callback && callback(err, msg.substr(4,16));
 		}, this);
 	}, 
 

@@ -334,6 +334,14 @@
 		<div>
 			<img src='/static/images/connected_module.png' style='width:100%;'/>
 			<br/>
+			<div class='configuredModuleDisplay' style='display:none;'>
+				<div class='helpText'>It usually takes less than couple of minutes for configuration. Once configured, exclamation marks will disappear.</div>
+			</div>
+			<div class='connectedConfigDone' style='display:none;'>
+				<br/>
+				<span class='button theamBorderColor theamTextColor' id='configMore'>Configure Another</span>
+				<span class='button theamBorderColor theamTextColor' id='configDone' style='margin-left:30px;'>Done Configuration</span>
+			</div>
 			<div class='moduleAttached' style='display:none;'>
 				<span style='margin-right:10px'>Enter module name</span>
 				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
@@ -345,10 +353,11 @@
 			</div>
 			<div class='moduleNotAttached'>
 				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
-				<span class='retryMsg' style='display:none;'>Oh no!! Home controller still cannot communicate with Switchboard module. Check the connections of serial cable and then retry.</span>
+				<span class='retryMsg' style='display:none;'>Oh no!! Home controller cannot communicate with Switchboard module. Check the connections of serial cable(disconnect-reconnect) and then retry.</span>
 				<br/><br/>
 				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
-			</div>	
+			</div>
+			<div class="loader" style="text-align:center;display:none;"><img src="static/images/loading.gif"/></div>	
 			
 		</div>
 	</script>
@@ -370,6 +379,7 @@
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/>
 			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipNwkSecButton' style='margin-left:30px;display:none;'>Skip</span>
 
 			
 		</div>
@@ -426,6 +436,7 @@
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/><br/>
 			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
 			<br/><br/>
 			
 		</div>
@@ -497,7 +508,7 @@
 			<br/><br/>
 		</div>	
 	</script>
-	<script type="text/template" id="roomTemplate">
+	<script type="text/template" id="groupTemplate">
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
@@ -745,8 +756,11 @@
 			}
 			if(pageObjName) {
 				sideMenu.switchPage(pageObjName);
+				try {window[pageObjName].forIntalonFlow();}catch(err){}
 				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
 			}
+			else 
+				sideMenu.switchPage('mainPageView');
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();

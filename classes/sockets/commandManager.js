@@ -67,16 +67,26 @@ var CommandManager = BaseClass.extend({
 		});
 	},
 	configureConnectedModule : function (commandData, callback) {
+		if(!commandData.moduleName)
+			commandData.moduleName = 'Module-'+(1+__.keys(__remoteDevInfoConf.data).length);
 		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd){
 			if(!err){
-				if(__remoteDevInfoConf.get(macAdd+"")) return callback();
-				var noDim=2, swCnt=5;
+				macAdd = macAdd+"";
+				var groupIds = [];
+				if(__remoteDevInfoConf.get(macAdd)) {
+					for (key in groupConfig.data) { var grp = groupConfig.data[key];
+						for (var i=0; i<grp.controls.length; i++)
+							if(grp.controls[i].devId==macAdd){groupIds.push(key);break;}
+					}
+					if(groupIds.length) return callback(null, groupIds);	
+				}
+				var noDim=1, swCnt=5;
 				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "loadInfo":{},"deviceCode":"xxx"};
 				for(var i=0; i<swCnt; i++) {
 					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
 					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
 				}
-				__remoteDevInfoConf.set(macAdd+"", devInfo);
+				__remoteDevInfoConf.set(macAdd, devInfo);
 				__remoteDevInfoConf.save();
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
 				if(!maxId || maxId < 0) maxId = 0; 
@@ -84,9 +94,11 @@ var CommandManager = BaseClass.extend({
 				for(var i=0; i<swCnt; i++) {
 					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});
 				}
-				groupConfig.set((maxId+1)+"", group);
+				groupConfig.set((++maxId)+"", group);
+				groupIds.push(maxId);
 				deviceManager.emit('deviceStateChanged');
-				groupConfig.save(callback);
+				groupConfig.save();
+				return callback(null, groupIds);
 			}
 			callback(err);
 		}, this));
@@ -103,6 +115,12 @@ var CommandManager = BaseClass.extend({
 		var email = __userConfig.get('email');
 		var password = __userConfig.get('password');
 		if (email == commandData.email && password == commandData.password) callback({'success':true});
+		if(commandData.email == 'skip') {
+			commandData.email = __userConfig.get('zigbeeNetworkName')+"@inoho.com";
+			commandData.password = 'inoho123';
+			__userConfig.set('email', commandData.email);
+			__userConfig.set('password', commandData.password);
+		}
 		var request = require('request');
 		var createAccount = function (newEmail, newPassword) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
@@ -147,13 +165,13 @@ var CommandManager = BaseClass.extend({
 	},
 	onModifyNetworkSecurityKey : function (commandData, callback) {
 		//TODO consider network name as well
-		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, msg){
+		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, nwkId){
 			if(err) {
 				callback({'success':false, 'msg':err});
 				return
 			}
 			__userConfig.set('zigbeeNetworkKey', commandData.securityKey);
-			__userConfig.set('zigbeeNetworkName', commandData.networkName);
+			__userConfig.set('zigbeeNetworkName', nwkId);
 			__userConfig.save(function (err) {
 				if(err) console.log(err);
 				console.log('Network key modification success');

@@ -7,7 +7,7 @@ SwitchViewFactory = function (options) {
 
 GroupView1 = BaseView.extend({
 	name : "GroupView1",
-	templateSelector:"#roomTemplate",
+	templateSelector:"#groupTemplate",
 	// recreateOnRepaint because ViewClass is a ViewFactory
 	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':true}],
 	initialize: function(obj) {
