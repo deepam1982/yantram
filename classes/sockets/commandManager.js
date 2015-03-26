@@ -53,6 +53,7 @@ var CommandManager = BaseClass.extend({
 	},
 	checkUpdates : function (commandData, callback) {
 		require('dns').resolve('www.google.com', function(err) {
+			if (err) console.log(err);
 			if (err) return callback({'success':false, 'msg':'Internet connection is down.'})
 			var sys = require('sys');
             var exec = require('child_process').exec;
