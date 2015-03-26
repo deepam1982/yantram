@@ -116,6 +116,13 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},
+	getNetworkKey : function (callback) {
+		var qry="0102";
+		this.sendQuery(null, {name:qry});
+		this._pendingReqCallbackMap["0102"] = __.bind(function (err, msg){
+			callback && callback(msg.substr(0,16));
+		}, this);	
+	},
 
 	updateNetworkKey : function (networkKey, callback) {
 		if(networkKey.length != 32 || networkKey.search(/^[a-fA-F0-9]*$/g) != 0) {

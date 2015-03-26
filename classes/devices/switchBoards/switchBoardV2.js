@@ -34,8 +34,10 @@ var SwitchBoardV2 = SwitchBoardV1.extend({
 		this.sensorState[1] = (this.isSensorActive[1])?(this._hexCharToInt(msg[2])*0x10 + this._hexCharToInt(msg[3])):0;
 	},
 	_setDimmerState : function (msg) {
-		this.dimmerState[0] = (!this.isSensorActive[0])?(this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1])):0xFF;
-		this.dimmerState[1] = (!this.isSensorActive[1])?(this._hexCharToInt(msg[2])*0x10 + this._hexCharToInt(msg[3])):0xFF;
+	//	this.dimmerState[0] = (!this.isSensorActive[0])?(this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1])):0xFF;
+	//	this.dimmerState[1] = (!this.isSensorActive[1])?(this._hexCharToInt(msg[2])*0x10 + this._hexCharToInt(msg[3])):0xFF;
+		this.dimmerState[0] = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);
+		this.dimmerState[1] = this._hexCharToInt(msg[2])*0x10 + this._hexCharToInt(msg[3]);
 	},
 
  	

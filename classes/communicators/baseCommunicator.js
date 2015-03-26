@@ -96,6 +96,9 @@ var BaseCommunicator = BaseClass.extend({
 	},
 	updateNetworkKey : function (networkKey, callback) {
 		callback && callback('noSupport');
+	},
+	getNetworkKey : function (callback) {
+		callback && callback('noSupport');
 	}
 
 

@@ -22,6 +22,15 @@ GroupView1 = BaseView.extend({
 	events: {
 		"tap .powerButton" : "onPowerOffClick"
 	},
+	repaint : function () {
+		// Hack to fix mobile app and mobile chrome browser where without following line,
+		// lower groups on app dance while on/off. Proper fix would be that on switch state change,
+		// entire group should not get repainted.
+		this.$el.css('height',this.$el.height()+'px');
+		BaseView.prototype.repaint.apply(this, arguments);
+		this.$el.css('height','auto');
+		
+	},
 	onPowerOffClick : function (event) {
 		var $loader;
 		$(event.target).closest('.roomTitleCont').append($loader=$('<img src="static/images/loading.gif" style="position:absolute;right:-11px;top:-13px;"/>'))

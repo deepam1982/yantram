@@ -123,10 +123,11 @@ var CommandManager = BaseClass.extend({
 			__userConfig.set('password', commandData.password);
 		}
 		var request = require('request');
-		var createAccount = function (newEmail, newPassword) {
+		var thisObj = this;
+		var createAccount = function (newEmail, newPassword, nwkKey) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
 			request.post('http://cloud.inoho.com/register/', 
-				{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, donotredirect:true}}, 
+				{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
 				function (err, resp, body){
 					console.log("got response from http://cloud.inoho.com/register/");
 					console.log(err, resp.statusCode, body);
@@ -139,27 +140,28 @@ var CommandManager = BaseClass.extend({
 						if(err) return console.log(err);
 						console.log('Cloud configuration success');
 						callback({'success':true});
+						thisObj.cloudSocket.socket.disconnect();
 					});
 				}
 			);
 		}
-		if (email && password) {
-			request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password}}, 
-				function (err, resp, body){
-					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
-					var rspJson = JSON.parse(body);
-					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
-					__userConfig.set('email', '');__userConfig.set('password', '');
-					console.log("removed "+email+' from cloud');
-					createAccount(commandData.email, commandData.password)
-					__userConfig.save(function (err) {err && console.log(err)});
-				}
-			);	 	
-		}
-		else 
-			createAccount(commandData.email, commandData.password)
-
-
+		deviceManager.communicator.getNetworkKey(function (nwkKey) {
+			if (email && password) {
+				request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
+					function (err, resp, body){
+						if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+						var rspJson = JSON.parse(body);
+						if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+						__userConfig.set('email', '');__userConfig.set('password', '');
+						console.log("removed "+email+' from cloud');
+						createAccount(commandData.email, commandData.password, nwkKey)
+						__userConfig.save(function (err) {err && console.log(err)});
+					}
+				);	 	
+			}
+			else 
+				createAccount(commandData.email, commandData.password, nwkKey)
+		});
 	},
 	getNetworkSettings	: function (commandData, callback) {
 		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
