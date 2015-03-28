@@ -23,10 +23,11 @@ var GroupConfigManager = BasicConfigManager.extend({
 			conf.count = count;
 			conf.disabledCtls = 0; 
 			__.each(conf.controls, function (ctl) {
-
+				var cnt = __.keys(ctl).length;
 				__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
-					ctl[key] = val;	
+					ctl[key] = val;
 				});
+				if (cnt == __.keys(ctl).length) return conf.controls = __.without(conf.controls, ctl);
 				var config = deviceManager.getConfig(ctl.devId);
 				ctl.disabled = (!config)?true:((!config.reachable)?true:false);
 				(ctl.disabled && conf.disabledCtls++);

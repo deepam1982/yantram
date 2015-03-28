@@ -9,6 +9,8 @@ ConfigureNewModuleView = BaseView.extend({
 	},
 	doneConfiguration : function () {
 		$('#menuCont .mainPannel').trigger('tap');
+//		refresh the page instead.
+//		window.location.href = '/';
 	},
 	configureMore : function () {
 		this._removeGroupViews();

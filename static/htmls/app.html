@@ -319,13 +319,13 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea theamBGColor'>
-			<div class='options mainPannel' jsVarNm='mainPageView'>Home</div>	
+			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
-			<div class='options devStng' jsVarNm='editPageView'>Device Settings</div>
-			<div class='options mudStng' jsVarNm='editMoodView'>Mood Settings</div>
-			<div class='options nwkStng' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
-			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
-			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
+			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
+			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
+			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
+			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
 		</div>
@@ -339,8 +339,8 @@
 			</div>
 			<div class='connectedConfigDone' style='display:none;'>
 				<br/>
-				<span class='button theamBorderColor theamTextColor' id='configMore'>Configure Another</span>
-				<span class='button theamBorderColor theamTextColor' id='configDone' style='margin-left:30px;'>Done Configuration</span>
+				<span class='button theamBorderColor theamTextColor' id='configMore'>Configure More</span>
+				<span class='button theamBorderColor theamTextColor' id='configDone' style='margin-left:30px;'>Done</span>
 			</div>
 			<div class='moduleAttached' style='display:none;'>
 				<span style='margin-right:10px'>Enter module name</span>
@@ -552,7 +552,7 @@
 					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span><%=name%></span>
+				<span class='toggelSwitch'><%=name%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
 				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasSchedules)?"":"display:none;")%>'></div>
 
@@ -755,9 +755,13 @@
 				case "configureModule" : pageObjName = 'configureModulePage'; break;
 			}
 			if(pageObjName) {
+				$('.hideWhileConfigureFlow').hide();
 				sideMenu.switchPage(pageObjName);
 				try {window[pageObjName].forIntalonFlow();}catch(err){}
-				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
+				window[pageObjName].onDone = function () {
+					$('.hideWhileConfigureFlow').show();
+					ioSocket.emit("checkConfigurations")
+				};
 			}
 			else 
 				sideMenu.switchPage('mainPageView');

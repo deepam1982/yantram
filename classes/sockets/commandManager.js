@@ -140,7 +140,7 @@ var CommandManager = BaseClass.extend({
 						if(err) return console.log(err);
 						console.log('Cloud configuration success');
 						callback({'success':true});
-						thisObj.cloudSocket.socket.disconnect();
+						thisObj.cloudSocket && thisObj.cloudSocket.socket.disconnect();
 					});
 				}
 			);
@@ -151,7 +151,9 @@ var CommandManager = BaseClass.extend({
 					function (err, resp, body){
 						if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
 						var rspJson = JSON.parse(body);
-						if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+						if (rspJson && rspJson.msg) console.log(rspJson.code, rspJson.msg); 
+						// 404 check if user dosen't exist then fine go ahead with account creation.
+						if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
 						__userConfig.set('email', '');__userConfig.set('password', '');
 						console.log("removed "+email+' from cloud');
 						createAccount(commandData.email, commandData.password, nwkKey)
@@ -178,7 +180,11 @@ var CommandManager = BaseClass.extend({
 			__userConfig.save(function (err) {
 				if(err) console.log(err);
 				console.log('Network key modification success');
-				callback({'success':true});
+				deviceManager.communicator.checkCommunication(function (err) {
+					if(err) callback({'success':false, 'msg':err});
+					else callback({'success':true});	
+				})
+				
 			});	
 		},this));
 	},
