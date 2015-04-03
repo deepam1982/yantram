@@ -69,13 +69,16 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             websiteRoutes(app);
 
             var checkConfigurations = function (socket){
-              //socket.emit('switchPage', 'welcomeScreen');
+//              socket.emit('switchPage', 'welcomeScreen');
+//              return;
               if(!__userConfig.get('zigbeeNetworkName') || !__userConfig.get('zigbeeNetworkKey'))
                 socket.emit('switchPage', 'welcomeScreen'); //socket.emit('switchPage', 'networkSetting');
               else if(!__userConfig.get('email') || !__userConfig.get('password'))
                 socket.emit('switchPage', 'cloudSetting');
               else if(!__.keys(__remoteDevInfoConf.data).length)
                 socket.emit('switchPage', 'configureModule');
+              else
+                socket.emit('switchPage', 'mainPage');
             }
             io.sockets.on('connection', function (socket) {
               console.log('Socket connection established!!');
@@ -117,7 +120,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               var groupConfigList = groupConfig.getList();
               io.sockets.emit('roomConfigUpdated', groupConfigList);
               theCloudSocket && theCloudSocket.emit('roomConfigUpdated', groupConfigList);
-            }, 100, {leading: false});
+            }, 10, {leading: false});
             
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType) {
               publishGroupConfig();

@@ -4,7 +4,7 @@ var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
-
+var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
@@ -52,7 +52,8 @@ var CommandManager = BaseClass.extend({
 		console.log('starting update now')
 	},
 	checkUpdates : function (commandData, callback) {
-		require('dns').resolve('www.google.com', function(err) {
+		checkInternet(function(err) {
+			if (err) console.log(err);
 			if (err) return callback({'success':false, 'msg':'Internet connection is down.'})
 			var sys = require('sys');
             var exec = require('child_process').exec;
@@ -67,16 +68,26 @@ var CommandManager = BaseClass.extend({
 		});
 	},
 	configureConnectedModule : function (commandData, callback) {
+		if(!commandData.moduleName)
+			commandData.moduleName = 'Module-'+(1+__.keys(__remoteDevInfoConf.data).length);
 		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd){
 			if(!err){
-				if(__remoteDevInfoConf.get(macAdd+"")) return callback();
-				var noDim=2, swCnt=5;
+				macAdd = macAdd+"";
+				var groupIds = [];
+				if(__remoteDevInfoConf.get(macAdd)) {
+					for (key in groupConfig.data) { var grp = groupConfig.data[key];
+						for (var i=0; i<grp.controls.length; i++)
+							if(grp.controls[i].devId==macAdd){groupIds.push(key);break;}
+					}
+					if(groupIds.length) return callback(null, groupIds);	
+				}
+				var noDim=1, swCnt=5;
 				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "loadInfo":{},"deviceCode":"xxx"};
 				for(var i=0; i<swCnt; i++) {
 					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
 					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
 				}
-				__remoteDevInfoConf.set(macAdd+"", devInfo);
+				__remoteDevInfoConf.set(macAdd, devInfo);
 				__remoteDevInfoConf.save();
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
 				if(!maxId || maxId < 0) maxId = 0; 
@@ -84,9 +95,11 @@ var CommandManager = BaseClass.extend({
 				for(var i=0; i<swCnt; i++) {
 					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});
 				}
-				groupConfig.set((maxId+1)+"", group);
+				groupConfig.set((++maxId)+"", group);
+				groupIds.push(maxId);
 				deviceManager.emit('deviceStateChanged');
-				groupConfig.save(callback);
+				groupConfig.save();
+				return callback(null, groupIds);
 			}
 			callback(err);
 		}, this));
@@ -103,61 +116,95 @@ var CommandManager = BaseClass.extend({
 		var email = __userConfig.get('email');
 		var password = __userConfig.get('password');
 		if (email == commandData.email && password == commandData.password) callback({'success':true});
+		if(commandData.email == 'skip') {
+			commandData.email = __userConfig.get('zigbeeNetworkName')+"@inoho.com";
+			commandData.password = 'inoho123';
+			__userConfig.set('email', commandData.email);
+			__userConfig.set('password', commandData.password);
+		}
 		var request = require('request');
-		var createAccount = function (newEmail, newPassword) {
+		var thisObj = this;
+		var createAccount = function (newEmail, newPassword, nwkKey) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
-			request.post('http://cloud.inoho.com/register/', 
-				{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, donotredirect:true}}, 
-				function (err, resp, body){
-					console.log("got response from http://cloud.inoho.com/register/");
-					console.log(err, resp.statusCode, body);
-					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
-					var rspJson = JSON.parse(body);
-					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+			checkInternet(function (err){
+				if(!err) {
+					request.post('http://cloud.inoho.com/register/', 
+						{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
+						function (err, resp, body){
+							console.log(err, arguments);
+							console.log("got response from http://cloud.inoho.com/register/");
+							console.log(err, resp.statusCode, body);
+							if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+							var rspJson = JSON.parse(body);
+							if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+							__userConfig.set('email', newEmail);__userConfig.set('password', newPassword);
+							console.log("cleated new account on cloud for  "+newEmail);
+							__userConfig.save(function (err) {
+								if(err) return console.log(err);
+								console.log('Cloud configuration success');
+								callback({'success':true});
+								thisObj.cloudSocket && thisObj.cloudSocket.socket.disconnect();
+							});
+						}
+					);
+				}
+				else {
 					__userConfig.set('email', newEmail);__userConfig.set('password', newPassword);
-					console.log("cleated new account on cloud for  "+newEmail);
-					__userConfig.save(function (err) {
-						if(err) return console.log(err);
-						console.log('Cloud configuration success');
+					__userConfig.save(function (err) {		
+						if(err) return callback({'success':false, 'msg':err});
 						callback({'success':true});
 					});
 				}
-			);
+			});
 		}
-		if (email && password) {
-			request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password}}, 
-				function (err, resp, body){
-					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
-					var rspJson = JSON.parse(body);
-					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
-					__userConfig.set('email', '');__userConfig.set('password', '');
-					console.log("removed "+email+' from cloud');
-					createAccount(commandData.email, commandData.password)
-					__userConfig.save(function (err) {err && console.log(err)});
-				}
-			);	 	
-		}
-		else 
-			createAccount(commandData.email, commandData.password)
-
-
+		deviceManager.communicator.getNetworkKey(function (err, nwkKey) {
+			if(err) return callback({'success':false, 'msg':err});
+			if (email && password) {
+				checkInternet(function (err){
+					if(!err){
+						request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
+							function (err, resp, body){
+								if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+								var rspJson = JSON.parse(body);
+								if (rspJson && rspJson.msg) console.log(rspJson.code, rspJson.msg); 
+								// 404 check if user dosen't exist then fine go ahead with account creation.
+								if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
+								__userConfig.set('email', '');__userConfig.set('password', '');
+								console.log("removed "+email+' from cloud');
+								createAccount(commandData.email, commandData.password, nwkKey)
+								__userConfig.save(function (err) {err && console.log(err)});
+							}
+						);
+					}
+					else {
+						return callback({'success':false, 'msg':'Internet connection is down.'});
+					}
+				});
+			}
+			else 
+				createAccount(commandData.email, commandData.password, nwkKey)
+		});
 	},
 	getNetworkSettings	: function (commandData, callback) {
 		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
 	},
 	onModifyNetworkSecurityKey : function (commandData, callback) {
 		//TODO consider network name as well
-		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, msg){
+		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, nwkId){
 			if(err) {
 				callback({'success':false, 'msg':err});
 				return
 			}
 			__userConfig.set('zigbeeNetworkKey', commandData.securityKey);
-			__userConfig.set('zigbeeNetworkName', commandData.networkName);
+			__userConfig.set('zigbeeNetworkName', nwkId);
 			__userConfig.save(function (err) {
 				if(err) console.log(err);
 				console.log('Network key modification success');
-				callback({'success':true});
+				deviceManager.communicator.checkCommunication(function (err) {
+					if(err) callback({'success':false, 'msg':err});
+					else callback({'success':true});	
+				})
+				
 			});	
 		},this));
 	},

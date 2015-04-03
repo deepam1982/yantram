@@ -28,8 +28,8 @@ var CC2530Controller = BaseCommunicator.extend({
 	_processPacket : function (data) {
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
-		//	if(msgTypeCode != '0301')
-		//		console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+			// if(msgTypeCode != '0301')
+			// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 
@@ -116,6 +116,18 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},
+	getNetworkKey : function (callback, retrying) {
+		var qry="0102";
+		this.sendQuery(null, {name:qry});
+		this._pendingReqCallbackMap["0102"] = __.bind(function (err, msg){
+			if(!retrying && err && err == 'timeout') {
+				console.log('timeout! retrying to get network key');
+				return setTimeout(__.bind(this.getNetworkKey, this, callback), 100);
+			}
+			if (err) return console.log("Error while getting network key:", err, msg);
+			callback && callback(err, msg.substr(0,16));
+		}, this);	
+	},
 
 	updateNetworkKey : function (networkKey, callback) {
 		if(networkKey.length != 32 || networkKey.search(/^[a-fA-F0-9]*$/g) != 0) {
@@ -126,19 +138,22 @@ var CC2530Controller = BaseCommunicator.extend({
 		console.log(qry)
 		this.sendQuery(null, {name:qry});
 		this._pendingReqCallbackMap["0106"] = __.bind(function (err, msg){
+			console.log(msg);
 			__.each(this.deviceList, function (listItem){
 				listItem.unreachable = true;
 				this.emit("deviceUnreachable", listItem.macAdd);
 			}, this);
-			callback && callback(err, msg);
+			callback && callback(err, msg.substr(4,16));
 		}, this);
 	}, 
 
-	checkCommunication : function (retrying) {
+	checkCommunication : function (retrying, calback) {
+		if(typeof retrying == 'function') {calback = retrying; retrying=false;}
 		console.log("Checking Communication.");
 		this._pendingReqCallbackMap["FFFF"] = __.bind(function (err) {
 			console.log("Test Communication "+((err)?((retrying)?"Failed!!":"retrying!!"):"Success!!"));
-			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true), 1000);
+			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true, calback), 1000);
+			else calback && calback(err);
 		}, this);
 		this.sendQuery(null, {name:"FFFF"});
 	},
@@ -156,7 +171,8 @@ var CC2530Controller = BaseCommunicator.extend({
 			this.sendQuery(null, {name:"0202"});
 			console.log("sent 0202 query to module");
 			this._pendingReqCallbackMap["0202"] = __.bind(function (err, macId) {
-				if(!err) console.log("got response of 0202 query");
+				if(err) callback(err);
+				console.log("got response of 0202 query");
 				console.log(macId)
 				this.sendQuery(null, {name:"0102"});
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}

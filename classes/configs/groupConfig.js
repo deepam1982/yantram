@@ -21,13 +21,16 @@ var GroupConfigManager = BasicConfigManager.extend({
 		__.each(this.toJSON(), function (conf, id) {
 			conf.id = id;
 			conf.count = count;
+			conf.disabledCtls = 0; 
 			__.each(conf.controls, function (ctl) {
-
+				var cnt = __.keys(ctl).length;
 				__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
-					ctl[key] = val;	
+					ctl[key] = val;
 				});
+				if (cnt == __.keys(ctl).length) return conf.controls = __.without(conf.controls, ctl);
 				var config = deviceManager.getConfig(ctl.devId);
 				ctl.disabled = (!config)?true:((!config.reachable)?true:false);
+				(ctl.disabled && conf.disabledCtls++);
 				ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
 				ctl.state = (ctl.state)?'on':'off';
 				var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);

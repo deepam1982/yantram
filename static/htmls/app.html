@@ -319,13 +319,13 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea theamBGColor'>
-			<div class='options mainPannel' jsVarNm='mainPageView'>Home</div>	
+			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
-			<div class='options devStng' jsVarNm='editPageView'>Device Settings</div>
-			<div class='options mudStng' jsVarNm='editMoodView'>Mood Settings</div>
-			<div class='options nwkStng' jsVarNm='networkSettingPage'>Network Settings</div>
-			<div class='options cldStng' jsVarNm='cloudSettingPage'>Cloud Settings</div>
-			<div class='options cnfrMdl' jsVarNm='configureModulePage'>Configure Module</div>	
+			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
+			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
+			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
+			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
 		</div>
@@ -334,6 +334,14 @@
 		<div>
 			<img src='/static/images/connected_module.png' style='width:100%;'/>
 			<br/>
+			<div class='configuredModuleDisplay' style='display:none;'>
+				<div class='helpText'>It usually takes less than couple of minutes for configuration. Once configured, exclamation marks will disappear.</div>
+			</div>
+			<div class='connectedConfigDone' style='display:none;'>
+				<br/>
+				<span class='button theamBorderColor theamTextColor' id='configMore'>Configure More</span>
+				<span class='button theamBorderColor theamTextColor' id='configDone' style='margin-left:30px;'>Done</span>
+			</div>
 			<div class='moduleAttached' style='display:none;'>
 				<span style='margin-right:10px'>Enter module name</span>
 				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
@@ -345,11 +353,22 @@
 			</div>
 			<div class='moduleNotAttached'>
 				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
-				<span class='retryMsg' style='display:none;'>Oh no!! Home controller still cannot communicate with Switchboard module. Check the connections of serial cable and then retry.</span>
+				<span class='retryMsg' style='display:none;'>Oh no!! Home controller cannot communicate with Switchboard module. Check the connections of serial cable(disconnect-reconnect) and then retry.</span>
 				<br/><br/>
 				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
-			</div>	
+			</div>
+			<div class="loader" style="text-align:center;display:none;"><img src="static/images/loading.gif"/></div>	
 			
+		</div>
+	</script>
+	<script type="text/template" id="homeControllerDownTemplate">
+		<div>
+			<br/><br/>
+			<span>Oops! Inoho cloud server is unable to reach your home controller.</span><br/><br/>
+			<span class='helpText'>This could be because of </span><br/>
+			<span class='helpText'>1) The home controller is not powered on.</span><br/>
+			<span class='helpText'>2) The home controller is not connected to the wifi router.</span><br/>
+			<span class='helpText'>3) The internet connection at your home is down.</span>
 		</div>
 	</script>
 	<script type="text/template" id="networkSettingTemplate">
@@ -370,6 +389,7 @@
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/>
 			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipNwkSecButton' style='margin-left:30px;display:none;'>Skip</span>
 
 			
 		</div>
@@ -426,6 +446,7 @@
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/><br/>
 			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
 			<br/><br/>
 			
 		</div>
@@ -497,7 +518,7 @@
 			<br/><br/>
 		</div>	
 	</script>
-	<script type="text/template" id="roomTemplate">
+	<script type="text/template" id="groupTemplate">
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
@@ -541,7 +562,7 @@
 					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span><%=name%></span>
+				<span class='toggelSwitch'><%=name%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
 				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasSchedules)?"":"display:none;")%>'></div>
 
@@ -744,9 +765,16 @@
 				case "configureModule" : pageObjName = 'configureModulePage'; break;
 			}
 			if(pageObjName) {
+				$('.hideWhileConfigureFlow').hide();
 				sideMenu.switchPage(pageObjName);
-				window[pageObjName].onDone = function () {ioSocket.emit("checkConfigurations")};
+				try {window[pageObjName].forIntalonFlow();}catch(err){}
+				window[pageObjName].onDone = function () {
+					$('.hideWhileConfigureFlow').show();
+					ioSocket.emit("checkConfigurations")
+				};
 			}
+			else 
+				sideMenu.switchPage('mainPageView');
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
@@ -778,6 +806,9 @@
 			});
 			ioSocket.on('moodConfigUpdated', function (config) {
 				mC.set(config, {merge: true});
+			});
+			ioSocket.on('noHomeControllerPresent', function () {
+				sideMenu.switchPage('homeControllerDownPage');
 			});
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
@@ -856,6 +887,11 @@
 		$('#appCont').append(welcomeScreenPage.$el);
 		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
 		$('#appCont').append(checkUpdatePage.$el);
+		var HomeControllerDownPageView = BaseView.extend({
+			templateSelector:"#homeControllerDownTemplate"
+		});
+		var homeControllerDownPage = new HomeControllerDownPageView();
+		$('#appCont').append(homeControllerDownPage.$el);
 
 	</script>
 	

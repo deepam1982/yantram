@@ -7,7 +7,7 @@ SwitchViewFactory = function (options) {
 
 GroupView1 = BaseView.extend({
 	name : "GroupView1",
-	templateSelector:"#roomTemplate",
+	templateSelector:"#groupTemplate",
 	// recreateOnRepaint because ViewClass is a ViewFactory
 	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':true}],
 	initialize: function(obj) {
@@ -21,6 +21,15 @@ GroupView1 = BaseView.extend({
     },
 	events: {
 		"tap .powerButton" : "onPowerOffClick"
+	},
+	repaint : function () {
+		// Hack to fix mobile app and mobile chrome browser where without following line,
+		// lower groups on app dance while on/off. Proper fix would be that on switch state change,
+		// entire group should not get repainted.
+		this.$el.css('height',this.$el.height()+'px');
+		BaseView.prototype.repaint.apply(this, arguments);
+		this.$el.css('height','auto');
+		
 	},
 	onPowerOffClick : function (event) {
 		var $loader;

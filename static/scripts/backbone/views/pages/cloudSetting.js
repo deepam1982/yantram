@@ -2,7 +2,9 @@
 CloudSettingPageView = BaseView.extend({
 	templateSelector:"#cloudSettingTemplate",
 		events: {
-		"tap #modifyCloudAccountButton" : "_onDone"
+		"tap #modifyCloudAccountButton" : "_onDone",
+		"tap #skipCldSetButton" : "_skipCloudSetting"
+
 	},
 	render: function() {
 		this.options.socket.emit("getCloudSettings", null, _.bind(function (rsp) {
@@ -13,6 +15,9 @@ CloudSettingPageView = BaseView.extend({
 			}
 		}, this));
 		BaseView.prototype.render.apply(this, arguments);
+	},
+	forIntalonFlow : function () {
+		this.$el.find('#skipCldSetButton').show();
 	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		
@@ -35,9 +40,15 @@ CloudSettingPageView = BaseView.extend({
 		}
 		this.modify(cloudEmail, cloudPwd);
 	},
+	_skipCloudSetting : function () {
+		this.modify('skip');
+	},
 	modify : function (cloudEmail, cloudPwd) {
 		this.$el.hide();
+		var $loader = $('<div style="text-align:center;"><img src="static/images/loading.gif"/></div>');
+		this.$el.parent().append($loader);
 		this.options.socket.emit("modifyCloudSettings", {"email":cloudEmail, "password":cloudPwd}, _.bind(function (rsp) {
+			$loader.remove();
 			this.$el.show();
 			if(!rsp.success) {
 				this.$el.find('.errorMsgDiv span').html(rsp.msg);

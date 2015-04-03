@@ -2,7 +2,8 @@
 NetworkSettingPageView = BaseView.extend({
 	templateSelector:"#networkSettingTemplate",
 	events: {
-		"tap #modifyNwkSecKeyButton" : "_onDone"
+		"tap #modifyNwkSecKeyButton" : "_onDone",
+		"tap #skipNwkSecButton" : "_skipConfiguration"
 	},
 	render: function() {
 		this.options.socket.emit("getNetworkSettings", null, _.bind(function (rsp) {
@@ -12,6 +13,9 @@ NetworkSettingPageView = BaseView.extend({
 			}
 		}, this));
 		BaseView.prototype.render.apply(this, arguments);
+	},
+	forIntalonFlow : function () {
+		this.$el.find('#skipNwkSecButton').show();
 	},
 	onDone : function (rsp) {
 		$('#menuCont .mainPannel').trigger('tap');		
@@ -35,6 +39,11 @@ NetworkSettingPageView = BaseView.extend({
 		securityKey = hex_md5(securityKey);
 		if(confirm("Modifying this network password will require reconfiguration of all the switch board modules. Are you sure you want to modify security key?"))
 			this.modify(networkName, securityKey);
+	},
+	_skipConfiguration : function () {
+		var securityKey = hex_md5(new Date().getTime()+"");
+		console.log(securityKey);
+		this.modify('Skip', securityKey);
 	},
 	modify : function (networkName, securityKey) {
 		this.options.socket.emit("modifyNetworkSecurityKey", {"securityKey":securityKey, "networkName":networkName}, _.bind(function (rsp) {

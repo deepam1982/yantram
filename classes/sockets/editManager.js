@@ -104,6 +104,10 @@ var EditManager = BaseClass.extend({
 				deviceManager.emit('deviceStateChanged');
 			});
 		}
+		if(obj.params.type && obj.params.type != 'dimmer') {
+			var device = deviceManager.getDevice(obj.devId);
+			device && device.setDimmer(obj.switchId, 255)
+		}
 		__.each(obj.params, function (val, key) {
 			if(__.indexOf(this.allowedSwitchParams, key) == -1) 
 				return callback && callback({'success':false, 'msg':'invalid key'});
