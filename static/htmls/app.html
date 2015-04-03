@@ -361,6 +361,16 @@
 			
 		</div>
 	</script>
+	<script type="text/template" id="homeControllerDownTemplate">
+		<div>
+			<br/><br/>
+			<span>Oops! Inoho cloud server is unable to reach your home controller.</span><br/><br/>
+			<span class='helpText'>This could be because of </span><br/>
+			<span class='helpText'>1) The home controller is not powered on.</span><br/>
+			<span class='helpText'>2) The home controller is not connected to the wifi router.</span><br/>
+			<span class='helpText'>3) The internet connection at your home is down.</span>
+		</div>
+	</script>
 	<script type="text/template" id="networkSettingTemplate">
 		<div>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
@@ -797,6 +807,9 @@
 			ioSocket.on('moodConfigUpdated', function (config) {
 				mC.set(config, {merge: true});
 			});
+			ioSocket.on('noHomeControllerPresent', function () {
+				sideMenu.switchPage('homeControllerDownPage');
+			});
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
 			ioSocket.on('showBurgerMenu', showBurgerMenu)
@@ -874,6 +887,11 @@
 		$('#appCont').append(welcomeScreenPage.$el);
 		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
 		$('#appCont').append(checkUpdatePage.$el);
+		var HomeControllerDownPageView = BaseView.extend({
+			templateSelector:"#homeControllerDownTemplate"
+		});
+		var homeControllerDownPage = new HomeControllerDownPageView();
+		$('#appCont').append(homeControllerDownPage.$el);
 
 	</script>
 	

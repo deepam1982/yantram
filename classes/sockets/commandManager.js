@@ -4,7 +4,7 @@ var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
-
+var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
@@ -52,7 +52,7 @@ var CommandManager = BaseClass.extend({
 		console.log('starting update now')
 	},
 	checkUpdates : function (commandData, callback) {
-		require('dns').resolve('www.google.com', function(err) {
+		checkInternet(function(err) {
 			if (err) console.log(err);
 			if (err) return callback({'success':false, 'msg':'Internet connection is down.'})
 			var sys = require('sys');
@@ -126,40 +126,60 @@ var CommandManager = BaseClass.extend({
 		var thisObj = this;
 		var createAccount = function (newEmail, newPassword, nwkKey) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
-			request.post('http://cloud.inoho.com/register/', 
-				{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
-				function (err, resp, body){
-					console.log("got response from http://cloud.inoho.com/register/");
-					console.log(err, resp.statusCode, body);
-					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
-					var rspJson = JSON.parse(body);
-					if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+			checkInternet(function (err){
+				if(!err) {
+					request.post('http://cloud.inoho.com/register/', 
+						{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
+						function (err, resp, body){
+							console.log(err, arguments);
+							console.log("got response from http://cloud.inoho.com/register/");
+							console.log(err, resp.statusCode, body);
+							if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+							var rspJson = JSON.parse(body);
+							if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
+							__userConfig.set('email', newEmail);__userConfig.set('password', newPassword);
+							console.log("cleated new account on cloud for  "+newEmail);
+							__userConfig.save(function (err) {
+								if(err) return console.log(err);
+								console.log('Cloud configuration success');
+								callback({'success':true});
+								thisObj.cloudSocket && thisObj.cloudSocket.socket.disconnect();
+							});
+						}
+					);
+				}
+				else {
 					__userConfig.set('email', newEmail);__userConfig.set('password', newPassword);
-					console.log("cleated new account on cloud for  "+newEmail);
-					__userConfig.save(function (err) {
-						if(err) return console.log(err);
-						console.log('Cloud configuration success');
+					__userConfig.save(function (err) {		
+						if(err) return callback({'success':false, 'msg':err});
 						callback({'success':true});
-						thisObj.cloudSocket && thisObj.cloudSocket.socket.disconnect();
 					});
 				}
-			);
+			});
 		}
-		deviceManager.communicator.getNetworkKey(function (nwkKey) {
+		deviceManager.communicator.getNetworkKey(function (err, nwkKey) {
+			if(err) return callback({'success':false, 'msg':err});
 			if (email && password) {
-				request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
-					function (err, resp, body){
-						if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
-						var rspJson = JSON.parse(body);
-						if (rspJson && rspJson.msg) console.log(rspJson.code, rspJson.msg); 
-						// 404 check if user dosen't exist then fine go ahead with account creation.
-						if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
-						__userConfig.set('email', '');__userConfig.set('password', '');
-						console.log("removed "+email+' from cloud');
-						createAccount(commandData.email, commandData.password, nwkKey)
-						__userConfig.save(function (err) {err && console.log(err)});
+				checkInternet(function (err){
+					if(!err){
+						request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
+							function (err, resp, body){
+								if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+								var rspJson = JSON.parse(body);
+								if (rspJson && rspJson.msg) console.log(rspJson.code, rspJson.msg); 
+								// 404 check if user dosen't exist then fine go ahead with account creation.
+								if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
+								__userConfig.set('email', '');__userConfig.set('password', '');
+								console.log("removed "+email+' from cloud');
+								createAccount(commandData.email, commandData.password, nwkKey)
+								__userConfig.save(function (err) {err && console.log(err)});
+							}
+						);
 					}
-				);	 	
+					else {
+						return callback({'success':false, 'msg':'Internet connection is down.'});
+					}
+				});
 			}
 			else 
 				createAccount(commandData.email, commandData.password, nwkKey)
