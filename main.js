@@ -9,6 +9,35 @@ if(noLogs) {
   console.log = function () {};
 }
 var on=1;
+fs.exists('/sys/class/gpio/gpio13', function (exist) {
+  if(exist) fs.writeFile('/sys/class/gpio/unexport',13, function (err) { if(err) return console.log();})
+  __.defer(function () {
+      fs.writeFile('/sys/class/gpio/export',13, function (err) { if(err) return console.log();
+        console.log('Opened gpio 13');
+        fs.writeFile('/sys/class/gpio/gpio13/direction','out', function(err) { if(err) return console.log(err);
+          console.log('Direction gpio 13 was set');
+          fs.writeFile('/sys/class/gpio/gpio13/value',on, function(err) {if(err)console.log(err);
+            console.log('Started Zigbee module reset control.');
+//            setInterval(function () {on = (on + 1) % 2;fs.writeFile('/sys/class/gpio/gpio18/value',on);}, 800);
+          });  
+        });  
+      });
+  });
+});
+var __restartZigbeeModule = function (calback) {
+  console.log(" ----------------- Restarting Zigbee Module ----------------- ");
+  fs.writeFile('/sys/class/gpio/gpio13/value',0, function(err) {
+      if(err) return calback && calback(err);
+      setTimeout(function () {
+            fs.writeFile('/sys/class/gpio/gpio13/value',1, function(err) {
+              if(err)console.log(err);
+              calback && setTimeout(__.bind(calback, null, err), 1500)
+            });
+      }, 300);
+  });
+};
+//setTimeout(__restartZigbeeModule, 20000);
+
 fs.exists('/sys/class/gpio/gpio18', function (exist) {
   if(exist) fs.writeFile('/sys/class/gpio/unexport',18, function (err) { if(err) return console.log();})
   __.defer(function () {

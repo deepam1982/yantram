@@ -23,7 +23,7 @@ CloudSettingPageView = BaseView.extend({
 		$('#menuCont .mainPannel').trigger('tap');		
 	},
 	_onDone : function (event) {
-		var cloudEmail = this.$el.find('.cloudEmail').val();
+		var cloudEmail = this.$el.find('.cloudEmail').val().trim();
 		var cloudEmailCnf = cloudEmail;//this.$el.find('.cloudEmailCnf').val();
 		if(!cloudEmail || cloudEmail != cloudEmailCnf) {
 			this.$el.find('.errorMsgDiv span').html("Enter your email in the first row, and then re-enter the same in second row.");
