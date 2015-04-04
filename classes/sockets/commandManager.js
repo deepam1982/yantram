@@ -131,9 +131,9 @@ var CommandManager = BaseClass.extend({
 					request.post('http://cloud.inoho.com/register/', 
 						{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
 						function (err, resp, body){
-							console.log(err, arguments);
+							//console.log(err, arguments);
 							console.log("got response from http://cloud.inoho.com/register/");
-							console.log(err, resp.statusCode, body);
+							//console.log(err, resp.statusCode, body);
 							if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
 							var rspJson = JSON.parse(body);
 							if(!rspJson || rspJson.status != 'success') return callback({'success':false, 'msg':rspJson.msg});
@@ -201,7 +201,14 @@ var CommandManager = BaseClass.extend({
 				if(err) console.log(err);
 				console.log('Network key modification success');
 				deviceManager.communicator.checkCommunication(function (err) {
-					if(err) callback({'success':false, 'msg':err});
+					if(err) console.log(err);
+					if(err) __restartZigbeeModule(function (err) {
+						if (err) callback({'success':false, 'msg':err});
+						else deviceManager.communicator.checkCommunication(function (err) {
+							if (err) callback({'success':false, 'msg':err});
+							else callback({'success':true});
+						});
+					});
 					else callback({'success':true});	
 				})
 				

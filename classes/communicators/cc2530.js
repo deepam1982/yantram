@@ -122,7 +122,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._pendingReqCallbackMap["0102"] = __.bind(function (err, msg){
 			if(!retrying && err && err == 'timeout') {
 				console.log('timeout! retrying to get network key');
-				return setTimeout(__.bind(this.getNetworkKey, this, callback), 100);
+				return setTimeout(__.bind(this.getNetworkKey, this, callback), 1500);
 			}
 			if (err) return console.log("Error while getting network key:", err, msg);
 			callback && callback(err, msg.substr(0,16));
