@@ -17,7 +17,8 @@ var SwitchBoardV1 = BaseDevice.extend({
 		this._setSwitchState(this._getSwitchStateMsg(msg));
 		this._setDimmerState(this._getDimmerStateMsg(msg));	
 		this._super(msg);
-		if (oldDm0St != this.dimmerState[0] || oldDm1St != this.dimmerState[1]) this.emit('stateChanged', 'dimmer');
+		if (Math.abs(oldDm0St-this.dimmerState[0])>10 || Math.abs(oldDm1St != this.dimmerState[1])>10) 
+			this.emit('stateChanged', 'dimmer');
 		var changebits = oldSwSt ^ this._binStateToInt(this.switchState)
 		if (changebits) this.emit('stateChanged', 'load', changebits);	
 	},

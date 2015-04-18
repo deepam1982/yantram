@@ -38,6 +38,7 @@ var RequestManager = BaseClass.extend({
 		console.log('recieved room list request!!');
 		if(socket === this.cloudSocket)
 			__.defer(function (skt) {
+				//emit the IP address for redirection if local
 				skt.emit('homeControllerLocalIpAddress', __.chain(require('os').networkInterfaces()).flatten().filter(function(val){ return (val.family == 'IPv4' && val.internal == false) }).pluck('address').first().value());
 			}, this.cloudSocket);
 		var resp = groupConfig.getList();

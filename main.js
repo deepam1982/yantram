@@ -80,8 +80,16 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             //var expressDevice = require('express-device');
             var app = express()
               , server = require('http').createServer(app)
-              , io = require('socket.io').listen(server)
-
+              , io = require('socket.io').listen(server);
+/*            io.set("transports", [
+                'websocket'
+              , 'flashsocket'
+              , 'htmlfile'
+              , 'xhr-polling'
+              , 'jsonp-polling'
+              , 'polling'
+            ]);
+*/
             //io.set('log level', 1);
             server.listen(80);
 
@@ -153,7 +161,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }, 10, {leading: false});
             
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType) {
-              publishGroupConfig();
+              console.log('########## deviceStateChanged ', devId, nodeType);
+              if(nodeType != 'sensor')publishGroupConfig();
               if(nodeType == 'load'){
                 __deviceStateConf.data = deviceManager.getDeviceStateMap();
                 __deviceStateConf.set('epoch', Date.now());
