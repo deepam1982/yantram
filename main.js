@@ -1,3 +1,4 @@
+__cloudUrl = 'http://cloud.inoho.com';
 var __ = require("underscore");
 var fs = require('fs');
 

@@ -128,11 +128,11 @@ var CommandManager = BaseClass.extend({
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
 			checkInternet(function (err){
 				if(!err) {
-					request.post('http://cloud.inoho.com/register/', 
+					request.post(__cloudUrl+'/register/', 
 						{form: {name:newEmail, email:newEmail, password:newPassword, cnfpassword:newPassword, productId:nwkKey, donotredirect:true}}, 
 						function (err, resp, body){
 							//console.log(err, arguments);
-							console.log("got response from http://cloud.inoho.com/register/");
+							console.log("got response from "+__cloudUrl+"/register/");
 							//console.log(err, resp.statusCode, body);
 							if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
 							var rspJson = JSON.parse(body);
@@ -162,7 +162,7 @@ var CommandManager = BaseClass.extend({
 			if (email && password) {
 				checkInternet(function (err){
 					if(!err){
-						request.post('http://cloud.inoho.com/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
+						request.post(__cloudUrl+'/deleteuser/', {form: {email:email, password:password, productId:nwkKey}}, 
 							function (err, resp, body){
 								if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
 								var rspJson = JSON.parse(body);

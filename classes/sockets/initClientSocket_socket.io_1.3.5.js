@@ -4,14 +4,11 @@
 *		https://gist.github.com/jfromaniello/4087861
 *
 */
-
+//var myXhr = require(__rootPath + '/classes/sockets/socketIoClientHackXhr');
+var __ = require("underscore");
 module.exports = function (callback) {
-
-	/*
-	 *  Little example of how to use ```socket-io.client``` and ```request``` from node.js
-	 *  to authenticate thru http, and send the cookies during the socket.io handshake.
-	 */
-	 
+//	return;
+	var myXhr = require(__rootPath + '/classes/sockets/socketIoClientHackXhr');
 	var io = require('socket.io-client');
 	var request = require('request');
 	 
@@ -19,11 +16,37 @@ module.exports = function (callback) {
 	 * This is the jar (like a cookie container) we will use always
 	 */
 	var j = request.jar();
+
+	myXhr.callbacks.test2 = function() {
+		this.setDisableHeaderCheck(true);
+		var stdOpen = this.open;
+		this.open = function() {
+			stdOpen.apply(this, arguments);
+			var header = j.getCookieString(__cloudUrl);
+//			console.log(header);
+			//this.setRequestHeader('cookie', myCookie);
+			this.setRequestHeader('cookie', header);
+			this.setRequestHeader('inoho-home-controller', true);
+		}
+	}
+/*
+	/*
+	 *  Little example of how to use ```socket-io.client``` and ```request``` from node.js
+	 *  to authenticate thru http, and send the cookies during the socket.io handshake.
+	 * /
+	 
+	var io = require('socket.io-client');
+	var request = require('request');
+	 
+	/*
+	 * This is the jar (like a cookie container) we will use always
+	 * /
+	var j = request.jar();
 	 
 	/*
 	 *  First I will patch the xmlhttprequest library that socket.io-client uses
 	 *  internally to simulate XMLHttpRequest in the browser world.
-	 */
+	 * /
 	var originalRequest = require('xmlhttprequest').XMLHttpRequest;
 	require(__rootPath+'/../node_modules/socket.io-client/node_modules/xmlhttprequest').XMLHttpRequest = function(){
 //	require('xmlhttprequest').XMLHttpRequest = function(){
@@ -38,7 +61,7 @@ module.exports = function (callback) {
 			this.setRequestHeader('inoho-home-controller', true);
 		};
 	};
-
+*/
 
 	/*
 	* Authenticate first, doing a post to some url 
@@ -49,7 +72,7 @@ module.exports = function (callback) {
 		if(!__userConfig.get('email')) return setTimeout(foo, 30000);
 		console.log("Trying to login to cloud");
 		request.get({jar: j, url: __cloudUrl+'/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
-	 		console.log('got response!!');
+	 		console.log('got response!!', err, resp.statusCode);
 	 		if(err) {
 	 			console.log(err);
 	 			console.log('Found no response from cloud, probably internet is down!!')
@@ -62,14 +85,21 @@ module.exports = function (callback) {
 			*/
 			pingTimeStamp = Date.now();
 			if(!socket){
-				socket = io.connect(__cloudUrl+'/inoho-home-controller');
-				socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
+				socket = io(__cloudUrl+'/inoho-home-controller');
+				socket.io.on('connect_error', function (err){console.log("------------ ", err);});
+				socket.on('connect', __.bind(function(){
+					console.log('connected! handshakedddddddddddd');
+					callback(null, this);
+				}, socket));
+				socket.on('reconnect', function (){console.log('reconnected cloud socket!!')});
 				socket.on('disconnect', function(){console.log('connection broken!!');foo();});
 				socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
-				callback(null, socket);
+				socket.on('error', function (err){console.log("------ERR------ ", err);});
+				socket.on('reconnect_error', function (err){console.log("------RECCON-ERR------ ", err);});
+				//callback(null, socket);
 			}
 			else 
-				socket.socket.reconnect();
+				socket.io.reconnect();
 			pingTimer = setInterval(function () {
 				if(Date.now()-pingTimeStamp < 6*60*1000) return;
 				console.log('stoped recieving sudoHeartbeat from cloud ... trying to reconnect now.') 
