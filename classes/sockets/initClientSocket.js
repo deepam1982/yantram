@@ -64,7 +64,7 @@ module.exports = function (callback) {
 			if(!socket){
 				socket = io.connect(__cloudUrl+'/inoho-home-controller');
 				socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
-				socket.on('disconnect', function(){console.log('connection broken!!');foo();});
+				socket.on('disconnect', function(){console.log('connection broken!!');setTimeout(foo, 10000);}); // try to reconnect only after 10 seconds m2m problem.
 				socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
 				callback(null, socket);
 			}
