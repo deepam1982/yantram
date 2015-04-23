@@ -9,14 +9,16 @@ GroupView1 = BaseView.extend({
 	name : "GroupView1",
 	templateSelector:"#groupTemplate",
 	// recreateOnRepaint because ViewClass is a ViewFactory
-	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':true}],
+	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':false}],
 	initialize: function(obj) {
 		var ColClass = Backbone.Collection.extend({model:SwitchModel});
 		this.switchCollection = new ColClass(obj.model.get("controls"));
-		BaseView.prototype.initialize.apply(this, arguments);
-		this.model.on('change', _.bind(function () {
-			this.switchCollection.set(this.model.get("controls"));
+		this.model.on('change', _.bind(function (model) {
+			//var changedProps = _.keys(model.changed);
+			//if(changedProps.length == 1 && changedProps[0] == "controls") this.avoidRepaint = true;
+			this.switchCollection.set(this.model.get("controls"), {merge: true});
 		}, this));
+		BaseView.prototype.initialize.apply(this, arguments);
 //		this.model.on('change', _.bind(this.repaint, this));
     },
 	events: {
@@ -26,6 +28,8 @@ GroupView1 = BaseView.extend({
 		// Hack to fix mobile app and mobile chrome browser where without following line,
 		// lower groups on app dance while on/off. Proper fix would be that on switch state change,
 		// entire group should not get repainted.
+		// group repaint could be avoided by setting this.avoidRepaint=true, after making sure that 
+		// only parameter of the controles of the group have changed. which can be done by listining to on-change of model
 		this.$el.css('height',this.$el.height()+'px');
 		BaseView.prototype.repaint.apply(this, arguments);
 		this.$el.css('height','auto');

@@ -190,6 +190,7 @@ var BaseView = Backbone.View.extend({
         }, this);
     },
     repaint	:	function () {
+        if(this.avoidRepaint) {this.avoidRepaint=false; return this;}
         if(!this.rendered) return this;
         this._detachModelEvents();
         this._detachCollectionEvents();

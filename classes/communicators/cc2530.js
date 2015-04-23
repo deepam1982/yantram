@@ -174,7 +174,7 @@ var CC2530Controller = BaseCommunicator.extend({
 				if(err) callback(err);
 				console.log("got response of 0202 query");
 				console.log(macId)
-				this.sendQuery(null, {name:"0102"});
+				this.sendQuery(null, {name:"0102"}); //send network info on serial
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
 				callback(err, macId);
