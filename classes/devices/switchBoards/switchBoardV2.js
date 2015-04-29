@@ -16,10 +16,14 @@ var SwitchBoardV2 = SwitchBoardV1.extend({
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
+		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
+		if(sensorStateChanged) this.avoidLogDVST = true;
 		this._super(msg);
-		if (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]) this.emit('stateChanged', 'sensor');
+		if(sensorStateChanged) this.emit('stateChanged', 'sensor');
+		this.avoidLogDVST = false;
 	},
 	_logDVST : function (msg) {
+		if(!this.avoidLogDVST)
 		console.log("#### DVST of "+this.id+" is " + this.switchState + "    " + this.dimmerState + "    " + this.sensorState);
 	},
 	_setActiveSensor : function (msg) {

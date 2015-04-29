@@ -286,6 +286,9 @@
 	</head>
 
 	<body>
+		<div id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+			<span>inoho<span>
+		</div>
 		<div id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
@@ -562,7 +565,7 @@
 					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch'><%=name%></span>
+				<span class='toggelSwitch' style='white-space:nowrap;'><%print((name.length>8)?name.substring(0, 7)+'...':name)%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
 				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasSchedules)?"":"display:none;")%>'></div>
 
@@ -783,7 +786,7 @@
 	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
-	  		if(!color) color="#69C1A8";
+	  		if(!color) color=(servedFromCloud)?"#69C1A8":"#EE972D";
 	  		var $sheet = $("<style>\
 			hr {\
 				border-top-color: "+color+"\
@@ -797,17 +800,29 @@
 			</style>");
 	  		$('body').append($sheet);	
 	  }
+	  var servedFromCloud = false;
 	  setAppTheamColor();
-	  var ioSocket, pingTimeStamp = Date.now();;
+	  var ioSocket, pingTimeStamp = Date.now();
 	  var connectSocket = function () {
-	  		ioSocket = io.connect('/'//, {transports: ['websocket']}
+	  		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
 	  			);
-	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data)});
+	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
 	  		ioSocket.on('roomConfigUpdated', function (config) {
-				gC.set(config, {merge: true});
+				gC.set(config, {merge: true, remove: false});
 			});
-			ioSocket.on('moodConfigUpdated', function (config) {
-				mC.set(config, {merge: true});
+			ioSocket.on('deleteGroup', function (groupId) {
+				if(!groupId) return;
+				gC.remove(gC.get(groupId));
+			});
+			ioSocket.on('onDeviceUpdate', function (config) {
+				dC.set(config, {merge: true, remove: false});
+			});
+			ioSocket.on('moodConfigUpdate', function (config) {
+				mC.set(config, {merge: true, remove: false});
+			});
+			ioSocket.on('deleteMood', function (moodId) {
+				if(!moodId) return;
+				mC.remove(gC.get(moodId));
 			});
 			ioSocket.on('noHomeControllerPresent', function () {
 				sideMenu.switchPage('homeControllerDownPage');
@@ -831,12 +846,18 @@
 		sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 		sideMenu.render();
 		var backboneAjax = Backbone.ajax;
+		var d = new Date();
 		Backbone.ajax = function (obj) {
-			if(!obj.useSocket) return backboneAjax.call(arguments);
+			var success = obj.success;
+			obj.success = function (data) {
+				console.log(obj.url, new Date()-d);
+				success.apply(this, arguments);
+			}
+			if(!obj.useSocket) return backboneAjax.apply(this, arguments);
 			ioSocket.emit(obj.url, obj.data, obj.success);
 		}
 		var RoomCollection = Backbone.Collection.extend({
-			url: '/room/list',
+			url: '/group/list',
 			model:RoomModel
 		});
 		var DeviceCollection = Backbone.Collection.extend({
@@ -860,13 +881,18 @@
 			(gC.models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
 		})
 //		gC.on("sort", function () {console.log(gC.pluck('name'));});
-		mC.on("add", function(model){
-			console.log(model);
-		})
+//		mC.on("add", function(model){console.log(model);})
 		// gc should follow dc and mc ... others wise page takes longer to load.
-		dC.fetch({update:true, useSocket:true});
-		mC.fetch({update:true, useSocket:true});
-		gC.fetch({update:true, useSocket:true});
+		var fetchCount = 0;
+		var fetchComplete = function () {
+			if(++fetchCount == 3)setTimeout(function () {
+				$('#appLoadingVeil').hide();
+				console.log('Veil lifted at:', new Date()-d);
+			}, 200);
+		};
+		dC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
+		mC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
+		gC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
 		
 		deviceCollection = dC;
 		var mainPageView = new MainPageView({'collection':gC});

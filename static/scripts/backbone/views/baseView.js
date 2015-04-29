@@ -71,16 +71,18 @@ var BaseView = Backbone.View.extend({
         return retindx;
     },
     //TODO write function similar to following for remove and change as well.
-    _onNewModelInSubViewArray : function (params, model, index) {
+    _onNewModelInSubViewArray : function (params, model, list) {
+        var index = list.indexOf(model)
         params.model=model;
         var view = new window[params.viewClassName](_.omit(params,'events'));
         var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
         if (!$parent || !$parent.length) $parent=this.$el;
         $parent.append(view.$el);
-        if(typeof index == 'number') $parent.children().eq(index).before($parent.children().last())
         if(this.rendered) view.render();
-        if(typeof index == 'number') 
+        if(typeof index == 'number') {
+            $parent.children().eq(index).before($parent.children().last());
             this[params.reference].splice(index, 0, view);
+        }
         else 
             this[params.reference].push(view);
         return view;

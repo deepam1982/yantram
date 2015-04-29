@@ -89,8 +89,8 @@ var DeviceManager = BaseClass.extend({
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);
-		device.on('stateChanged', __.bind(function (device, nodeType, changebits) {
-			this.emit('deviceStateChanged', device.id, device.getConfig(), nodeType);
+		device.on('stateChanged', __.bind(function (device, nodeType, switchIds) {
+			this.emit('deviceStateChanged', device.id, device.getConfig(), nodeType, switchIds);
 		}, this, device));
 		this._deviceMap[deviceId] = device;
 		__.extend(this._virtualNodes, device.virtualNodes);

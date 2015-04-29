@@ -7,7 +7,16 @@ var CC2530Controller = BaseCommunicator.extend({
 		this._send("\x2B0301FFFF\x0D", function () { // "\x2B0302FFFF"
 //			console.log('##### Sent broadcast')
 		});
+		setTimeout(__.bind(this.checkBroadCastRsp, this), 2000);
 		this._super()
+	},
+	checkBroadCastRsp : function () {
+		if(this._queryQ.length) return setTimeout(__.bind(this.checkBroadCastRsp, this), 1000);
+		__.each(this.deviceList, __.bind(function (devInfo) {
+			if(devInfo.lastSeenAt+3 < (new Date().getTime() / 1000)){
+				this._send("\x2B0301"+devInfo.nwkAdd+"\x0D", function () { });
+			}
+		}, this));
 	},
 	_hexCharToInt: function(str) {
 		var intt = str.charCodeAt(0);
@@ -28,8 +37,8 @@ var CC2530Controller = BaseCommunicator.extend({
 	_processPacket : function (data) {
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
-			// if(msgTypeCode != '0301')
-			// 	console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		// if(msgTypeCode != '0301')
+		// 	 console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 
@@ -112,7 +121,7 @@ var CC2530Controller = BaseCommunicator.extend({
 				var qObj = this._queryQ.shift();
 				qObj && this._send(qObj.query, function (err, results) {qObj.callback(err, results, qObj.queryInHexStr)});
 				if(this._queryQ.length) this._processQueryQ();
-			}, this), 50);
+			}, this), 10); // this was earlier 50ms, but then I thought 10ms is fine.
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 	},

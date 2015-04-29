@@ -4,7 +4,7 @@
 *		https://gist.github.com/jfromaniello/4087861
 *
 */
-
+var __ = require("underscore");
 module.exports = function (callback) {
 
 	/*
@@ -39,6 +39,35 @@ module.exports = function (callback) {
 		};
 	};
 
+	var allowedEventsForHackEmit = ['roomConfigUpdated', 'onDeviceUpdate', 'moodConfigUpdate', 'deleteGroup', 'deleteMood'];
+	var orignalEmitFunction = null;
+	var hackedEmit = function (eventName, data, calback) { //TODO handle calback
+		if(__.indexOf(allowedEventsForHackEmit, eventName) == -1) return orignalEmitFunction.apply(this, arguments);
+		console.log('hack emit on cloud socket',eventName);
+
+		request({
+			jar: j, 
+			url: __cloudUrl+'/socketemit', 
+			method: "POST",
+			json: true,
+			headers: {
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data})
+		},function (err, resp, body){console.log(body);});
+
+		// var cookie = j.getCookieString(__cloudUrl);
+		// var dataStr = JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data});
+		// var command = 'curl -X POST  --cookie "'+cookie+'" -H "Content-Type: application/json" -d \''+dataStr+'\''+' '+__cloudUrl+'/socketemit';
+		// var exec = require('child_process').exec;
+		// var foo = function(error, stdout, stderr) {
+		// 	console.log(error, stdout);
+		// }
+		// exec(command, foo);
+		// // console.log(command);
+		// console.log('command executed');
+	};
+
 
 	/*
 	* Authenticate first, doing a post to some url 
@@ -63,8 +92,10 @@ module.exports = function (callback) {
 			pingTimeStamp = Date.now();
 			if(!socket){
 				socket = io.connect(__cloudUrl+'/inoho-home-controller');
+				orignalEmitFunction = socket.emit;
+				socket.emit = hackedEmit;
 				socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
-				socket.on('disconnect', function(){console.log('connection broken!!');foo();});
+				socket.on('disconnect', function(){console.log('connection broken!!');setTimeout(foo, 10000);}); // try to reconnect only after 10 seconds m2m problem.
 				socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
 				callback(null, socket);
 			}

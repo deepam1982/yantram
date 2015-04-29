@@ -1,4 +1,4 @@
-var parsers = require("serialport").parsers;
+ var parsers = require("serialport").parsers;
 var SerialPort = require("serialport").SerialPort;
 
 var BaseClass = require(__rootPath+"/classes/baseClass");
@@ -50,12 +50,16 @@ var BaseCommunicator = BaseClass.extend({
 		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
 		this.checkCommunication();
+		this._broadcastLoop();
+	},
+	_broadcastLoop : function () {
+		if(this._queryQ.length) return setTimeout(__.bind(this._broadcastLoop, this), 1000);
 		this._broadcast();
-		setInterval(__.bind(this._broadcast, this), 8000);
+		setTimeout(__.bind(this._broadcastLoop, this), 8000)
 	},
 	_checkConnectivity : function () {
 		__.each(this.deviceList, function (dev) {
-			if(dev.lastSeenAt < (Date.now()/1000) - 20 && !dev.unreachable) {
+			if(dev.lastSeenAt < (Date.now()/1000) - 25 && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
 				dev.unreachable = true;
 				this.emit("deviceUnreachable", dev.macAdd);
 			}

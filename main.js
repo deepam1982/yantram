@@ -1,3 +1,12 @@
+var originalConsoleLog = console.log;
+console.log = function () {
+  var d=new Date();
+  var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
+  var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
+  return originalConsoleLog.apply(console, mainArguments);
+};
+
+
 __cloudUrl = 'http://cloud.inoho.com';
 var __ = require("underscore");
 var fs = require('fs');
@@ -103,8 +112,6 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               res.send(500, 'Something broke!');
             });
 
-            var websiteRoutes = require(__rootPath + '/routes/website')
-            websiteRoutes(app);
 
             var checkConfigurations = function (socket){
 //              socket.emit('switchPage', 'welcomeScreen');
@@ -154,15 +161,28 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             restoreState();
             //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
             var theCloudSocket = null
-            var publishGroupConfig = __.throttle(function () {
-              var groupConfigList = groupConfig.getList();
-              io.sockets.emit('roomConfigUpdated', groupConfigList);
-              theCloudSocket && theCloudSocket.emit('roomConfigUpdated', groupConfigList);
-            }, 10, {leading: false});
+            var publishGroupConfig = function (groupIds) {
+              (!groupIds || !groupIds.length) && (groupIds = __.keys(groupConfig.data));
+              __.each(groupIds, function (id, i) {
+                __.defer(function (idd) {
+                  var conf = groupConfig.getGroupDetails(idd);
+                  io.sockets.emit('roomConfigUpdated', conf);
+                  __.defer(function (conff) {theCloudSocket && theCloudSocket.emit('roomConfigUpdated', conff);}, conf);
+                }, id);
+              });
+            };
+
+            groupConfig.on('groupDeleteStart', function (groupId) {
+              io.sockets.emit('deleteGroup', groupId);
+              theCloudSocket && theCloudSocket.emit('deleteGroup', groupId);
+            });
             
-            deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType) {
-              console.log('########## deviceStateChanged ', devId, nodeType);
-              if(nodeType != 'sensor')publishGroupConfig();
+            deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType, switchIds) {
+              if(nodeType != 'sensor') {
+                console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
+                var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
+                publishGroupConfig(groupIds);
+              }
               if(nodeType == 'load'){
                 __deviceStateConf.data = deviceManager.getDeviceStateMap();
                 __deviceStateConf.set('epoch', Date.now());
@@ -170,8 +190,17 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               }
             });
 
-            deviceManager.on('moodConfigChanged', function (conf) {
-              io.sockets.emit('moodConfigUpdated', moodConfig.getList());
+            moodConfig.on('moodDeleteStart', function (moodId) {
+              io.sockets.emit('deleteMood', moodId);
+              theCloudSocket && theCloudSocket.emit('deleteMood', moodId);
+            });
+
+            moodConfig.on('moodConfigChanged', function (moodId) {
+              var list=moodId?[moodConfig.getMoodDetails(moodId)]:moodConfig.getList()
+              __.each(list, function (info) {
+                io.sockets.emit('moodConfigUpdate', info);
+              });
+//              io.sockets.emit('moodConfigUpdate', moodConfig.getList());
             });  
 
             require(__rootPath + '/classes/sockets/initClientSocket')(function (err, cloudSocket) {
@@ -194,6 +223,10 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                 console.log( "[Inside 'uncaughtException' event] " + err.stack || err.message );
             });
 
+            var websiteRoutes = require(__rootPath + '/routes/website');
+            var ajaxRoutes = require(__rootPath + '/routes/ajax');
+            websiteRoutes(app, socComMngr);
+            ajaxRoutes(app, socComMngr);
 
 
 

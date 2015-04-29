@@ -27,6 +27,12 @@ var CommandManager = BaseClass.extend({
 		socket.on('setDuty', this.onSetDutyCommand);
 		socket.on('groupOff', __.bind(this.groupOff, this));
 	},
+	executeCommand : function (commandData) {
+		switch(commandData.actionName) {
+			case 'toggleSwitch' : this.onToggleSwitchCommand(commandData); break;
+			case 'setDuty' 		: this.onSetDutyCommand(commandData); break;
+		}
+	},
 	onLocalConnection : function (socket) {
 		this.onCommonConnection(socket);
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
