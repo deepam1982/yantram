@@ -18,7 +18,8 @@ var EditManager = BaseClass.extend({
 		socket.on('modifyMood', __.bind(this.modifyMood, this));
 	},
 	modifyMood : function (obj, callback) {
-		if((parseInt(obj.id) && !moodConfig.get(obj.id)) || !obj.name || !obj.icon || !obj.controls || !__.isArray(obj.controls))
+		var curObj;
+		if((parseInt(obj.id) && !(curObj=moodConfig.get(obj.id))) || !obj.name || !obj.icon || !obj.controls || !__.isArray(obj.controls))
 			return callback && callback({'success':false, 'msg':'invalid parameters'});
 		var invalidParams = false, controls=[], id=0;
 		__.each(obj.controls, function (ctrl) {
@@ -28,36 +29,35 @@ var EditManager = BaseClass.extend({
 		}, this);
 		if(invalidParams) return callback && callback({'success':false, 'msg':'invalid parameters1'});
 		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket
-		obj.id = Math.max(parseInt(obj.id), 0);
-		if(!obj.id) obj.id = 1 + __.max(__.map(moodConfig.data, function (val, key){return parseInt(key)}));
-		obj.id = Math.max(obj.id, 1);
-		if(controls.length)
-			moodConfig.set(obj.id+"", {"name":obj.name, "controls":controls, "icon":obj.icon});
-		else{
-			moodConfig.emit('moodDeleteStart', obj.id);
-			moodConfig.data = __.omit(moodConfig.data, obj.id+"");
-		}
-		var rank = parseInt(obj.rank || 0), rankObj=null, rankModified=false;
-		if(rank && rank != parseInt(obj.id)) {
-			rankModified=true;
-			rankObj = moodConfig.get(obj.id+"");
-		}
-		var newData = {}, nwId=1;
-		__.each(moodConfig.data, function (group, key) {
-			if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
-			if(rankObj !== group) newData[""+(nwId++)] = group;
-		});
-		if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
+		__.defer(function (){
+			obj.id = Math.max(parseInt(obj.id), 0);
+			if(!obj.id) obj.id = 1 + __.max(__.map(moodConfig.data, function (val, key){return parseInt(key)}));
+			obj.id = Math.max(obj.id, 1);
+			if(controls.length)
+				moodConfig.set(obj.id+"", {"name":obj.name, "controls":controls, "icon":obj.icon});
+			else{
+				moodConfig.emit('moodDeleteStart', obj.id);
+				moodConfig.data = __.omit(moodConfig.data, obj.id+"");
+			}
 
-		moodConfig.data = newData;
-		//callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket
-		if(rankModified || !controls.length) moodConfig.emit('moodConfigChanged');
-		else moodConfig.emit('moodConfigChanged', obj.id);
-		if(!controls.length) moodConfig.emit('moodDeleted', obj.id);
-		moodConfig.save(function (err) {if(err) console.log(err);});
+			var rankObj=moodConfig.get(obj.id+""), rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
+			currentRank =(curObj)?curObj.rank:0, rankModified=(rank != currentRank);
+			
+			var dataArr = __.sortBy(__.values(moodConfig.data), 'rank');
+			__.each(dataArr, function (data, indx) {
+				if(data === rankObj) return data.rank = rank;
+				if (indx+1 < rank) return data.rank = indx+1;
+				return data.rank = indx+2;
+			});
+			if(rankModified || !controls.length) moodConfig.emit('moodConfigChanged');
+			else moodConfig.emit('moodConfigChanged', obj.id);
+			if(!controls.length) moodConfig.emit('moodDeleted', obj.id);
+			moodConfig.save(function (err) {if(err) console.log(err);});
+		}, this);	
 	},
 	modifyGroup : function (obj, callback) {
-		if((parseInt(obj.id) && !groupConfig.get(obj.id)) || !obj.name || !obj.controls || !__.isArray(obj.controls))
+		var curObj;
+		if((parseInt(obj.id) && !(curObj=groupConfig.get(obj.id))) || !obj.name || !obj.controls || !__.isArray(obj.controls))
 			return callback && callback({'success':false, 'msg':'invalid parameters'});
 		var invalidParams = false, controls=[], id=0;
 		__.each(obj.controls, function (ctrl) {
@@ -78,20 +78,16 @@ var EditManager = BaseClass.extend({
 				groupConfig.data = __.omit(groupConfig.data, obj.id+"");
 			}
 
-			var rank = parseInt(obj.rank || 0), rankObj=null, rankModified=false;
-			if(rank && rank != parseInt(obj.id)) {
-				rankModified=true;
-				rankObj = groupConfig.get(obj.id+"");
-			}
-			var newData = {}, nwId=1;
-			__.each(groupConfig.data, function (group, key) {
-				if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
-				if(rankObj !== group) newData[""+(nwId++)] = group;
+			var rankObj=groupConfig.get(obj.id+""), rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
+			currentRank =(curObj)?curObj.rank:0, rankModified=(rank != currentRank);
+			
+			console.log(rank, currentRank, rankObj);
+			var dataArr = __.sortBy(__.values(groupConfig.data), 'rank');
+			__.each(dataArr, function (data, indx) {
+				if(data === rankObj) return data.rank = rank;
+				if (indx+1 < rank) return data.rank = indx+1;
+				return data.rank = indx+2;
 			});
-			if(rankObj && nwId == rank) newData[""+(nwId++)] = rankObj;
-
-			groupConfig.data = newData;
-			//callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket
 			if(rankModified || !controls.length) deviceManager.emit('deviceStateChanged');
 			else deviceManager.emit('deviceStateChanged', controls[0].devId, null, 'groupModified');
 			if(!controls.length) groupConfig.emit('groupDeleted', obj.id);

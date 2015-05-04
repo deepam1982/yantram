@@ -59,7 +59,7 @@ var BaseCommunicator = BaseClass.extend({
 	},
 	_checkConnectivity : function () {
 		__.each(this.deviceList, function (dev) {
-			if(dev.lastSeenAt < (Date.now()/1000) - 25 && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
+			if((dev.lastSeenAt < ((Date.now()/1000) - 25)) && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
 				dev.unreachable = true;
 				this.emit("deviceUnreachable", dev.macAdd);
 			}

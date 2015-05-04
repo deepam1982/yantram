@@ -45,9 +45,27 @@ var BaseView = Backbone.View.extend({
                 arr.on('add', _.bind(this._onNewModelInSubViewArray, this, params), this);
                 arr.on('remove', _.bind(this._onModelRemovalFromSubViewArray, this, params), this);
                 arr.on('change', _.bind(this._onModelChangeOfSubViewArray, this, params), this);
+                arr.on('sort', _.bind(this._onModelSortOfSubViewArray, this, params), this);
             }
         }, this);
 	},
+    _onModelSortOfSubViewArray : function (params, list) {
+        var idList = list.pluck('id'), noChange=true, idViewMap = {}, view;
+        for (var indx=0; indx<this[params.reference].length; indx++) {
+            idViewMap[(view = this[params.reference][indx]).model.id] = view;
+            noChange && (this[params.reference][indx].model.id != idList[indx]) && (noChange=false); 
+        }
+        if(noChange) return;
+        console.log('Order Changed')
+        var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
+        if (!$parent || !$parent.length) $parent=this.$el;
+        this[params.reference]=[];
+        for (var indx=0; indx<idList.length; indx++) {
+            this[params.reference].push(view = idViewMap[idList[indx]]);
+            $parent.children().eq(indx).before(view.$el);
+        }
+
+    },
     _onModelChangeOfSubViewArray : function (params, model) {
         if(params.recreateOnRepaint) {
             var index = this._onModelRemovalFromSubViewArray(params, model);
@@ -154,6 +172,7 @@ var BaseView = Backbone.View.extend({
                 arr.off('add', null, this);
                 arr.off('remove', null, this);
                 arr.off('change', null, this);
+                arr.off('sort', null, this);
             }
         }, this);
         _.each(this.subViews, function (params) {

@@ -4,8 +4,10 @@ var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var MoodConfigManager = BasicConfigManager.extend({
 	file : '/../configs/moodConfig.json',
 	getMoodDetails : function (id) {
-		var count = __.keys(this.data).length;
+		var keys = __.keys(this.data);
+		var count = keys.length;
 		var mood = JSON.parse(JSON.stringify(this.data[id]));
+		mood.rank || (mood.rank = (__.indexOf(keys, id+'')+1));
 		mood.count = count;
 		mood.id=id+''; // id has to be string;
 		__.each(mood.controls, function (ctrl, indx){

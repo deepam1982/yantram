@@ -19,7 +19,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 		var groupIds = [];
 		__.each(this.toJSON(), function (conf, id) {
 			for(var idx=0; idx < conf.controls.length; idx++){
-				if(conf.controls[idx].devId == devId && 1+__.indexOf(switchIds, parseInt(conf.controls[idx].switchID))) {
+				if(conf.controls[idx].devId == devId && (!switchIds || 1+__.indexOf(switchIds, parseInt(conf.controls[idx].switchID)))) {
 					groupIds.push(id);break;
 				}
 			}
@@ -31,8 +31,10 @@ var GroupConfigManager = BasicConfigManager.extend({
 		return this._getGroupDetails(conf, id);
 	},
 	_getGroupDetails : function (conf, id) {
-		var count = __.keys(this.data).length;
+		var keys = __.keys(this.data);
+		var count = keys.length;
 		conf.id = id+''; // id has to be string
+		conf.rank || (conf.rank = (__.indexOf(keys, id+'')+1));
 		conf.count = count;
 		conf.disabledCtls = 0; 
 		__.each(conf.controls, function (ctl) {
@@ -51,7 +53,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 			if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
 			ctl.schedules = [];
 			__.each(timers.schedules, function (schdl){ctl.schedules.push(__.omit(schdl, "devId", "loadId"))});
-			ctl.hasSchedules = ctl.schedules.length;
+			ctl.hasActiveSchedules = __.max(__.pluck(ctl.schedules, 'enabled'));// ctl.schedules.length;
 			ctl.hasTimer = (!ctl.autoOff)?false:ctl.autoOff.enabled;
 			ctl.autoToggleTime = null;
 			var vLoad = deviceManager.getVirtualLoad(ctl.devId, ctl.switchID);

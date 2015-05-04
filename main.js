@@ -181,6 +181,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               if(nodeType != 'sensor') {
                 console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
                 var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
+                console.log(groupIds);
                 publishGroupConfig(groupIds);
               }
               if(nodeType == 'load'){

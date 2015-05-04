@@ -15,10 +15,10 @@ SwitchModel = BaseModel.extend({
 	urlRoot		:	'/model/switch',
 	toggelSwitch : function (calback, errorCalback) {
 		var devId = this.get('devId'), switchId = this.get('switchID'), state=this.get('state');
-		console.log("toggelSwitch called "+devId+" "+switchId+" "+state);
+	//	console.log("toggelSwitch called "+devId+" "+switchId+" "+state);
 		this.sendActionRequestByAjax("toggleSwitch", {"devId":devId, "switchId":switchId, "state":state}, function(rsp){
 			//console.log('Ajax response toggelSwitch came.', rsp)
-			calback.apply(this, arguements);
+			calback.apply(this, arguments);
 		}, errorCalback);	
 	},
 	setDuty : function (duty, calback) {

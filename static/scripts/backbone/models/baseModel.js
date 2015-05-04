@@ -23,7 +23,7 @@ BaseModel = Backbone.Model.extend({
 		if(!data) data = {};
 //		data.respondWithModel=true;
 		data.actionName=$actionName;
-		console.log($actionName);
+		// console.log($actionName);
 		$.ajax({
 			url: this.url(),
 			data:data,

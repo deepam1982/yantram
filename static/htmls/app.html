@@ -481,8 +481,8 @@
 					<div style='margin-left:-50px;'><%=group.name%></div>
 					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
 						<div class='iconPartition' style='width:55px;float:left;text-align:center;cursor:pointer;'>
-							<div style='width:55px;height:55px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
-								<img style="width:55px;height:55px;cursor:pointer;" src='static/images/transparent/<%=ctl.icon%>.png' />
+							<div style='width:54px;height:54px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
+								<img style="width:55px;height:55px;cursor:pointer;margin-top:-1px;" src='static/images/transparent/<%=ctl.icon%>.png' />
 							</div>	
 							<span class='font12'><%=ctl.name%></span>
 						</div>
@@ -513,7 +513,7 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
-					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
 				<%}%>	
 				<br/><br/>
 			<%}%>
@@ -550,7 +550,7 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
-					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
 				<%}%>	
 				<br/><br/>
 			<%}%>
@@ -560,14 +560,14 @@
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style=''>
-			<div class='iconPartition' style='width:75px;float:left;text-align:center;cursor:pointer;'>
-				<div style='width:75px;height:75px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
-					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
+			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
+				<div style='width:74px;height:74px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
+					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
 				<span class='toggelSwitch' style='white-space:nowrap;'><%print((name.length>8)?name.substring(0, 7)+'...':name)%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
-				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasSchedules)?"":"display:none;")%>'></div>
+				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
 
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
@@ -822,7 +822,7 @@
 			});
 			ioSocket.on('deleteMood', function (moodId) {
 				if(!moodId) return;
-				mC.remove(gC.get(moodId));
+				mC.remove(mC.get(moodId));
 			});
 			ioSocket.on('noHomeControllerPresent', function () {
 				sideMenu.switchPage('homeControllerDownPage');
@@ -868,9 +868,11 @@
 			model:BaseModel
 		});
 		var gC = new RoomCollection();
-		gC.comparator = function (model) {return parseInt(model.id);};
 		var dC = new DeviceCollection();
 		var mC = new MoodCollection();
+		gC.comparator = function (model) {return parseInt(model.get('rank'));};
+		mC.comparator = function (model) {return parseInt(model.get('rank'));};
+		
 		dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
 		
 		gC.on("add", function(roomModel){
