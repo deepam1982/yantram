@@ -1,17 +1,35 @@
+var __ = require("underscore");
+__cloudUrl = 'http://cloud.inoho.com';
+var request = require('request');
 var originalConsoleLog = console.log;
+var noLogs = false;
 console.log = function () {
   var d=new Date();
   var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   return originalConsoleLog.apply(console, mainArguments);
 };
+var logString = '';
+var logOnCloud = function () {
+  var d=new Date();
+  var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
+  var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
+  (!noLogs) && originalConsoleLog.apply(console, mainArguments);
+  var newLine = (mainArguments).join(' ');
+  if(logString.length + newLine.length > 800) {
+    originalConsoleLog('---- logging on to cloud -----');
+    request({url: __cloudUrl+'/clientlog', method: "POST", json:true, headers: {"content-type": "application/json",},
+            body: JSON.stringify({username: __userConfig.get('email'), "data":logString})}, function (err, resp, body){
+              originalConsoleLog(body);
+            });
+    logString = newLine;
+  }
+  else logString += '\n'+newLine; 
+}
 
 
-__cloudUrl = 'http://cloud.inoho.com';
-var __ = require("underscore");
 var fs = require('fs');
 
-var noLogs = false;
 __.each(process.argv, function (argmnt) {
   if(argmnt == 'noLogs') noLogs = true;
 });
@@ -34,7 +52,7 @@ fs.exists('/sys/class/gpio/gpio13', function (exist) {
       });
   });
 });
-var __restartZigbeeModule = function (calback) {
+__restartZigbeeModule = function (calback) {
   console.log(" ----------------- Restarting Zigbee Module ----------------- ");
   fs.writeFile('/sys/class/gpio/gpio13/value',0, function(err) {
       if(err) return calback && calback(err);
@@ -74,6 +92,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
         __userConfig = new UsrCnfMngr({'callback':function (err) {
+
+          if(__userConfig.get('logOnCloud') === true) console.log = logOnCloud;
 
           var DevStConfMngr = BasicConfigManager.extend({file : '/../configs/deviceStateConfig.json'});
           __deviceStateConf = new DevStConfMngr({'callback':function (err) {

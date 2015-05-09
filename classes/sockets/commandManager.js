@@ -1,10 +1,13 @@
 var __ = require("underscore");
+var request = require('request');
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
+var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
+var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
@@ -26,6 +29,10 @@ var CommandManager = BaseClass.extend({
 		socket.on('toggleSwitch', this.onToggleSwitchCommand);
 		socket.on('setDuty', this.onSetDutyCommand);
 		socket.on('groupOff', __.bind(this.groupOff, this));
+		socket.on('updateNow', __.bind(this.updateNow, this));
+		socket.on('restartHomeController', __.bind(this.restartHomeController, this));
+		socket.on('startCloudLogs', __.bind(this.setLogOnCloud, this, true));
+		socket.on('stopCloudLogs', __.bind(this.setLogOnCloud, this, false));
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
@@ -42,10 +49,19 @@ var CommandManager = BaseClass.extend({
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
-		socket.on('updateNow', __.bind(this.updateNow, this));
 		socket.on('applyMood', __.bind(this.activateMood, this));
+		socket.on('restoreFactory', __.bind(this.restoreFactory, this));
 
 		console.log('Added Command Listners!!')
+	},
+	setLogOnCloud : function (flag) {
+		__userConfig.set('logOnCloud', (flag === true));
+		__userConfig.save(__.bind(this.restartHomeController, this));
+	},
+	restartHomeController : function() {
+		console.log('restarting home controller');
+		var exec = require('child_process').exec;
+		exec("sudo service inoho restart");	
 	},
 	updateNow : function () {
 		var sys = require('sys');
@@ -56,6 +72,44 @@ var CommandManager = BaseClass.extend({
 //		exec("sudo service inoho restart", foo);	
 		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh", foo);	
 		console.log('starting update now')
+	},
+	restoreFactory : function (callback) {
+		var thisObj = this;
+		checkInternet(function(err) {
+			if (err) return callback({'success':false, 'msg':'Internet connection is down.'});
+			deviceManager.communicator.getNetworkKey(function (err, nwkKey) {
+				if(err) return callback({'success':false, 'msg':err});
+				request.post(__cloudUrl+'/deleteuser/', {form: {email:__userConfig.get('email'), password:__userConfig.get('password'), productId:nwkKey}}, function (err, resp, body){
+					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+					var rspJson = JSON.parse(body);
+					// 404 check if user dosen't exist then fine go ahead with account creation.
+					if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
+					// cloud account deletion successful.
+					groupConfig.data='';
+					groupConfig.save(function (err) {
+						if(err) return callback({'success':false, 'msg':err});
+						moodConfig.data='';
+						moodConfig.save(function (err) {
+							if(err) return callback({'success':false, 'msg':err});
+							timerConfig.data='';
+							timerConfig.save(function (err) {
+								if(err) return callback({'success':false, 'msg':err});
+								deviceInfoConfig.data='';
+								deviceInfoConfig.save(function (err) {
+									if(err) return callback({'success':false, 'msg':err});
+									__userConfig.data='';
+									__userConfig.save(function (err) {
+										if(err) return callback({'success':false, 'msg':err});
+										return callback({'success':true});
+										setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
 	},
 	checkUpdates : function (commandData, callback) {
 		checkInternet(function(err) {
@@ -128,7 +182,6 @@ var CommandManager = BaseClass.extend({
 			__userConfig.set('email', commandData.email);
 			__userConfig.set('password', commandData.password);
 		}
-		var request = require('request');
 		var thisObj = this;
 		var createAccount = function (newEmail, newPassword, nwkKey) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);

@@ -190,7 +190,7 @@
 
 		.basicSwitchTemplate {
 			float:left;background-color:white;position:relative;border-radius:3px;
-			margin-bottom: 20px;
+			margin-bottom:20px;padding-top:2px;
 		}
 
 		.schedularCont .done,
@@ -727,6 +727,16 @@
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		var hashChanged = function () {console.log('Hash Changed!!')};
+		if ("onhashchange" in window) { // event supported?
+			window.onhashchange = function () {hashChanged(window.location.hash);}
+		}
+		else { // event not supported:
+			var storedHash = window.location.hash;
+			window.setInterval(function () {(window.location.hash != storedHash) && (storedHash = window.location.hash) && hashChanged(storedHash);}, 500);
+		}
+	</script>
+	<script>
 		$('#burgerImageCont').on('tap', function () {
 			var $menuContPar = $('#menuCont').parent();
 			var $appContPar = $('#appCont').parent();
@@ -803,9 +813,27 @@
 	  var servedFromCloud = false;
 	  setAppTheamColor();
 	  var ioSocket, pingTimeStamp = Date.now();
+	  hashChanged = function (hash) {
+		if(!window.location.hash) return;
+		var removeHash = false;
+		switch(window.location.hash) {
+			case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
+			case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
+			case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
+			case '#restorefactorysetting'	: 	if(confirm("Are you sure you wanna restore factory setting?")){
+													ioSocket.emit('restoreFactory', function (rsp) {
+														if(!rsp.success) alert(rsp.msg);
+													});
+												};removeHash=true;break;
+
+			case '#shownetworksettings'	:	sideMenu.switchPage('networkSettingPage');break;
+		}
+		if(removeHash)window.location.hash = '';
+	  };
 	  var connectSocket = function () {
 	  		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
 	  			);
+	  		ioSocket.on('connect', function () {});
 	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
 	  		ioSocket.on('roomConfigUpdated', function (config) {
 				gC.set(config, {merge: true, remove: false});

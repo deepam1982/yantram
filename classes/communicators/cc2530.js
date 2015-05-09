@@ -35,6 +35,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		return this._intToHexStr(newSt);							
 	},
 	_processPacket : function (data) {
+		this.lastPacketRecievedAt = new Date().getTime() / 1000;
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0301')
