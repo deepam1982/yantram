@@ -100,8 +100,8 @@ var CommandManager = BaseClass.extend({
 									__userConfig.data='';
 									__userConfig.save(function (err) {
 										if(err) return callback({'success':false, 'msg':err});
-										return callback({'success':true});
 										setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
+										return callback({'success':true});
 									});
 								});
 							});
