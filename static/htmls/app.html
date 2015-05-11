@@ -190,7 +190,7 @@
 
 		.basicSwitchTemplate {
 			float:left;background-color:white;position:relative;border-radius:3px;
-			margin-bottom: 20px;
+			margin-bottom:20px;padding-top:2px;
 		}
 
 		.schedularCont .done,
@@ -286,6 +286,9 @@
 	</head>
 
 	<body>
+		<div id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+			<span>inoho<span>
+		</div>
 		<div id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
@@ -478,8 +481,8 @@
 					<div style='margin-left:-50px;'><%=group.name%></div>
 					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
 						<div class='iconPartition' style='width:55px;float:left;text-align:center;cursor:pointer;'>
-							<div style='width:55px;height:55px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
-								<img style="width:55px;height:55px;cursor:pointer;" src='static/images/transparent/<%=ctl.icon%>.png' />
+							<div style='width:54px;height:54px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
+								<img style="width:55px;height:55px;cursor:pointer;margin-top:-1px;" src='static/images/transparent/<%=ctl.icon%>.png' />
 							</div>	
 							<span class='font12'><%=ctl.name%></span>
 						</div>
@@ -510,7 +513,7 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
-					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
 				<%}%>	
 				<br/><br/>
 			<%}%>
@@ -547,7 +550,7 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
-					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(id)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
 				<%}%>	
 				<br/><br/>
 			<%}%>
@@ -557,14 +560,14 @@
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style=''>
-			<div class='iconPartition' style='width:75px;float:left;text-align:center;cursor:pointer;'>
-				<div style='width:75px;height:75px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
-					<img style="width:75px;height:75px;cursor:pointer;" src='static/images/transparent/<%=icon%>.png' />
+			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
+				<div style='width:74px;height:74px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
+					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch'><%=name%></span>
+				<span class='toggelSwitch' style='white-space:nowrap;'><%print((name.length>8)?name.substring(0, 7)+'...':name)%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
-				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasSchedules)?"":"display:none;")%>'></div>
+				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
 
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
@@ -724,6 +727,16 @@
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		var hashChanged = function () {console.log('Hash Changed!!')};
+		if ("onhashchange" in window) { // event supported?
+			window.onhashchange = function () {hashChanged(window.location.hash);}
+		}
+		else { // event not supported:
+			var storedHash = window.location.hash;
+			window.setInterval(function () {(window.location.hash != storedHash) && (storedHash = window.location.hash) && hashChanged(storedHash);}, 500);
+		}
+	</script>
+	<script>
 		$('#burgerImageCont').on('tap', function () {
 			var $menuContPar = $('#menuCont').parent();
 			var $appContPar = $('#appCont').parent();
@@ -783,7 +796,7 @@
 	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
-	  		if(!color) color="#69C1A8";
+	  		if(!color) color=(servedFromCloud)?"#69C1A8":"#EE972D";
 	  		var $sheet = $("<style>\
 			hr {\
 				border-top-color: "+color+"\
@@ -797,17 +810,47 @@
 			</style>");
 	  		$('body').append($sheet);	
 	  }
+	  var servedFromCloud = false;
 	  setAppTheamColor();
-	  var ioSocket, pingTimeStamp = Date.now();;
+	  var ioSocket, pingTimeStamp = Date.now();
+	  hashChanged = function (hash) {
+		if(!window.location.hash) return;
+		var removeHash = false;
+		switch(window.location.hash) {
+			case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
+			case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
+			case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
+			case '#restorefactorysetting'	: 	if(confirm("Are you sure you wanna restore factory setting?")){
+													ioSocket.emit('restoreFactory', function (rsp) {
+														if(!rsp.success) alert(rsp.msg);
+													});
+												};removeHash=true;break;
+
+			case '#shownetworksettings'	:	sideMenu.switchPage('networkSettingPage');break;
+		}
+		if(removeHash)window.location.hash = '';
+	  };
 	  var connectSocket = function () {
-	  		ioSocket = io.connect('/'//, {transports: ['websocket']}
+	  		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
 	  			);
-	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data)});
+	  		ioSocket.on('connect', function () {});
+	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
 	  		ioSocket.on('roomConfigUpdated', function (config) {
-				gC.set(config, {merge: true});
+				gC.set(config, {merge: true, remove: false});
 			});
-			ioSocket.on('moodConfigUpdated', function (config) {
-				mC.set(config, {merge: true});
+			ioSocket.on('deleteGroup', function (groupId) {
+				if(!groupId) return;
+				gC.remove(gC.get(groupId));
+			});
+			ioSocket.on('onDeviceUpdate', function (config) {
+				dC.set(config, {merge: true, remove: false});
+			});
+			ioSocket.on('moodConfigUpdate', function (config) {
+				mC.set(config, {merge: true, remove: false});
+			});
+			ioSocket.on('deleteMood', function (moodId) {
+				if(!moodId) return;
+				mC.remove(mC.get(moodId));
 			});
 			ioSocket.on('noHomeControllerPresent', function () {
 				sideMenu.switchPage('homeControllerDownPage');
@@ -831,12 +874,18 @@
 		sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 		sideMenu.render();
 		var backboneAjax = Backbone.ajax;
+		var d = new Date();
 		Backbone.ajax = function (obj) {
-			if(!obj.useSocket) return backboneAjax.call(arguments);
+			var success = obj.success;
+			obj.success = function (data) {
+				console.log(obj.url, new Date()-d);
+				success.apply(this, arguments);
+			}
+			if(!obj.useSocket) return backboneAjax.apply(this, arguments);
 			ioSocket.emit(obj.url, obj.data, obj.success);
 		}
 		var RoomCollection = Backbone.Collection.extend({
-			url: '/room/list',
+			url: '/group/list',
 			model:RoomModel
 		});
 		var DeviceCollection = Backbone.Collection.extend({
@@ -847,9 +896,11 @@
 			model:BaseModel
 		});
 		var gC = new RoomCollection();
-		gC.comparator = function (model) {return parseInt(model.id);};
 		var dC = new DeviceCollection();
 		var mC = new MoodCollection();
+		gC.comparator = function (model) {return parseInt(model.get('rank'));};
+		mC.comparator = function (model) {return parseInt(model.get('rank'));};
+		
 		dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
 		
 		gC.on("add", function(roomModel){
@@ -860,13 +911,18 @@
 			(gC.models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
 		})
 //		gC.on("sort", function () {console.log(gC.pluck('name'));});
-		mC.on("add", function(model){
-			console.log(model);
-		})
+//		mC.on("add", function(model){console.log(model);})
 		// gc should follow dc and mc ... others wise page takes longer to load.
-		dC.fetch({update:true, useSocket:true});
-		mC.fetch({update:true, useSocket:true});
-		gC.fetch({update:true, useSocket:true});
+		var fetchCount = 0;
+		var fetchComplete = function () {
+			if(++fetchCount == 3)setTimeout(function () {
+				$('#appLoadingVeil').hide();
+				console.log('Veil lifted at:', new Date()-d);
+			}, 200);
+		};
+		dC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
+		mC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
+		gC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
 		
 		deviceCollection = dC;
 		var mainPageView = new MainPageView({'collection':gC});

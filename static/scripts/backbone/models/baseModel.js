@@ -1,6 +1,6 @@
 BaseModel = Backbone.Model.extend({
 	url	:	function () {
-		return this.urlRoot+this.get('id')+"/";
+		return this.urlRoot; //+this.get('id')+"/";
 	},
 	parse: function(resp) {
 		if (resp.status == "success" && resp.data && resp.data.model)
@@ -18,26 +18,23 @@ BaseModel = Backbone.Model.extend({
 		data.deviceType = ( screen.width <= 480 )?'Mobile':'Laptop';
 		ioSocket.emit(actionName, data);
 		if (success) success();
-	}
-/*	sendActionRequest	:	function ($actionName, data, success, error) {
+	},
+	sendActionRequestByAjax	:	function ($actionName, data, success, error) {
 		if(!data) data = {};
 //		data.respondWithModel=true;
+		data.actionName=$actionName;
+		// console.log($actionName);
 		$.ajax({
-			url: this.url()+$actionName,
+			url: this.url(),
 			data:data,
 			async:false,
 			dataType: 'json',
 			success: _.bind(function(resp) {
-				if (resp.status != "success"){
-					alert("Action failed: " + resp.info);
+				if (!resp.success){
 					console.log('error while performing action');
 					if (typeof error == "function") error();
 					return;
 				}
-				if (resp.data.model && resp.data.model.id==this.id) {
-					this.set(resp.data.model);
-				}
-//				this.trigger("actionDone");
 				if (typeof success == "function") success(resp.data);
 			}, this),
 			error:	function (resp) {
@@ -46,5 +43,5 @@ BaseModel = Backbone.Model.extend({
 			}
 		});		
 	}
-*/	
+	
 })

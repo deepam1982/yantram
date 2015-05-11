@@ -90,9 +90,11 @@ var Coordinator = BaseClass.extend({
 				nodeIdArr.push(id);
 				console.log(timer.minute, timer.hour, timer.amPm)
 				var min = parseInt(timer.minute); 
-				var hour = parseInt(timer.hour)+((timer.amPm == 'AM')?0:12); 
+				var hour = parseInt(timer.hour)+((timer.amPm == 'AM')?0:12) - ((parseInt(timer.hour)==12)?12:0); 
 				var onPattern = "00 "+min+" "+hour+" * * *";
-				var offPattern ="00 "+((min+10)%60)+" "+((hour+parseInt((min+10)/60))%24)+" * * *";
+				var offPattern = "02 "+min+" "+hour+" * * *";
+				// offPattern = onPattern + 2 seconds. having +10 mins instead, causes the problem where geyser on-ed by timer, could not be turned off for 10 mins.
+				//var offPattern ="00 "+((min+10)%60)+" "+((hour+parseInt((min+10)/60))%24)+" * * *";
 				console.log(onPattern, offPattern);
 				if(!this.utilNodes[id]) 
 					this.utilNodes[id] = new CronDevice({'switchOnAt':onPattern, 'switchOffAt':offPattern, 'id':id});

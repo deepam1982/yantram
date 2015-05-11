@@ -14,7 +14,7 @@ startWithLogs)
 
 start)
 	echo "starting node: $NODE $SERVER_JS_FILE"
-	sudo -u $USER $NODE $SERVER_JS_FILE noLogs &
+	sudo -u $USER $NODE $SERVER_JS_FILE noLogs > $OUT 2>$OUT &
 	;;
 
 stop)
@@ -24,7 +24,7 @@ stop)
 restart)
 	killall $NODE	
 	echo "starting node: $NODE $SERVER_JS_FILE"
-	sudo -u $USER $NODE $SERVER_JS_FILE noLogs &
+	sudo -u $USER $NODE $SERVER_JS_FILE noLogs > $OUT 2>$OUT &
 	;;
 
 *)

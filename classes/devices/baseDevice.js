@@ -63,7 +63,7 @@ var BaseDevice = BaseClass.extend({
 				vDevice.syncPending = true;
 				this.setSwitch(loadIndex, vDevice.state, __.bind(function () {
 					vDevice.syncPending = false;
-					if(!force) { // if not force means it is sensor who is toggeling
+					if(!force) { // if not force then sensor is toggeling
 						console.log("@@@@@@@@@@@ Switch toggelled by Sensor @@@@@@@@@");	
 						eventLogger.addEvent("toggelSwitch", {
 							'boardId':this.id, 
@@ -73,7 +73,7 @@ var BaseDevice = BaseClass.extend({
 							'state':this.switchState[loadIndex] // log new state
 						});
 					}
-					else {} // else its a remote device who is toggeling
+					else {} // else its the remote device toggeling
 					vDevice._onStateChange(force);
 				}, this));
 			}
@@ -137,7 +137,8 @@ var BaseDevice = BaseClass.extend({
 		if(!force && this.syncInProgress) return;
 		if(typeof count == 'undefined') count=0;
 		if (count > 10) { this.syncCallbackStack = []; this.syncInProgress=false; return;}
-		this._sendQuery({name:"GTDVST"});
+//		this._sendQuery({name:"GTDVST"}); // mostly remote device has already sent the status wait and then resend status query
+		setTimeout(__.bind(function () {if(this.syncInProgress)this._sendQuery({name:"GTDVST"});}, this),100)
 		clearTimeout(this.syncInProgress);
 		this.syncInProgress = setTimeout(__.bind(this.syncState, this, null, true, count+1), 2500);
 	//	console.log("this.syncInProgress - "+this.syncInProgress);

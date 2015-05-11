@@ -12,14 +12,17 @@ RoomModel = BaseModel.extend({
 })
 
 SwitchModel = BaseModel.extend({
-	urlRoot		:	'/room/model/',
+	urlRoot		:	'/model/switch',
 	toggelSwitch : function (calback, errorCalback) {
 		var devId = this.get('devId'), switchId = this.get('switchID'), state=this.get('state');
-		console.log("toggelSwitch called "+devId+" "+switchId+" "+state);
-		this.sendActionRequest("toggleSwitch", {"devId":devId, "switchId":switchId, "state":state}, calback, errorCalback);	
+	//	console.log("toggelSwitch called "+devId+" "+switchId+" "+state);
+		this.sendActionRequestByAjax("toggleSwitch", {"devId":devId, "switchId":switchId, "state":state}, function(rsp){
+			//console.log('Ajax response toggelSwitch came.', rsp)
+			calback.apply(this, arguments);
+		}, errorCalback);	
 	},
 	setDuty : function (duty, calback) {
-		this.sendActionRequest("setDuty", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
+		this.sendActionRequestByAjax("setDuty", {"duty":duty, "devId":this.get('devId'), "switchId":this.get('switchID')}, calback);	
 	},
 	setSwitchParam : function (params, calback) {
 		var devId = this.get('devId'), switchId = this.get('switchID');

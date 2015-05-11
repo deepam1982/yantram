@@ -87,7 +87,7 @@ EditGroupPannel = BaseView.extend({
 	erase : function () {
 		if(!this.rendered) return;
 		var groupInfo = this.model.toJSON();
-		groupInfo.rank = this.$el.find('input[name=rank]:checked').val() || groupInfo.id;
+		groupInfo.rank = this.$el.find('input[name=rank]:checked').val() || groupInfo.rank;
 		groupInfo.name=this.$el.find('.groupName').val() || groupInfo.name;
 		var controls = [], id=0;
 		deviceCollection.each(function (dev) {
@@ -117,7 +117,7 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  	}),
  	deleteGroup : function () {
  		var groupInfo = this.model.toJSON();
-		groupInfo.rank = groupInfo.id;
+//		groupInfo.rank = groupInfo.id;
 		groupInfo.controls = [];
 		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
  	},

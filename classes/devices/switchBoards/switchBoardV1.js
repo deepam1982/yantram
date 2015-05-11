@@ -20,7 +20,11 @@ var SwitchBoardV1 = BaseDevice.extend({
 		if (Math.abs(oldDm0St-this.dimmerState[0])>10 || Math.abs(oldDm1St != this.dimmerState[1])>10) 
 			this.emit('stateChanged', 'dimmer');
 		var changebits = oldSwSt ^ this._binStateToInt(this.switchState)
-		if (changebits) this.emit('stateChanged', 'load', changebits);	
+		var changeSwitchIndexes = []
+		__.times(this.numberOfSwitches, function(indx){
+			if((changebits>>indx) % 2) changeSwitchIndexes.push(this.numberOfSwitches-1-indx);
+		}, this);
+		if (changebits) this.emit('stateChanged', 'load', changeSwitchIndexes);
 	},
 	_logDVST : function (msg) {
 		console.log("#### DVST of "+this.id+" is " + this.switchState + " " + this.dimmerState);
@@ -78,21 +82,39 @@ var SwitchBoardV1 = BaseDevice.extend({
 			__.each(setSwitchQ, function (obj) {obj.callback && obj.callback();}, this);
 		}, this))
 	},
+	// _setSwitch : function (swst, callback, donotRetry) {
+	// 	this._sendQuery({name:"STSWPT", value:this._intToHexStr(swst)}, 
+	// 		__.bind(function(){
+	// 			setTimeout(__.bind(function () {
+	// 				if (this._binStateToInt(this.switchState)^swst) {
+	// 					this.syncState(__.bind(function () {
+	// 						if(!donotRetry && this._binStateToInt(this.switchState)^swst) {
+	// 							console.log("#### retrying STSWPT")
+	// 							this._setSwitch(swst, callback, true);
+	// 						}
+	// 						else callback && callback()
+	// 					}, this));
+	// 				}
+	// 				else callback && callback()
+	// 			}, this), 100); // if this interval is long it will create problem when user rapidly toggels the switch.	
+	// 		}, this));
+	// },
 	_setSwitch : function (swst, callback, donotRetry) {
 		this._sendQuery({name:"STSWPT", value:this._intToHexStr(swst)}, 
 			__.bind(function(){
-				setTimeout(__.bind(function () {
-					if (this._binStateToInt(this.switchState)^swst)
-						this.syncState(__.bind(function () {
-							if(!donotRetry && this._binStateToInt(this.switchState)^swst) {
-								console.log("#### retrying STSWPT")
-								this._setSwitch(swst, callback, true);
-							}
-							else callback && callback()
-						}, this))
+				// successful response comes only when request registers successfully :D
+				this.syncState(__.bind(function () {
+					if(!donotRetry && this._binStateToInt(this.switchState)^swst) {
+						console.log("#### retrying STSWPT")
+						this._setSwitch(swst, callback, true);
+					}
 					else callback && callback()
-				}, this), 100); // if this interval is long it will create problem when user rapidly toggels the switch.	
-			}, this));
+				}, this));
+				setTimeout(__.bind(function () {
+					if(!donotRetry && this._binStateToInt(this.switchState)^swst)
+						this._setSwitch(swst, callback, true);
+				}, this), 200); // if this interval is long (should be 100) it will create problem when user rapidly toggels the switch.	
+		}, this));		// and if the interval is short (should be 200) it will resend query when response is on the way.
 	},
 	toggleSwitch : function(switchNo) {
 		return this.virtualNodes[this.id+"-l"+switchNo].setState(!this.switchState[switchNo]);

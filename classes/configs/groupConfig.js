@@ -15,46 +15,66 @@ var GroupConfigManager = BasicConfigManager.extend({
 		}
 		return null;
 	},
+	getGroupsHavingDevice : function (devId, switchIds) {
+		var groupIds = [];
+		__.each(this.toJSON(), function (conf, id) {
+			for(var idx=0; idx < conf.controls.length; idx++){
+				if(conf.controls[idx].devId == devId && (!switchIds || 1+__.indexOf(switchIds, parseInt(conf.controls[idx].switchID)))) {
+					groupIds.push(id);break;
+				}
+			}
+		});
+		return groupIds
+	},
+	getGroupDetails : function (id) {
+		var conf = JSON.parse(JSON.stringify(this.data[id]));
+		return this._getGroupDetails(conf, id);
+	},
+	_getGroupDetails : function (conf, id) {
+		var keys = __.keys(this.data);
+		var count = keys.length;
+		conf.id = id+''; // id has to be string
+		conf.rank || (conf.rank = (__.indexOf(keys, id+'')+1));
+		conf.count = count;
+		conf.disabledCtls = 0; 
+		__.each(conf.controls, function (ctl) {
+			var cnt = __.keys(ctl).length;
+			__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
+				ctl[key] = val;
+			});
+			if (cnt == __.keys(ctl).length) return conf.controls = __.without(conf.controls, ctl);
+			var config = deviceManager.getConfig(ctl.devId);
+			ctl.disabled = (!config)?true:((!config.reachable)?true:false);
+			(ctl.disabled && conf.disabledCtls++);
+			ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
+			ctl.state = (ctl.state)?'on':'off';
+			var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);
+			ctl.autoOff = timers.autoOff[0];
+			if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
+			ctl.schedules = [];
+			__.each(timers.schedules, function (schdl){ctl.schedules.push(__.omit(schdl, "devId", "loadId"))});
+			ctl.hasActiveSchedules = __.max(__.pluck(ctl.schedules, 'enabled'));// ctl.schedules.length;
+			ctl.hasTimer = (!ctl.autoOff)?false:ctl.autoOff.enabled;
+			ctl.autoToggleTime = null;
+			var vLoad = deviceManager.getVirtualLoad(ctl.devId, ctl.switchID);
+			if(vLoad) {
+				var tmp = vLoad.getRemainingTimeToToggle();
+				if(tmp < Infinity) {
+					var d = new Date(new Date().getTime() + tmp*1000), hour = d.getHours(), min = d.getMinutes();
+					ctl.autoToggleTime = ((hour<10)?'0':'')+hour+':'+((min<10)?'0':'')+min;	
+				}
+			}
+			if (config && (ctl.switchID == 0 || ctl.switchID == 1)) {
+				ctl.duty = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
+			}
+		});
+		return conf;
+	},
 	getList : function () {
 		var data = [];
-		var count = __.keys(this.data).length;
-		__.each(this.toJSON(), function (conf, id) {
-			conf.id = id;
-			conf.count = count;
-			conf.disabledCtls = 0; 
-			__.each(conf.controls, function (ctl) {
-				var cnt = __.keys(ctl).length;
-				__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
-					ctl[key] = val;
-				});
-				if (cnt == __.keys(ctl).length) return conf.controls = __.without(conf.controls, ctl);
-				var config = deviceManager.getConfig(ctl.devId);
-				ctl.disabled = (!config)?true:((!config.reachable)?true:false);
-				(ctl.disabled && conf.disabledCtls++);
-				ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
-				ctl.state = (ctl.state)?'on':'off';
-				var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);
-				ctl.autoOff = timers.autoOff[0];
-				if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
-				ctl.schedules = [];
-				__.each(timers.schedules, function (schdl){ctl.schedules.push(__.omit(schdl, "devId", "loadId"))});
-				ctl.hasSchedules = ctl.schedules.length;
-				ctl.hasTimer = (!ctl.autoOff)?false:ctl.autoOff.enabled;
-				ctl.autoToggleTime = null;
-				var vLoad = deviceManager.getVirtualLoad(ctl.devId, ctl.switchID);
-				if(vLoad) {
-					var tmp = vLoad.getRemainingTimeToToggle();
-					if(tmp < Infinity) {
-						var d = new Date(new Date().getTime() + tmp*1000), hour = d.getHours(), min = d.getMinutes();
-						ctl.autoToggleTime = ((hour<10)?'0':'')+hour+':'+((min<10)?'0':'')+min;	
-					}
-				}
-				if (config && (ctl.switchID == 0 || ctl.switchID == 1)) {
-					ctl.duty = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
-				}
-			});
-			data.push(conf);
-		});
+		__.each(this.toJSON(), function (conf, id) {	
+			data.push(this._getGroupDetails(conf, id));
+		}, this);
 		return data;
 	}
 })

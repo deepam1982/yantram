@@ -1,4 +1,4 @@
-var parsers = require("serialport").parsers;
+ var parsers = require("serialport").parsers;
 var SerialPort = require("serialport").SerialPort;
 
 var BaseClass = require(__rootPath+"/classes/baseClass");
@@ -44,18 +44,28 @@ var BaseCommunicator = BaseClass.extend({
 			setTimeout(__.bind(this._onPortOpen, this), 1000);
 		}, this));
 		setInterval(__.bind(this._timeoutPendingRequests, this), 3000);
+		this.lastPacketRecievedAt = new Date().getTime()/1000; // 
 	},
 	checkCommunication : function () {},
 	_onPortOpen : function () {
 		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
 		this.checkCommunication();
+		this._broadcastLoop();
+	},
+	_broadcastLoop : function () {
+		if(this._queryQ.length) return setTimeout(__.bind(this._broadcastLoop, this), 1000);
 		this._broadcast();
-		setInterval(__.bind(this._broadcast, this), 8000);
+		setTimeout(__.bind(this._broadcastLoop, this), 8000)
 	},
 	_checkConnectivity : function () {
+		if( ((new Date().getTime()/1000) - this.lastPacketRecievedAt) > 25) {
+			console.log("########### Zigbee Module stopped responding")
+			this.lastPacketRecievedAt = new Date().getTime()/1000;
+			__restartZigbeeModule();
+		}
 		__.each(this.deviceList, function (dev) {
-			if(dev.lastSeenAt < (Date.now()/1000) - 20 && !dev.unreachable) {
+			if((dev.lastSeenAt < ((Date.now()/1000) - 25)) && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
 				dev.unreachable = true;
 				this.emit("deviceUnreachable", dev.macAdd);
 			}
