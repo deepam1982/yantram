@@ -73,6 +73,7 @@ module.exports = function (callback) {
 	* Authenticate first, doing a post to some url 
 	* with the credentials for instance
 	*/
+	
 	var pingTimeStamp, pingTimer, socket;
 	var foo = function () {
 		if(!__userConfig.get('email')) return setTimeout(foo, 30000);
