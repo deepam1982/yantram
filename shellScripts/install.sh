@@ -72,3 +72,10 @@ line="0 0 * * * sudo bash $DIR1/shellScripts/updateCron.sh > $DIR0/logs/updateCr
 (crontab -u root -l; echo "$line" ) | crontab -u root -
 
 echo "------------------ updateCron added to cron ----------------";
+
+sudo chmod 755 $DIR1/shellScripts/shallRestart.sh
+line="*/15 * * * * sudo bash $DIR1/shellScripts/shallRestart.sh > $DIR0/logs/checkForRestart.log"
+(crontab -u root -l; echo "$line" ) | crontab -u root -
+
+echo "------------------ checkForRestart added to cron ----------------";
+
