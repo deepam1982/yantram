@@ -161,6 +161,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		if(typeof retrying == 'function') {calback = retrying; retrying=false;}
 		console.log("Checking Communication.");
 		this._pendingReqCallbackMap["FFFF"] = __.bind(function (err) {
+			if(err) console.log(err);
 			console.log("Test Communication "+((err)?((retrying)?"Failed!!":"retrying!!"):"Success!!"));
 			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true, calback), 1000);
 			else calback && calback(err);

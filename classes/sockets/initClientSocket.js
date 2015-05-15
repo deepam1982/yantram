@@ -43,7 +43,7 @@ module.exports = function (callback) {
 	var orignalEmitFunction = null;
 	var hackedEmit = function (eventName, data, calback) { //TODO handle calback
 		if(__.indexOf(allowedEventsForHackEmit, eventName) == -1) return orignalEmitFunction.apply(this, arguments);
-		console.log('hack emit on cloud socket',eventName);
+		//console.log('hack emit on cloud socket',eventName);
 
 		request({
 			jar: j, 
@@ -54,7 +54,7 @@ module.exports = function (callback) {
 				"content-type": "application/json",
 			},
 			body: JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data})
-		},function (err, resp, body){console.log(body);});
+		},function (err, resp, body){if(err) console.log(err,body);});
 
 		// var cookie = j.getCookieString(__cloudUrl);
 		// var dataStr = JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data});

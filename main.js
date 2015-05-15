@@ -9,22 +9,26 @@ console.log = function () {
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   return originalConsoleLog.apply(console, mainArguments);
 };
-var logString = '';
+var logString = '', pushLogtimer=null;
+var pushLogsToCloud = function() {
+    if (pushLogtimer) clearTimeout(pushLogtimer);
+    pushLogtimer = setTimeout(pushLogsToCloud, 5000);
+    if(!logString) return;
+    originalConsoleLog('---- logging on to cloud -----');
+    request({url: __cloudUrl+'/clientlog', method: "POST", json:true, headers: {"content-type": "application/json",},
+              body: JSON.stringify({username: __userConfig.get('email'), "data":logString})
+            }, function (err, resp, body){originalConsoleLog(body);}
+    );
+    logString = '';
+}
 var logOnCloud = function () {
   var d=new Date();
   var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   (!noLogs) && originalConsoleLog.apply(console, mainArguments);
   var newLine = (mainArguments).join(' ');
-  if(logString.length + newLine.length > 800) {
-    originalConsoleLog('---- logging on to cloud -----');
-    request({url: __cloudUrl+'/clientlog', method: "POST", json:true, headers: {"content-type": "application/json",},
-            body: JSON.stringify({username: __userConfig.get('email'), "data":logString})}, function (err, resp, body){
-              originalConsoleLog(body);
-            });
-    logString = newLine;
-  }
-  else logString += '\n'+newLine; 
+  if(logString.length + newLine.length > 800) pushLogsToCloud();
+  logString += ((logString)?'\n':'')+newLine; 
 }
 
 

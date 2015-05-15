@@ -70,7 +70,7 @@ var CommandManager = BaseClass.extend({
 			console.log(error, stdout, stderr);
 		}
 //		exec("sudo service inoho restart", foo);	
-		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh", foo);	
+		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh > "+__rootPath+"/../logs/updateCron.log", foo);	
 		console.log('starting update now')
 	},
 	restoreFactory : function (callback) {

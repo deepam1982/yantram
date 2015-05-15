@@ -26,6 +26,7 @@ success=`jsonval`
 #echo $restart
 
 if [ "$success" == "true" -a "$restart" == "true" ]; then
+	echo "Restarting now!"
 	CMD="sudo service inoho restart"
 	eval "$CMD"
 fi
