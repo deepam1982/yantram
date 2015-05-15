@@ -565,7 +565,7 @@
 					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch' style='white-space:nowrap;'><%print((name.length>8)?name.substring(0, 7)+'...':name)%></span>
+				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
 				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
 
@@ -817,6 +817,7 @@
 		if(!window.location.hash) return;
 		var removeHash = false;
 		switch(window.location.hash) {
+			case '#updatenow'				: 	ioSocket.emit('updateNow');removeHash=true;break;
 			case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
 			case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
 			case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;

@@ -44,7 +44,7 @@ var BaseCommunicator = BaseClass.extend({
 			setTimeout(__.bind(this._onPortOpen, this), 1000);
 		}, this));
 		setInterval(__.bind(this._timeoutPendingRequests, this), 3000);
-		this.lastPacketRecievedAt = new Date().getTime()/1000; // 
+		this.zModRestartedAt =this.lastPacketRecievedAt = new Date().getTime()/1000; // 
 	},
 	checkCommunication : function () {},
 	_onPortOpen : function () {
@@ -61,15 +61,28 @@ var BaseCommunicator = BaseClass.extend({
 	_checkConnectivity : function () {
 		if( ((new Date().getTime()/1000) - this.lastPacketRecievedAt) > 25) {
 			console.log("########### Zigbee Module stopped responding")
-			this.lastPacketRecievedAt = new Date().getTime()/1000;
+			this.zModRestartedAt = this.lastPacketRecievedAt = new Date().getTime()/1000;
 			__restartZigbeeModule();
 		}
+		var unreachableCount=0, maxTimeStamp=0;
 		__.each(this.deviceList, function (dev) {
+			if(dev.unreachable) unreachableCount++;
+			maxTimeStamp=Math.max(maxTimeStamp, dev.lastSeenAt);
 			if((dev.lastSeenAt < ((Date.now()/1000) - 25)) && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
 				dev.unreachable = true;
 				this.emit("deviceUnreachable", dev.macAdd);
 			}
 		}, this)
+		maxTimeStamp=Math.max(maxTimeStamp, this.zModRestartedAt||0);
+		if(this.deviceList.length == unreachableCount) {
+			console.log("########### all",unreachableCount, "devices seems unreachable.");
+			var threstHold = 120
+			if(maxTimeStamp < ((Date.now()/1000) - threstHold)) {
+				console.log("########### no communication from any router for more than", threstHold, 'seconds')
+				this.zModRestartedAt = new Date().getTime()/1000;
+				__restartZigbeeModule();
+			}
+		}
 	},
 	_onDataArrival : function (data) {
 		data = this.byteDataToStr(data);
