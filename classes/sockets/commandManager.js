@@ -33,6 +33,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('restartHomeController', __.bind(this.restartHomeController, this));
 		socket.on('startCloudLogs', __.bind(this.setLogOnCloud, this, true));
 		socket.on('stopCloudLogs', __.bind(this.setLogOnCloud, this, false));
+		socket.on('applyMood', __.bind(this.activateMood, this));
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
@@ -49,7 +50,6 @@ var CommandManager = BaseClass.extend({
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
-		socket.on('applyMood', __.bind(this.activateMood, this));
 		socket.on('restoreFactory', __.bind(this.restoreFactory, this));
 
 		console.log('Added Command Listners!!')

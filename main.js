@@ -151,7 +151,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }
             io.sockets.on('connection', function (socket) {
               console.log('Socket connection established!!');
-              socket.emit('showBurgerMenu');
+              // socket.emit('showBurgerMenu'); // not required any more
               socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
               if(__systemConfig.get('communicator') != 'tarang') 
                 checkConfigurations(socket);
@@ -233,6 +233,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               publishGroupConfig();
               socComMngr.setCloudSocket(cloudSocket);
               socReqMngr.setCloudSocket(cloudSocket);
+              socEdtMngr.setCloudSocket(cloudSocket);
             })
               
 

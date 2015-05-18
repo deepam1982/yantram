@@ -12,7 +12,14 @@ var EditManager = BaseClass.extend({
 		this.localIo = obj.localIo;
 		this.localIo.sockets.on('connection', this.onLocalConnection);
 	},
+	setCloudSocket	: 	function (cloudSocket) {
+		this.cloudSocket = cloudSocket;
+		this.onCommonConnection(cloudSocket);
+	},
 	onLocalConnection : function (socket) {
+		this.onCommonConnection(socket);
+	},
+	onCommonConnection : function (socket) {
 		socket.on('setSwitchParam', __.bind(this.modifySwitchParam, this));
 		socket.on('modifyGroup', __.bind(this.modifyGroup, this));
 		socket.on('modifyMood', __.bind(this.modifyMood, this));
