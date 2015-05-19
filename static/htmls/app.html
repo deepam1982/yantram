@@ -860,6 +860,7 @@
 			});
 			ioSocket.on('noHomeControllerPresent', function () {
 				sideMenu.switchPage('homeControllerDownPage');
+				$('#appLoadingVeil').hide();
 			});
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);

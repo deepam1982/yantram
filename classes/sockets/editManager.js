@@ -29,10 +29,15 @@ var EditManager = BaseClass.extend({
 		if((parseInt(obj.id) && !(curObj=moodConfig.get(obj.id))) || !obj.name || !obj.icon || !obj.controls || !__.isArray(obj.controls))
 			return callback && callback({'success':false, 'msg':'invalid parameters'});
 		var invalidParams = false, controls=[], id=0;
+		var hashToAvoidDuplicate = {};
 		__.each(obj.controls, function (ctrl) {
 			if(!ctrl.devId || typeof ctrl.switchId == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchId))
 				return invalidParams = true;
-			controls.push({"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state)?"on":"off"})
+			var uniqueKey = ctrl.devId+'-'+ctrl.switchId;
+			if(!__.has(hashToAvoidDuplicate, uniqueKey)) {
+				hashToAvoidDuplicate[uniqueKey] = true;
+				controls.push({"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state)?"on":"off"});
+			}
 		}, this);
 		if(invalidParams) return callback && callback({'success':false, 'msg':'invalid parameters1'});
 		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket

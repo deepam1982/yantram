@@ -170,8 +170,9 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             
             var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
             var restoreStateAttempts = 0;
+            var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
             var restoreState = function () {
-              require('dns').resolve('www.google.com', function(err) {
+              checkInternet(function(err) {
                 if (err) return(++restoreStateAttempts && setTimeout(restoreState, ((restoreStateAttempts < 8)?30:120)*1000));
                 var sys = require('sys');
                 var exec = require('child_process').exec;
