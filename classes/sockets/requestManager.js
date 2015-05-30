@@ -9,20 +9,15 @@ var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 
 var RequestManager = BaseClass.extend({
 	init : function (obj) {
-		__.bindAll(this, "onLocalConnection", "onCloudConnection");
+		__.bindAll(this, "setEventListners");
 		this.localIo = obj.localIo;
-		this.localIo.sockets.on('connection', this.onLocalConnection);
+		this.localIo.sockets.on('connection', this.setEventListners);
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;
-		this.cloudSocket.on('connect', this.onCloudConnection);
+		this.setEventListners(this.cloudSocket);
 	},
-	onCloudConnection : function () {
-		if(this.cloudSocketConnectionDone) return;
-		this.onLocalConnection(this.cloudSocket);
-		this.cloudSocketConnectionDone = true;
-	},
-	onLocalConnection : function (socket) {
+	setEventListners : function (socket) {
 		socket.on('/room/list', __.bind(this.onRoomListRequest, this, socket));
 		socket.on('/group/list', __.bind(this.onRoomListRequest, this, socket));
 		socket.on('/device/list', __.bind(this.onDeviceListRequest, this, socket));

@@ -43,26 +43,8 @@ var DeviceManager = BaseClass.extend({
 	_registrationCheck : {},
 	_onNewDeviceFound : function (deviceId, count) {
 		if(this._deviceMap[deviceId] || typeof this._deviceMap[deviceId] != 'undefined' && !count) return;
-		this._deviceMap[deviceId]=false;
-		if(typeof count=='undefined') count=0;
-		if (count > 5) {
-			console.log('#### Registration of device:'+deviceId+" failed afret "+count+" tries");
-//			this._deviceMap[deviceId]=true;
-			return;
-		}
-		if(!this._registrationCheck[deviceId]) { 
- 			this._registrationCheck[deviceId] = __.throttle(__.bind(function(cnt){
-				if (!this._deviceMap[deviceId]) {
-					this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
-					console.log('#### Registration of device:'+deviceId+" not found retrying now-"+cnt);
-					this._onNewDeviceFound(deviceId, cnt);
-				}
-			}, this), 5000);
-			this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
-			setTimeout(__.bind(this._registrationCheck[deviceId], this, count+1), 2000);
-		}
-		else
-			this._registrationCheck[deviceId](count+1);
+	//	this._deviceMap[deviceId]=false;
+		this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
 	},
 	sendQuery : function (deviceId, queryObj, callback) {
 		this.communicator.sendQuery(deviceId, queryObj, function (err, result, query) {
@@ -70,8 +52,8 @@ var DeviceManager = BaseClass.extend({
 				callback && callback(err, result);
 		});
 	},
-	_onMsgRecieved : function (type, msg, deviceId) {
-		if(type == "DVTP") this._registerNewDevice (msg, deviceId);
+	_onMsgRecieved : function (type, msg, deviceId, callback) {
+		if(type == "DVTP") this._registerNewDevice (msg, deviceId, callback);
 		else if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg); // its device's job to handel its own msg
 		else {
 			// message from unregistered device
@@ -79,7 +61,7 @@ var DeviceManager = BaseClass.extend({
 			this._onNewDeviceFound(deviceId);
 		}
 	},
-	_registerNewDevice : function (type, deviceId) {
+	_registerNewDevice : function (type, deviceId, callback) {
 		if(this._deviceMap[deviceId]) return;
 		switch (type) {
 			case "SWITCHBOARDV1" : var device = new SwitchBoardV1 (deviceId, this); break;
@@ -98,6 +80,7 @@ var DeviceManager = BaseClass.extend({
 				__.has(this._virtualNodesOldState, id) && node.setState(this._virtualNodesOldState[id]);
 			}, this)
 		this.emit('newNodesFound', device.virtualNodes, deviceId);
+		callback && callback();
 		
 		// device.getConfig();
 		// this.emit('newDeviceFound', deviceId);

@@ -13,6 +13,7 @@ module.exports = function (callback) {
 	 */
 	 
 	var io = require('socket.io-client');
+
 	var request = require('request');
 	 
 	/*
@@ -43,27 +44,33 @@ module.exports = function (callback) {
 	var orignalEmitFunction = null;
 	var hackedEmit = function (eventName, data, calback) { //TODO handle calback
 		if(__.indexOf(allowedEventsForHackEmit, eventName) == -1) return orignalEmitFunction.apply(this, arguments);
-		//console.log('hack emit on cloud socket',eventName);
+		// console.log('hack emit on cloud socket',eventName);
+		// request({
+		// 	jar: j, 
+		// 	url: __cloudUrl+'/socketemit', 
+		// 	method: "POST",
+		// 	json: true,
+		// 	headers: {
+		// 		"content-type": "application/json",
+		// 	},
+		// 	body: JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data})
+		// },function (err, resp, body){
+		// 	if(err) console.log(err,body);
+		// 	console.log(body);
+		// });
 
-		request({
-			jar: j, 
-			url: __cloudUrl+'/socketemit', 
-			method: "POST",
-			json: true,
-			headers: {
-				"content-type": "application/json",
-			},
-			body: JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data})
-		},function (err, resp, body){if(err) console.log(err,body);});
+		var cookie = j.getCookieString(__cloudUrl);
+		var dataStr = JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data});
+		var command = 'curl -X POST --max-time 3 --retry 3 --cookie "'+cookie+'" -H "Content-Type: application/json" -d \''+dataStr+'\''+' '+__cloudUrl+'/socketemit';
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			if(error) console.log(error, stdout);
+//			if(error) console.log(command);
+		}
+		exec(command, foo);
 
-		// var cookie = j.getCookieString(__cloudUrl);
-		// var dataStr = JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data});
-		// var command = 'curl -X POST  --cookie "'+cookie+'" -H "Content-Type: application/json" -d \''+dataStr+'\''+' '+__cloudUrl+'/socketemit';
-		// var exec = require('child_process').exec;
-		// var foo = function(error, stdout, stderr) {
-		// 	console.log(error, stdout);
-		// }
-		// exec(command, foo);
+
+
 		// // console.log(command);
 		// console.log('command executed');
 	};
@@ -73,31 +80,55 @@ module.exports = function (callback) {
 	* Authenticate first, doing a post to some url 
 	* with the credentials for instance
 	*/
-	var pingTimeStamp, pingTimer, socket;
+	var pingTimeStamp = Date.now(), pingTimer, socket, socketCheckTimer;
 	var foo = function () {
 		if(!__userConfig.get('email')) return setTimeout(foo, 30000);
 		console.log("Trying to login to cloud");
-		request.get({jar: j, url: __cloudUrl+'/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
+		request.get({jar: j, timeout:3000, url: __cloudUrl+'/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
 	 		console.log('got response!!');
 	 		if(err) {
 	 			console.log(err);
 	 			console.log('Found no response from cloud, probably internet is down!!')
 	 		}
 	 		if(!err && resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
-	 		if (!resp || err || resp.statusCode != 200) {console.log("will retry connecting cloud in 60 sec."); setTimeout(foo, 60000); return;}
+	 		if (!resp || err || resp.statusCode != 200) {
+	 			if(Date.now()-pingTimeStamp < 20*1000) return foo(); // 20 seconds
+	 			console.log("will retry connecting cloud in 60 sec."); setTimeout(foo, 60000); return;}
 
 			/*
 			* now we can connect.. and socket.io will send the cookies!
 			*/
 			pingTimeStamp = Date.now();
-			if(!socket){
-				socket = io.connect(__cloudUrl+'/inoho-home-controller');
-				orignalEmitFunction = socket.emit;
-				socket.emit = hackedEmit;
-				socket.on('connect', function(){console.log('connected! handshakedddddddddddd');});
-				socket.on('disconnect', function(){console.log('connection broken!!');setTimeout(foo, 10000);}); // try to reconnect only after 10 seconds m2m problem.
-				socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
-				callback(null, socket);
+			if(!socket || !socket.firstConnectionDone){
+				var onSocketFirstConnect = function (newSocket) {
+					if(socket !== newSocket) return;
+					console.log("onSocketFirstConnect called!!")
+					socket.firstConnectionDone = true;
+					orignalEmitFunction = socket.emit;
+					socket.emit = hackedEmit;
+					socket.on('disconnect', function(){console.log(socket.socket.open, 'connection broken!!');socket.socket.reconnect();}); // try to reconnect only after 10 seconds m2m problem.
+					socket.on('sudoHeartbeat', function(){pingTimeStamp = Date.now();console.log("recieved sudoHeartbeat from cloud");});
+					socket.on('testEvent', function(){console.log("recieved testEvent from cloud");});
+					socket.on('testEvent1', function(){console.log("recieved testEvent1 from cloud");});
+					callback(null, socket);
+				}
+				var connectSocket = function () {
+					console.log("Trying to establish socket with cloud");
+					socket = io.connect(__cloudUrl+'/inoho-home-controller',{'connect timeout':4000});
+					socket.on('connect', function(){
+						console.log('connected! handshakedddddddddddd');
+						if(!socket.firstConnectionDone) onSocketFirstConnect(socket)
+					});
+				}
+				connectSocket();
+				socketCheckTimer = setInterval(function () {
+					if(socket.firstConnectionDone && socket.socket.open) return;
+					console.log("########### Cloud socket seems to have disconnected. Trying to reconnect");
+					if (socket.firstConnectionDone) return socket.socket.reconnect();
+					clearInterval(socketCheckTimer);
+					clearInterval(pingTimer);
+					setTimeout(foo,5000);
+				}, 5000); 
 			}
 			else 
 				socket.socket.reconnect();
