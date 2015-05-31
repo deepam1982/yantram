@@ -10,6 +10,7 @@ var BaseCommunicator = BaseClass.extend({
 	serialPort : null,
 	_data : "",
 	deviceList : [],
+	_macIdNwkIdMap : {},
 	_queryQ : [],
 	_pendingReqCallbackMap : {},
 	_timeoutPendingRequests : function () {
@@ -44,17 +45,18 @@ var BaseCommunicator = BaseClass.extend({
 			setTimeout(__.bind(this._onPortOpen, this), 1000);
 		}, this));
 		setInterval(__.bind(this._timeoutPendingRequests, this), 3000);
-		this.zModRestartedAt =this.lastPacketRecievedAt = new Date().getTime()/1000; // 
+		this.querySentTimeStamp = this.zModRestartedAt =this.lastPacketRecievedAt = new Date().getTime()/1000; // 
 	},
 	checkCommunication : function () {},
 	_onPortOpen : function () {
 		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
-		this.checkCommunication();
+		setTimeout(__.bind(this.checkCommunication, this), 3000);
 		this._broadcastLoop();
 	},
 	_broadcastLoop : function () {
-		if(this._queryQ.length) return setTimeout(__.bind(this._broadcastLoop, this), 1000);
+		if(this._queryQ.length || ((new Date().getTime()/1000)-this.querySentTimeStamp) < 2) 
+			return setTimeout(__.bind(this._broadcastLoop, this), 1000);
 		this._broadcast();
 		setTimeout(__.bind(this._broadcastLoop, this), 8000)
 	},
@@ -80,7 +82,7 @@ var BaseCommunicator = BaseClass.extend({
 			if(maxTimeStamp < ((Date.now()/1000) - threstHold)) {
 				console.log("########### no communication from any router for more than", threstHold, 'seconds')
 				this.zModRestartedAt = new Date().getTime()/1000;
-				__restartZigbeeModule();
+				__restartZigbeeModule(__.bind(function(){setTimeout(__.bind(this.getNetworkKey, this), 3000)}, this));
 			}
 		}
 	},
@@ -98,6 +100,7 @@ var BaseCommunicator = BaseClass.extend({
 		this._checkConnectivity();	
 	},
 	_send : function (command, callback) {
+		this.querySentTimeStamp = new Date().getTime()/1000;
 		this.serialPort.write(__.map(command, function (c){return c.charCodeAt(0);}), function(err, results) {
 			if (err) {
 				console.log('Error: error while writing data on serial Port');
@@ -114,8 +117,9 @@ var BaseCommunicator = BaseClass.extend({
 		catch(err){return null;}
 	},
 	_getNwkAdd : function (devId) {
-		try {return __.findWhere(this.deviceList, {'deviceId':devId}).nwkAdd;}
-		catch(err){return null;}
+		return this._macIdNwkIdMap[devId];
+		// try {return __.findWhere(this.deviceList, {'deviceId':devId}).nwkAdd;}
+		// catch(err){return null;}
 	},
 	updateNetworkKey : function (networkKey, callback) {
 		callback && callback('noSupport');

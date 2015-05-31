@@ -1,11 +1,16 @@
 var __ = require("underscore");
 __cloudUrl = 'http://cloud.inoho.com';
+__rootPath = __dirname;
+var dateFormat = require(__rootPath+"/classes/utils/dateFormater");
+Date.prototype.format = function (mask, utc) {
+  return dateFormat(this, mask, utc);
+};
 var request = require('request');
 var originalConsoleLog = console.log;
 var noLogs = false;
 console.log = function () {
   var d=new Date();
-  var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
+  var ds = d.format('logTime')//d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   return originalConsoleLog.apply(console, mainArguments);
 };
@@ -86,7 +91,6 @@ fs.exists('/sys/class/gpio/gpio18', function (exist) {
   });
 });
 
-__rootPath = __dirname;
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
 var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConfig.json'});
 __systemConfig = new SystemConfigMngr({'callback':function(err){
@@ -151,7 +155,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }
             io.sockets.on('connection', function (socket) {
               console.log('Socket connection established!!');
-              socket.emit('showBurgerMenu');
+              // socket.emit('showBurgerMenu'); // not required any more
               socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
               if(__systemConfig.get('communicator') != 'tarang') 
                 checkConfigurations(socket);
@@ -168,10 +172,14 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             var SocketEditManager = require(__rootPath + '/classes/sockets/editManager')
             var socEdtMngr = new SocketEditManager({'localIo':io});
             
+            var FileReader = require(__rootPath + '/classes/sockets/fileReader')
+            var fileReader = new FileReader({'localIo':io});
+
             var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
             var restoreStateAttempts = 0;
+            var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
             var restoreState = function () {
-              require('dns').resolve('www.google.com', function(err) {
+              checkInternet(function(err) {
                 if (err) return(++restoreStateAttempts && setTimeout(restoreState, ((restoreStateAttempts < 8)?30:120)*1000));
                 var sys = require('sys');
                 var exec = require('child_process').exec;
@@ -214,6 +222,25 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                 __deviceStateConf.save();
               }
             });
+            deviceManager.communicator.on("publishingNetworkKey", function (name, key, id) {
+              if(!__remoteDevInfoConf.getList().length) return;
+              var fileName = __rootPath+'/../logs/network.log', str ;
+              var logString = "Id:"+ id + " Name:"+name+" Key:"+key, logStrWtDt = logString+" Date:"+ (new Date()).format('log')+'\n';
+              fs.exists(fileName, function(exists) {
+                if(!exists) return fs.writeFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
+                fs.readFile(fileName, "utf8", function(err, data) {
+                  if(err) return console.log(err);
+                  data = data.split('\n');
+                  while(data.length) {
+                    if (!(str = data.pop())) continue;
+                    if(str.indexOf(logString) != -1) return;
+                    break;
+                  }
+                  fs.appendFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
+                });
+              });
+              
+            })
 
             moodConfig.on('moodDeleteStart', function (moodId) {
               io.sockets.emit('deleteMood', moodId);
@@ -233,6 +260,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               publishGroupConfig();
               socComMngr.setCloudSocket(cloudSocket);
               socReqMngr.setCloudSocket(cloudSocket);
+              fileReader.setCloudSocket(cloudSocket);
+              socEdtMngr.setCloudSocket(cloudSocket);
             })
               
 

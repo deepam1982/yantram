@@ -11,21 +11,16 @@ var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
-		__.bindAll(this, "onLocalConnection", "onCloudConnection", "onToggleSwitchCommand", 
+		__.bindAll(this, "onLocalConnection", "onToggleSwitchCommand", 
 			"onSetDutyCommand", "onModifyNetworkSecurityKey");
 		this.localIo = obj.localIo;
 		this.localIo.sockets.on('connection', this.onLocalConnection);
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;
-		this.cloudSocket.on('connect', this.onCloudConnection);
+		this.setCommonEventListners(this.cloudSocket);
 	},
-	onCloudConnection : function () {
-		if(this.cloudSocketConnectionDone) return;
-		this.onCommonConnection(this.cloudSocket);
-		this.cloudSocketConnectionDone = true;
-	},
-	onCommonConnection : function (socket) {
+	setCommonEventListners : function (socket) {
 		socket.on('toggleSwitch', this.onToggleSwitchCommand);
 		socket.on('setDuty', this.onSetDutyCommand);
 		socket.on('groupOff', __.bind(this.groupOff, this));
@@ -33,6 +28,9 @@ var CommandManager = BaseClass.extend({
 		socket.on('restartHomeController', __.bind(this.restartHomeController, this));
 		socket.on('startCloudLogs', __.bind(this.setLogOnCloud, this, true));
 		socket.on('stopCloudLogs', __.bind(this.setLogOnCloud, this, false));
+		socket.on('restoreNetwork', __.bind(this.restoreNetwork, this));
+		socket.on('restartZigbee', __.bind(this.restartZigbee, this));
+		socket.on('applyMood', __.bind(this.activateMood, this));
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
@@ -41,7 +39,7 @@ var CommandManager = BaseClass.extend({
 		}
 	},
 	onLocalConnection : function (socket) {
-		this.onCommonConnection(socket);
+		this.setCommonEventListners(socket);
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
 		socket.on('getNetworkSettings', __.bind(this.getNetworkSettings, this));
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
@@ -49,7 +47,6 @@ var CommandManager = BaseClass.extend({
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
-		socket.on('applyMood', __.bind(this.activateMood, this));
 		socket.on('restoreFactory', __.bind(this.restoreFactory, this));
 
 		console.log('Added Command Listners!!')
@@ -75,31 +72,39 @@ var CommandManager = BaseClass.extend({
 	},
 	restoreFactory : function (callback) {
 		var thisObj = this;
+		console.log("--------- restoreFactory called ---------");
 		checkInternet(function(err) {
 			if (err) return callback({'success':false, 'msg':'Internet connection is down.'});
 			deviceManager.communicator.getNetworkKey(function (err, nwkKey) {
 				if(err) return callback({'success':false, 'msg':err});
+				console.log("network key:", nwkKey)
 				request.post(__cloudUrl+'/deleteuser/', {form: {email:__userConfig.get('email'), password:__userConfig.get('password'), productId:nwkKey}}, function (err, resp, body){
 					if (!resp || err || resp.statusCode != 200) return callback({'success':false, 'msg':err});
+					console.log("account deletion response came from cloud");
 					var rspJson = JSON.parse(body);
 					// 404 check if user dosen't exist then fine go ahead with account creation.
 					if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
-					// cloud account deletion successful.
+					console.log("cloud account deletion successful!");
 					groupConfig.data='';
 					groupConfig.save(function (err) {
 						if(err) return callback({'success':false, 'msg':err});
+						console.log("groupConfig reset");
 						moodConfig.data='';
 						moodConfig.save(function (err) {
 							if(err) return callback({'success':false, 'msg':err});
+							console.log("moodConfig reset");
 							timerConfig.data='';
 							timerConfig.save(function (err) {
 								if(err) return callback({'success':false, 'msg':err});
+								console.log("timerConfig reset");
 								deviceInfoConfig.data='';
 								deviceInfoConfig.save(function (err) {
 									if(err) return callback({'success':false, 'msg':err});
+									console.log("deviceInfoConfig reset");
 									__userConfig.data='';
 									__userConfig.save(function (err) {
 										if(err) return callback({'success':false, 'msg':err});
+										console.log("__userConfig reset");
 										setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
 										return callback({'success':true});
 									});
@@ -247,29 +252,60 @@ var CommandManager = BaseClass.extend({
 	getNetworkSettings	: function (commandData, callback) {
 		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
 	},
+	restoreNetwork : function (commandData, callback) {
+		console.log("---------- restoreNetwork called -------------");
+		var nwkKey = commandData.key || __userConfig.get('zigbeeNetworkKey');
+		var nwkName = commandData.name || __userConfig.get('zigbeeNetworkName');
+		var nwkId = commandData.id || __userConfig.get('zigbeeNetworkId');
+		deviceManager.communicator.restoreNetwork(nwkId, nwkName, nwkKey, function (err) {
+			if(err) {
+				console.log(err);
+				return (callback && callback({'success':false, 'msg':err}));
+			}
+			callback && callback({'success':true})
+			console.log("---------- restored network -------------");
+		});
+	},
+	restartZigbee : function (commandData, callback) {
+		__restartZigbeeModule(function (err) {
+			if (err) return (callback && callback({'success':false, 'msg':err}));
+			callback && callback({'success':true});
+			setTimeout(__.bind(deviceManager.communicator.getNetworkKey, deviceManager.communicator), 5000);
+		});
+	},
 	onModifyNetworkSecurityKey : function (commandData, callback) {
 		//TODO consider network name as well
-		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, nwkId){
+		deviceManager.communicator.updateNetworkKey(commandData.securityKey, __.bind(function (err, longNwkId){
 			if(err) {
 				callback({'success':false, 'msg':err});
 				return
 			}
 			__userConfig.set('zigbeeNetworkKey', commandData.securityKey);
-			__userConfig.set('zigbeeNetworkName', nwkId);
+			__userConfig.set('zigbeeNetworkName', longNwkId);
 			__userConfig.save(function (err) {
 				if(err) console.log(err);
 				console.log('Network key modification success');
-				deviceManager.communicator.checkCommunication(function (err) {
-					if(err) console.log(err);
-					if(err) __restartZigbeeModule(function (err) {
-						if (err) callback({'success':false, 'msg':err});
-						else deviceManager.communicator.checkCommunication(function (err) {
+				setTimeout(__.bind(function(){
+					deviceManager.communicator.checkCommunication(function (err, key, sqrtyKey, nwkId) {
+						if(err) console.log(err);
+						if(err) __restartZigbeeModule(function (err) {
 							if (err) callback({'success':false, 'msg':err});
-							else callback({'success':true});
+							else deviceManager.communicator.checkCommunication(function (err, key, sqrtyKey, nwkId) {
+								if (err) callback({'success':false, 'msg':err});
+								else {
+									callback({'success':true});	
+									__userConfig.set('zigbeeNetworkId', nwkId);
+									__userConfig.save();
+								}
+							});
 						});
-					});
-					else callback({'success':true});	
-				})
+						else {
+							callback({'success':true});	
+							__userConfig.set('zigbeeNetworkId', nwkId);
+							__userConfig.save();
+						}
+					})
+				}, this), 3000); //3 seconds from module to restart
 				
 			});	
 		},this));

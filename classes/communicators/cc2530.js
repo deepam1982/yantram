@@ -4,17 +4,18 @@ var BaseCommunicator = require(__rootPath+"/classes/communicators/baseCommunicat
 var CC2530Controller = BaseCommunicator.extend({
 	baudrate: 115200,
 	_broadcast : function () {
-		this._send("\x2B0301FFFF\x0D", function () { // "\x2B0302FFFF"
+		this._send("\x2B0302FFFF\x0D", function () { // "\x2B0302FFFF"
 //			console.log('##### Sent broadcast')
 		});
 		setTimeout(__.bind(this.checkBroadCastRsp, this), 2000);
 		this._super()
 	},
 	checkBroadCastRsp : function () {
-		if(this._queryQ.length) return setTimeout(__.bind(this.checkBroadCastRsp, this), 1000);
+		if(this._queryQ.length || ((new Date().getTime()/1000)-this.querySentTimeStamp) < 2)
+			return setTimeout(__.bind(this.checkBroadCastRsp, this), 1000);
 		__.each(this.deviceList, __.bind(function (devInfo) {
 			if(devInfo.lastSeenAt+3 < (new Date().getTime() / 1000)){
-				this._send("\x2B0301"+devInfo.nwkAdd+"\x0D", function () { });
+				this._send("\x2B0302"+devInfo.nwkAdd+"\x0D", function () { });
 			}
 		}, this));
 	},
@@ -38,22 +39,24 @@ var CC2530Controller = BaseCommunicator.extend({
 		this.lastPacketRecievedAt = new Date().getTime() / 1000;
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
-		// if(msgTypeCode != '0301')
-		// 	 console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		// if(msgTypeCode != '0302')
+		 	 // console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
+		if(!clbk && msgTypeCode == '0302') msgTypeCode = '0302a'
 		this._pendingReqCallbackMap[msgTypeCode] = null;
 		clbk && clbk(null, data.substr(7)); 
 		if(data.length < 8) return;
 		var sourceMacAdd = data.substr(7,16);
 		var sourceNwkAdd = data.substr(23,4);
 		var msg = data.substr(29);
+		this._macIdNwkIdMap[sourceMacAdd] = sourceNwkAdd;
 		switch (msgTypeCode) {
-			case '0301' : 	this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); break;
-			case '0302' : 	var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
-							this.emit('msgRecieved', "DVST", state, sourceMacAdd); break;
+			case '0301' : 	this._handleDevTypeResponse(sourceMacAdd, sourceNwkAdd, msg); break;
+			case '0302a': 	this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); break;
+			case '0302' : 	this._handleStateResponse(sourceMacAdd, sourceNwkAdd, msg); break;
 			case '0304'	: 	this.emit('msgRecieved', "STSWPT", msg, sourceMacAdd); break;
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
-			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break;
+			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break; //????
 			default 	: 	return;
 		}
 //		console.log(msgId);
@@ -80,19 +83,33 @@ var CC2530Controller = BaseCommunicator.extend({
 			this._processArrivedData(leftOver);
 		}
 	},
-	_handleBroadcastResponse :function (macAdd, nwkAdd, deviceName) {
+	_handleStateResponse : function (macAdd, nwkAdd, msg) {
+		var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
+		this.emit('msgRecieved', "DVST", state, macAdd);
+		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
+		if (listItem) {__.extend(listItem, {'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});}
+	},
+	_handleDevTypeResponse : function (macAdd, nwkAdd, deviceName) {
+		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
+		if (!listItem) {
+			this.emit('msgRecieved', "DVTP", deviceName, macAdd, __.bind(function(){
+				this.deviceList.push({'macAdd':macAdd, 'deviceId':macAdd, 'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});	
+		//		console.log('device with macId:'+macAdd+" found at netAdd:"+nwkAdd);
+			}, this))		
+		}
+	},
+	_handleBroadcastResponse :function (macAdd, nwkAdd, msg){
 		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
 		if (listItem) {
 			if(listItem.unreachable) {
 				listItem.unreachable = false;
 				this.emit("deviceReachable", listItem.macAdd);
 			}
-			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+			if(listItem.lastMsg != msg) this._handleStateResponse(macAdd, nwkAdd, msg);
+			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});
 		}
 		else {
-			this.deviceList.push({'macAdd':macAdd, 'deviceId':macAdd, 'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
-			console.log('device with macId:'+macAdd+" found at netAdd:"+nwkAdd);
-			setTimeout(__.bind(this.emit, this, 'msgRecieved', "DVTP", deviceName, macAdd), 1000);
+			this.emit('msgRecieved', "newdevice", nwkAdd, macAdd);
 		}
 	},
 	_buildQuery : function (queryObj) {
@@ -129,13 +146,17 @@ var CC2530Controller = BaseCommunicator.extend({
 	getNetworkKey : function (callback, retrying) {
 		var qry="0102";
 		this.sendQuery(null, {name:qry});
+		console.log('getting network key');
 		this._pendingReqCallbackMap["0102"] = __.bind(function (err, msg){
 			if(!retrying && err && err == 'timeout') {
 				console.log('timeout! retrying to get network key');
 				return setTimeout(__.bind(this.getNetworkKey, this, callback), 1500);
 			}
 			if (err) return console.log("Error while getting network key:", err, msg);
-			callback && callback(err, msg.substr(0,16));
+			var nwkName = msg.substr(0,16), nwkKey = msg.substr(16,32), nwkId = msg.substr(48,4);
+			console.log("Network Parameters - nwkName:"+nwkName, "nwkKey:"+nwkKey, "nwkId:"+nwkId)
+			callback && callback(err, nwkName, nwkKey, nwkId);
+			if(!err) this.emit("publishingNetworkKey", nwkName, nwkKey, nwkId); // this must be after the callback function call
 		}, this);	
 	},
 
@@ -148,6 +169,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		console.log(qry)
 		this.sendQuery(null, {name:qry});
 		this._pendingReqCallbackMap["0106"] = __.bind(function (err, msg){
+			if(err) return (callback && callback(err));
 			console.log(msg);
 			__.each(this.deviceList, function (listItem){
 				listItem.unreachable = true;
@@ -157,16 +179,37 @@ var CC2530Controller = BaseCommunicator.extend({
 		}, this);
 	}, 
 
-	checkCommunication : function (retrying, calback) {
-		if(typeof retrying == 'function') {calback = retrying; retrying=false;}
+	restoreNetwork : function (nwkId, nwkName, nwkKey, callback) {
+		console.log('restoring network',nwkId, nwkName, nwkKey);
+		var nwkStr = nwkId.toUpperCase() + nwkName.toUpperCase() + nwkKey.toUpperCase();
+		if(nwkStr.length != (32+16+4) || nwkStr.search(/^[a-fA-F0-9]*$/g) != 0)
+			return (callback && callback('invalidKey'));
+		this.sendQuery(null, {name:"0106"+nwkStr});
+		this._pendingReqCallbackMap["0106"] = __.bind(function (err, msg){
+			if(err) return (callback && callback(err));
+			console.log(msg);
+			callback && callback(err, msg.substr(4,16));
+		}, this);
+	},
+
+	checkCommunication : function (calback, retrying) {
 		console.log("Checking Communication.");
-		this._pendingReqCallbackMap["FFFF"] = __.bind(function (err) {
+		return this.getNetworkKey(__.bind(function (err, nwkName, sqrtyKey, nwkId) {
 			if(err) console.log(err);
 			console.log("Test Communication "+((err)?((retrying)?"Failed!!":"retrying!!"):"Success!!"));
-			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true, calback), 1000);
-			else calback && calback(err);
-		}, this);
-		this.sendQuery(null, {name:"FFFF"});
+			if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, calback, true), 1000);
+			else calback && calback(err, nwkName, sqrtyKey, nwkId);
+		}, this));
+		// if(typeof retrying == 'function') {calback = retrying; retrying=false;}
+		// console.log("Checking Communication.");
+		// this._pendingReqCallbackMap["FFFF"] = __.bind(function (err, msg) {
+		// 	if(err) console.log(err);
+		// 	console.log(msg);
+		// 	console.log("Test Communication "+((err)?((retrying)?"Failed!!":"retrying!!"):"Success!!"));
+		// 	if(err && !retrying) setTimeout(__.bind(this.checkCommunication, this, true, calback), 1000);
+		// 	else calback && calback(err);
+		// }, this);
+		// this.sendQuery(null, {name:"FFFF"});
 	},
 
 	checkSerialCable	: function (callback) {

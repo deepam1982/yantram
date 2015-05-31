@@ -20,6 +20,7 @@ BaseModel = Backbone.Model.extend({
 		if (success) success();
 	},
 	sendActionRequestByAjax	:	function ($actionName, data, success, error) {
+		if(servedFromCloud) return this.sendActionRequest.apply(this, arguments);
 		if(!data) data = {};
 //		data.respondWithModel=true;
 		data.actionName=$actionName;

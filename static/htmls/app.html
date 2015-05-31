@@ -286,14 +286,14 @@
 	</head>
 
 	<body>
-		<div id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
-			<span>inoho<span>
+		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
 		<div id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
-						<a href='/' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
+						<a href='' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
 						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
 						</div>	
@@ -331,6 +331,7 @@
 			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
+			<div class='options logout' ><a href='logout' style='text-decoration:none;color:inherit'>Logout</a></div>
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
@@ -705,6 +706,22 @@
 		<div class="switchProxyCont"></div>
 		<div style='clear:both;'></div>	
 		<br/>
+	</script>
+	<script type="text/template" id="fileReaderTemplate">
+		<br/>
+		<span>Absolute Path:</span>
+		<input type='text' id='filePath' style='width:50%'></input>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type='submit' id='submitFilePath' style=''></input>
+		<br/><br/><br/>
+		<div class='fileContentArea font10'></div>
+	</script>
+	<script type="text/template" id="commandPosterTemplate">
+		<br/>
+		<span>Event name:</span>&nbsp;&nbsp;<input type='text' class='eventName' style='width:30%'></input>
+		<br/><br/>
+		<span>Enter Json:</span>&nbsp;&nbsp;&nbsp;&nbsp;<textarea class='textJson' style='width:100%; height:200px;'></textarea>
+		<br/><br/><br/>
+		<input type='submit' id='postJson' style=''></input>
 	</script>	
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
@@ -724,6 +741,8 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/readFile.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/commandPoster.js"></script>
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
@@ -791,8 +810,12 @@
 	  }
 	  var showBurgerMenu = function () {
 	  	$('#burgerImageCont').show();
-	  	setAppTheamColor("#EE972D");
-	  	setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
+	  	if(servedFromCloud) {
+	  		$('.nwkStng, .cldStng, .cnfrMdl, .chkUpdt').hide();
+	  	}else {
+	  		$('.logout').hide();
+	  		setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
+	  	}
 	  };
 	  var setAppTheamColor = function (color) {
 	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
@@ -818,7 +841,9 @@
 		var removeHash = false;
 		switch(window.location.hash) {
 			case '#updatenow'				: 	ioSocket.emit('updateNow');removeHash=true;break;
+			case '#restorenetwork'			: 	ioSocket.emit('restoreNetwork');removeHash=true;break;
 			case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
+			case '#restartzigbee'			: 	ioSocket.emit('restartZigbee');removeHash=true;break;
 			case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
 			case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
 			case '#restorefactorysetting'	: 	if(confirm("Are you sure you wanna restore factory setting?")){
@@ -827,14 +852,18 @@
 													});
 												};removeHash=true;break;
 
-			case '#shownetworksettings'	:	sideMenu.switchPage('networkSettingPage');break;
+			case '#shownetworksettings'		:	sideMenu.switchPage('networkSettingPage');break;
+			case '#showfilereader'			:	sideMenu.switchPage('fileReaderPage');break;
+			case '#showcommandposter'		:	sideMenu.switchPage('commandPosterPage');break;
+
+
 		}
 		if(removeHash)window.location.hash = '';
 	  };
 	  var connectSocket = function () {
 	  		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
 	  			);
-	  		ioSocket.on('connect', function () {});
+	  		ioSocket.on('connect', showBurgerMenu);
 	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
 	  		ioSocket.on('roomConfigUpdated', function (config) {
 				gC.set(config, {merge: true, remove: false});
@@ -855,10 +884,10 @@
 			});
 			ioSocket.on('noHomeControllerPresent', function () {
 				sideMenu.switchPage('homeControllerDownPage');
+				$('#appLoadingVeil').hide();
 			});
 			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
 			ioSocket.on('switchPage', configurationWorkFlow);
-			ioSocket.on('showBurgerMenu', showBurgerMenu)
 			ioSocket.on('homeControllerLocalIpAddress', function (add) {
 				var arr = window.location.href.split("/");
 				if(arr[2] == add) return;
@@ -947,6 +976,10 @@
 		$('#appCont').append(welcomeScreenPage.$el);
 		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
 		$('#appCont').append(checkUpdatePage.$el);
+		var fileReaderPage = new FileReaderPageView({socket:ioSocket});
+		$('#appCont').append(fileReaderPage.$el);
+		var commandPosterPage = new CommandPosterPageView({socket:ioSocket});
+		$('#appCont').append(commandPosterPage.$el);
 		var HomeControllerDownPageView = BaseView.extend({
 			templateSelector:"#homeControllerDownTemplate"
 		});

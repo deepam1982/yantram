@@ -99,20 +99,21 @@ var SwitchBoardV1 = BaseDevice.extend({
 	// 			}, this), 100); // if this interval is long it will create problem when user rapidly toggels the switch.	
 	// 		}, this));
 	// },
-	_setSwitch : function (swst, callback, donotRetry) {
+	_setSwitch : function (swst, callback, retryCount) {
+		if(!retryCount)retryCount=0;
 		this._sendQuery({name:"STSWPT", value:this._intToHexStr(swst)}, 
 			__.bind(function(){
 				// successful response comes only when request registers successfully :D
 				this.syncState(__.bind(function () {
-					if(!donotRetry && this._binStateToInt(this.switchState)^swst) {
+					if(!retryCount && this._binStateToInt(this.switchState)^swst) {
 						console.log("#### retrying STSWPT")
-						this._setSwitch(swst, callback, true);
+						this._setSwitch(swst, callback, retryCount+1);
 					}
 					else callback && callback()
 				}, this));
 				setTimeout(__.bind(function () {
-					if(!donotRetry && this._binStateToInt(this.switchState)^swst)
-						this._setSwitch(swst, callback, true);
+					if(retryCount < 5 && this._binStateToInt(this.switchState)^swst)
+						this._setSwitch(swst, callback, retryCount+1);
 				}, this), 200); // if this interval is long (should be 100) it will create problem when user rapidly toggels the switch.	
 		}, this));		// and if the interval is short (should be 200) it will resend query when response is on the way.
 	},

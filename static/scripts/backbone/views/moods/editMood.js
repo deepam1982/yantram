@@ -2,7 +2,7 @@ EditMoodPannel = BaseView.extend({
 	name : "EditMoodPannel",
 	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
 	templateSelector:"#editMoodTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editMoodCont', 'array':'deviceCollection'}],
+	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editMoodCont', 'array':'gC'}],
 		events : {
 		"tap .moodIcon" : 'changeMoodIcon'
 	},
@@ -25,9 +25,9 @@ EditMoodPannel = BaseView.extend({
 		moodInfo.name=this.$el.find('.moodName').val() || moodInfo.name;
 		moodInfo.name=moodInfo.name.charAt(0).toUpperCase() + moodInfo.name.slice(1);
 		var controls = [], id=0;
-		deviceCollection.each(function (dev) {
-			_.each(dev.get('loadInfo'), function (sw, key) {
-				sw.selected && controls.push({"id":++id, "devId":dev.id, "switchId":parseInt(key), "state":sw.setOn});
+		gC.each(function (grp) {
+			_.each(grp.get('controls'), function (sw, key) {
+				sw.selected && controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
 			}, this);
 		}, this);
 		moodInfo.controls = controls;
@@ -38,13 +38,21 @@ EditMoodPannel = BaseView.extend({
 		ioSocket.emit("modifyMood", this._getMoodInfo(), function (err){if(err)console.log(err)});
 	},
 	render : function () {
-		deviceCollection.each(function (dev) {
-				_.each(dev.get('loadInfo'), function (sw, key) {sw.task='moodSelection';sw.selected=false;}, this);
+		var hash = {};
+		_.each((this.moodInfo)?this.moodInfo.controls:this.model.get('controls'), function (obj) {
+			if(!hash[obj.devId]) hash[obj.devId]={}; 
+			hash[obj.devId][obj.switchId]= (obj.state=='on'||obj.state==true)?true:false;
+		}, this);
+
+		gC.each(function (grp) {
+			_.each(grp.get('controls'), function (sw, key) {
+				sw.task='moodSelection';sw.selected=false;
+				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){
+					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID]
+				}
 			}, this);
-			_.each((this.moodInfo)?this.moodInfo.controls:this.model.get('controls'), function (obj) {
-				var sw = deviceCollection.get(obj.devId).get('loadInfo')[obj.switchId];
-				sw.selected=true;sw.setOn=(obj.state=='on'||obj.state==true)?true:false;
-			}, this);
+		}, this);
+
 		BaseView.prototype.render.apply(this, arguments);
 		setTimeout(_.bind(function(){this.$el.find('input[type="radio"][checked]').prop("checked", true);},this),200);
 		return this;
