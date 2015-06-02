@@ -61,7 +61,7 @@ module.exports = function (callback) {
 
 		var cookie = j.getCookieString(__cloudUrl);
 		var dataStr = JSON.stringify({username: __userConfig.get('email'), event:eventName, "data":data});
-		var command = 'curl -X POST --max-time 3 --retry 3 --cookie "'+cookie+'" -H "Content-Type: application/json" -d \''+dataStr+'\''+' '+__cloudUrl+'/socketemit';
+		var command = 'curl -X POST --max-time 6 --retry 3 --cookie "'+cookie+'" -H "Content-Type: application/json" -d \''+dataStr+'\''+' '+__cloudUrl+'/socketemit';
 		var exec = require('child_process').exec;
 		var foo = function(error, stdout, stderr) {
 			if(error) console.log(error, stdout);
@@ -84,16 +84,14 @@ module.exports = function (callback) {
 	var foo = function () {
 		if(!__userConfig.get('email')) return setTimeout(foo, 30000);
 		console.log("Trying to login to cloud");
-		request.get({jar: j, timeout:3000, url: __cloudUrl+'/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
+		request.get({jar: j, url: __cloudUrl+'/login/', form: {username: __userConfig.get('email'), password: __userConfig.get('password')} }, function (err, resp, body){
 	 		console.log('got response!!');
 	 		if(err) {
 	 			console.log(err);
 	 			console.log('Found no response from cloud, probably internet is down!!')
 	 		}
 	 		if(!err && resp.statusCode != 200) console.log('Cloud login resp code-'+resp.statusCode);	
-	 		if (!resp || err || resp.statusCode != 200) {
-	 			if(Date.now()-pingTimeStamp < 20*1000) return foo(); // 20 seconds
-	 			console.log("will retry connecting cloud in 60 sec."); setTimeout(foo, 60000); return;}
+	 		if (!resp || err || resp.statusCode != 200) {console.log("will retry connecting cloud in 60 sec."); setTimeout(foo, 60000); return;}
 
 			/*
 			* now we can connect.. and socket.io will send the cookies!
