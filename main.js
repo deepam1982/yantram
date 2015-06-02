@@ -10,7 +10,7 @@ var originalConsoleLog = console.log;
 var noLogs = false;
 console.log = function () {
   var d=new Date();
-  var ds = d.format('logTime')//d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
+  var ds = d.format('logTime'); //d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   return originalConsoleLog.apply(console, mainArguments);
 };
@@ -28,7 +28,7 @@ var pushLogsToCloud = function() {
 }
 var logOnCloud = function () {
   var d=new Date();
-  var ds = d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
+  var ds = d.format('logTime'); //d.getHours()+':'+d.getMinutes()+'.'+d.getSeconds()+'-'+d.getMilliseconds();
   var mainArguments = [ds].concat(Array.prototype.slice.call(arguments));
   (!noLogs) && originalConsoleLog.apply(console, mainArguments);
   var newLine = (mainArguments).join(' ');
