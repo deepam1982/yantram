@@ -46,7 +46,12 @@ NetworkSettingPageView = BaseView.extend({
 		this.modify('Skip', securityKey);
 	},
 	modify : function (networkName, securityKey) {
+		this.$el.hide();
+		var $loader = $('<div style="text-align:center;"><img src="static/images/loading.gif"/></div>');
+		this.$el.parent().append($loader);
 		this.options.socket.emit("modifyNetworkSecurityKey", {"securityKey":securityKey, "networkName":networkName}, _.bind(function (rsp) {
+			$loader.remove();
+			this.$el.show();
 			if(!rsp.success) {
 				this.$el.find('.errorMsgDiv span').html(rsp.msg);
 				this.$el.find('.errorMsgDiv').show();
