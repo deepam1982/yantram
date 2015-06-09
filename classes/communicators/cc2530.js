@@ -109,7 +109,9 @@ var CC2530Controller = BaseCommunicator.extend({
 			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});
 		}
 		else {
-			this.emit('msgRecieved', "newdevice", nwkAdd, macAdd);
+			this.emit('msgRecieved', "newdevice", nwkAdd, macAdd, __.bind(function () {
+				this.deviceList.push({'macAdd':macAdd, 'deviceId':macAdd, 'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+			}, this));
 		}
 	},
 	_buildQuery : function (queryObj) {

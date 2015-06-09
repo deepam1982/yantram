@@ -5,6 +5,7 @@ var SwitchBoardV1 = require(__rootPath+"/classes/devices/switchBoards/switchBoar
 var SwitchBoardV2 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV2");
 var SwBd01 = require(__rootPath+"/classes/devices/switchBoards/swBd01");
 var SwBd02 = require(__rootPath+"/classes/devices/switchBoards/swBd02");
+var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
 	_deviceMap : {},
@@ -53,12 +54,21 @@ var DeviceManager = BaseClass.extend({
 		});
 	},
 	_onMsgRecieved : function (type, msg, deviceId, callback) {
-		if(type == "DVTP") this._registerNewDevice (msg, deviceId, callback);
-		else if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg); // its device's job to handel its own msg
+		var category = null;
+		if(type == "DVTP") {
+			category = msg;
+			if(deviceInfoConfig.get(deviceId)){
+				deviceInfoConfig.set(deviceId+".category",msg);
+				deviceInfoConfig.save();
+			}
+		}
+		if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg); // its device's job to handel its own msg
 		else {
 			// message from unregistered device
 			console.log("#### Msg:"+msg+" from Unregistered Device:"+deviceId);
-			this._onNewDeviceFound(deviceId);
+			if(!category) category = deviceInfoConfig.get(deviceId+".category");
+			if(category) this._registerNewDevice (category, deviceId, callback);
+			else this._onNewDeviceFound(deviceId);
 		}
 	},
 	_registerNewDevice : function (type, deviceId, callback) {

@@ -28,8 +28,7 @@ var BasicConfigManager = BaseClass.extend({
 		var val = this.data;
 		while(val && path.length) 
 			val = val[path.shift()];
-		//TODO return cloned value.
-		return val;
+		return (val)?JSON.parse(JSON.stringify(val)):val;
 	},
 	set : function (path, value) {
 		path = path.split('.');
