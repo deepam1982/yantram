@@ -128,7 +128,9 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             ]);
 */
             //io.set('log level', 1);
+            //var auth = require(__rootPath+"/classes/auth/server");
             server.listen(80);
+
 
             app.use(favicon(__rootPath + '/static/images/favicon.ico'));
             //app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
@@ -223,7 +225,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               }
             });
             deviceManager.communicator.on("publishingNetworkKey", function (name, key, id) {
-              if(!__remoteDevInfoConf.getList().length) return;
+              if(!__remoteDevInfoConf.getList().length || name == '0B0B0B0B0B0B0B0B') return;
               var fileName = __rootPath+'/../logs/network.log', str ;
               var logString = "Id:"+ id + " Name:"+name+" Key:"+key, logStrWtDt = logString+" Date:"+ (new Date()).format('log')+'\n';
               fs.exists(fileName, function(exists) {

@@ -57,7 +57,7 @@ var CC2530Controller = BaseCommunicator.extend({
 			case '0304'	: 	this.emit('msgRecieved', "STSWPT", msg, sourceMacAdd); break;
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
 			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break; //????
-			default 	: 	return;
+			default 	: 	console.log("Unknown message from zigbee module -", data); return;
 		}
 //		console.log(msgId);
 		if (msgTypeCode == '0301') {} //this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); 
