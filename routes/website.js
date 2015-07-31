@@ -7,7 +7,9 @@ module.exports = function(app) {
 			case 'Maze' : var appFile = __rootPath + '/static/htmls/app_2.html'; break;
 			default		: var appFile = __rootPath + '/static/htmls/app_1.html';
 		}
-		res.sendFile(appFile);
+		try {res.sendFile(appFile);}
+		catch(err) {res.sendfile(appFile);}
+
 	});
 	app.get('/auth/login', function(req, res) {
 		try {res.sendFile(__rootPath + '/static/htmls/auth/login.html');}

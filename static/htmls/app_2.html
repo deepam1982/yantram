@@ -787,7 +787,7 @@
 				<div id='scheduleEditor' class='editSchedule' style='display:none;'></div>
 				<% if(typeof schedules != 'undefined')for(var i=0; i<schedules.length; i++){ var sch = schedules[i]; %>
 					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin-bottom:8px;'>&nbsp;
-						<span style="<% if(!sch.enabled) print('color:#CCCCCC;')%>font-weight:bold;">
+						<span style="<% if(sch.enabled) print('color:#CCCCCC;')%>font-weight:bold;">
 							<% print((sch.type == 'on')?'Turn-on at':'Turn-off at')%> <%if(sch.hour<10)print('0')%><%=sch.hour%>:<%if(sch.minute<10)print('0')%><%=sch.minute%>  <%=sch.amPm%>
 						</span>&nbsp;
 						<span style='float:right;margin-right:0px;'>
