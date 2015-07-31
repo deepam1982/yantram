@@ -4,7 +4,7 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<style>
-		body{
+		html, body{
 			width:100%;
 			height: 100%;
 			padding:0;
@@ -15,33 +15,49 @@
 			color:gray;
 			font-weight: lighter;
 		}
+		#bgImageContWrapper{
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			top: 0px;
+		}
+		#bgImageCont{
+			min-height:100%;
+			max-width:500px;			
+			margin:auto;
+			background-image: url("/static/images/backgrounds/app_2_2x.png");
+			background-size: 100% 100%;
+		}
 		#mainCont{
 			min-height:100%;
 			max-width:500px;			
 			margin:auto;
-			background-color: rgb(255,255,255);
+			/*background-color: rgb(255,255,255);*/
 			text-align:left;
 			overflow: hidden;
 			position: relative;
 		}
 		#header {
-			padding:20px 20px 0 20px;
+			/*padding:20px 20px 0 20px;*/
+			position:relative;
 		}
 		.slim #header {
 			padding:10px 10px 0 10px;
 		}
 		#appCont {
 			min-height:500px;
-			padding:0 20px 20px 20px;
+			overflow: hidden;
+			position: relative;
+			/*padding:0 20px 20px 20px;*/
 		}
 		.slim #appCont {
-			padding:0 10px 10px 10px;
+			/*padding:0 10px 10px 10px;*/
 		}
 		#menuCont {
 			min-height:100%;
-			padding:20px 0px 0 10px;
+			padding:3px 0px 0 10px;
 			font-size: 14px;
-			color: white;
+			color: #F3CBCB;
 			font-weight: 400;
 			text-align:left;
 			position:relative;
@@ -67,15 +83,14 @@
 			border:0px;
 /*			border-top: 1px solid white;
 */			z-index: 100;
-			border-top-width:2px; 
-			border-style:solid;
+			box-shadow: 0px -1px 5px #000000;
 		}
 		.moodTitleCont, .titleCont, .roomTitleCont {
-			padding:1px 3px;
-			color: white;
+			padding:10px 20px;
+			color: #FFC2C2;
 			font-weight: 200;	
 			font-size: 14px;
-			border-radius: 3px;
+			/*border-radius: 3px;*/
 		}
 		.moodTitleCont {
 			border-bottom-right-radius: 0px;
@@ -89,15 +104,31 @@
 		}
 
 		.editViewCont .roomTitleCont {
-			background:white;
-			color: black;
-			font-size: 15px;
-			margin-bottom: -20px;
+			font-size: 14px;
+			margin-bottom: -13px;
 			font-weight:400; 
 		}
 		.groupView {
-			/*margin: 10px 0px 0px;*/
+			margin: 0px 0px 45px;
 		}
+		.trapTheam .groupView {
+			margin: 0px 0px 20px;
+		}
+
+		#groupTitleHeaderForTrapTheam {
+			display:none;
+			border-bottom:5px solid rgba(96,20,31,0.45);
+			border-left:500px solid transparent;
+
+		}
+		#groupFooterForTrapTheam {
+			display:none;
+			border-top:25px solid rgba(0,0,0,0.5);
+			border-left:500px solid transparent;
+		}
+		.trapTheam #groupTitleHeaderForTrapTheam, .trapTheam #groupFooterForTrapTheam {display: block;}
+		.editViewCont #groupTitleHeaderForTrapTheam, .editViewCont #groupFooterForTrapTheam {display: none;}
+
 		.popupPannel, .moodView, .editViewCont .groupView {
 			background:white;
 			border-width:1px; 
@@ -105,6 +136,11 @@
 			border-radius: 5px;
 			padding-bottom: 5px;
 		}
+		.editViewCont .groupView {
+			background-color: transparent;
+			border-width: 0px;
+		}
+
 		.moodView{
 			margin-bottom: 15px;
 		}
@@ -113,14 +149,18 @@
 		}
 
 		.powerButton {
-			width:13px;
+			width:18px;
 			float:right;
 			margin-top:1px;
 			cursor:pointer;
 			position:absolute;
-			right:-7px;
-			top:-9px;
+			right:10px;
+			top:-2px;
 			padding:10px;
+		}
+		.trapTheam .powerButton {
+			right:15px;
+			top:-7px;
 		}
 		.editButton {
 			display: none;
@@ -174,7 +214,7 @@
 			padding-top:20px;
 			margin: -12px 0px 0 0;
 			text-align:center;
-			color:black;
+			color:#A58F8F;
 		}
 		.disabledScreen {
 			position:absolute;
@@ -206,8 +246,16 @@
 		}
 
 		.basicSwitchTemplate {
-			float:left;background-color:white;position:relative;border-radius:3px;
-			margin:10px 0px;padding-top:2px;
+			float:left;position:relative;border-radius:3px;
+			margin:20px 5px 30px;padding-top:2px;
+		}
+		.trapTheam .basicSwitchTemplate {
+			margin:18px 5px 5px;
+		}
+
+		.onBackdrop .basicSwitchTemplate {
+			background-color: #832A28;
+			padding-top: 10px; margin-top: 7px;
 		}
 
 		.schedularCont .done,
@@ -230,6 +278,34 @@
 		.whiteBG{background-color: white;}
 		.whiteBorderColor{border-color:white;}
 
+		.editTemplateCont {
+			margin-top:-20px;
+			background-color:#832A28;
+		}
+
+		.translucentBg30{
+			background-color:rgba(0,0,0,0.3);
+		}
+
+		.translucentBg45{
+			background-color:rgba(96,20,31,0.45);
+		}
+
+		.translucentBg50{
+			background-color:rgba(0,0,0,0.5);
+		}
+
+		.fanSlider {
+			margin:20px 0 0 10px !important;
+		}
+
+		.theamSettingPage .paddingDiv{
+			padding : 0 20px 50px ;
+		}
+		.cloudSettingPage .paddingDiv{
+			padding : 0px 20px;
+		}
+
 		.theamTable .tableBox {
 			float: left;
 			width: 50px;
@@ -237,6 +313,18 @@
 			text-align: center;
 		}
 
+		* {
+			-o-user-select: none;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		::selection { background: transparent;color:inherit; }
+		::-moz-selection { background: transparent;color:inherit; }
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -310,27 +398,32 @@
 	</style>
 	</head>
 
-	<body>
-		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+	<body class='trapTheam'>
+		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#832A28; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
+		<div id='bgImageContWrapper'><div id='bgImageCont'></div></div>
 		<div id='mainCont'>
-			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
+			<div class='headerCont' style='width:100%;float:left;'>
+				<div class='translucentBg30' style='width:100%;height:50px;box-shadow: 0px 1px 10px #333333;'></div>
 				<div id='header'>
-					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
-						<a href='' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
-						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
-							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
+					<div style="font-weight:200;font-size:28px;margin:-43px 0 -1000px 0;padding:0 0 1000px; width:100%;">
+						<div style='padding:0 20px;'>
+							<a href='' style='text-decoration:none;'><span style="color:#A58F8F;">ino</span><span style='color:#F3CBCB;'>ho</span></a>
+							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
+								<img id='burgerImage' class='' style='width:25px;' src="/static/images/transparentBurgerIcon_2.png"></img>
+							</div>	
 						</div>	
 					</div>
 				</div>
-				<br/>
+				<br/><br/><br/>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			
+			<div id='sideMenuCont' class='translucentBg30' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
 			<div style='clear:both;'></div>	
-			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
-		</div>		
+			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer'></div>
+		</div>
 		<img src="static/images/loading.gif" style="display:none;"/>
 	</body>
 	<script type="text/javascript" src="/static/scripts/iefix.js"></script>
@@ -346,7 +439,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
-		<div id='menuCont' class='menuArea theamBGColor'>
+		<div id='menuCont' class='menuArea'>
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
@@ -361,9 +454,9 @@
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
-		<div>
-			<img src='/static/images/connected_module.png' style='width:100%;'/>
-			<br/>
+		<div style='padding:20px;' class='translucentBg50'>
+			<img class='whiteBG' src='/static/images/connected_module.png' style='width:100%;'/>
+			<br/><br/>
 			<div class='configuredModuleDisplay' style='display:none;'>
 				<div class='helpText'>Please wait till the exclamation mark go away, should be about 30 seconds.</div>
 			</div>
@@ -382,7 +475,7 @@
 				<span class='button theamBorderColor theamTextColor' id='configureNewModuleButton'>Configure</span>
 			</div>
 			<div class='moduleNotAttached'>
-				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
+				<span class='connectModuleMsg theamTextColor'>Connect Switchboard module to Home controller using serial cable.</span>
 				<span class='retryMsg' style='display:none;'>Oh no!! Home controller cannot communicate with Switchboard module. Check the connections of serial cable(disconnect-reconnect) and then retry.</span>
 				<br/><br/>
 				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
@@ -455,10 +548,11 @@
 		</div>
 	</script>
 	<script type="text/template" id="cloudSettingTemplate">
-		<div>
+		<div class="cloudSettingPage translucentBg30">
 			<br/>
-			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
+			<div class="titleCont"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
+			<div class='paddingDiv'>
 			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
 			<br/>
 			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -478,7 +572,7 @@
 			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
 			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
 			<br/><br/>
-			
+			</div>
 		</div>
 	</script>
 	<script type="text/template" id="theamSettingTemplate">
@@ -576,18 +670,20 @@
 	</script>
 	<script type="text/template" id="groupTemplate">
 		<div class='groupView theamBorderColor'>
-			<div class="roomTitleCont theamBGColor" style='position:relative;'>
-				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style=""/>
+			<div id='groupTitleHeaderForTrapTheam'></div>
+			<div class="roomTitleCont translucentBg45" style='position:relative;'>
+				<span style="text-align:left;text-transform: uppercase;"><%=name%></span>
+				<img class='powerButton' src="static/images/power2.png" style=""/>
 				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
 				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
-			<div class='switchCont'>
-				
-			</div>
-			<div style='clear:both;'></div>
-			<div class='advancePannel editTemplateCont' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+			<div class='translucentBg50'>
+				<div class='switchCont'></div>
+				<div style='clear:both;'></div>
+			</div>	
+			<div id='groupFooterForTrapTheam'></div>
+			<div class='advancePannel editTemplateCont theamTextColor' style='display:none; width:100%;position:relative;'>
 				<div class='cross' style='top:10px;'><b>Done</b></div>
 			</div>
 			<div style='clear:both;'></div>	
@@ -612,18 +708,16 @@
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style=''>
-			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
-				<div style='width:74px;height:74px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
-					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/transparent/<%=icon%>.png' />
-					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
+			<div class='iconPartition' style='width:65px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
+				<div style='width:65px;height:45px;position:relative;'>
+					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((state=="on")?"on":"off")%>/<%=icon%>.png' />
+					<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
-				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
-				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
-
+				<span class='toggelSwitch font12' style='text-transform: uppercase;white-space:nowrap;line-height:2;color:<%print((state=="on")?"#F3CBCB":"#A58F8F")%>'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
+				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
-				<div class='theamTextColor' style='position:absolute;right:24px;top:-9px;width:26px;height:12px;font-size:10px;font-weight:bold;'><%=autoToggleTime%></div>
+				<div style='color:<%print((state=="on")?"#F3CBCB":"#A58F8F")%>;position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
 			<%}%>
 
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
@@ -633,10 +727,13 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+		<div class="titleCont theamBGColor">
+		<span style="text-align:left;">Device Settings</span>
+		<span class='helpText' style='float:right;'>Long press device icon to edit device parameters</span>
 		<br/>
-		<span class='helpText' style=''>Long press device icon to edit device parameters</span>
 		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
+		<div style='clear:both;'></div>
+		</div>
 		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
@@ -649,7 +746,7 @@
 		<div class='moodViewCont'></div>
 	</script>
 	<script type="text/template" id="editSwitchTemplate">
-		<div style='padding:0px 10px 10px 70px;'>
+		<div class='theamTextColor' style='padding:0px 10px 10px 70px;'>
 			<br/>
 			<span class='editColumn'>Name</span>
 			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
@@ -706,7 +803,7 @@
 			</div>
 			<br/>
 			<span class='editColumn'>Icon</span>
-			<div class='iconCont'></div>
+			<div style='background-color:white;border-radius:4px;padding:5px;'><div class='iconCont'></div><div style='clear:both;'></div></div>
 			 
 		</div>
 	</script>
@@ -754,9 +851,11 @@
 	</script>
 	<script type="text/template" id="deviceGroupTemplate">
 		<div style='size:40px; margin:18px 0 0 -60px; font-size:10px; float:left;'><%=name%></div>
+		<div style='background-color:white; margin:-7px 10px; padding:5px; border-radius:5px;'>
 		<div class="switchProxyCont"></div>
 		<div style='clear:both;'></div>	
 		<br/>
+		</div>
 	</script>
 	<script type="text/template" id="fileReaderTemplate">
 		<br/>
@@ -797,6 +896,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/commandPoster.js"></script>
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
+	<script>var appTheam='Maze'</script>
 	<script type="text/javascript" src="/static/scripts/app.js"></script>
-	
+		
 <HTML>	

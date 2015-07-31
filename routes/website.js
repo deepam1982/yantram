@@ -3,13 +3,15 @@ var express = require('express');
 module.exports = function(app) {
 	
 	app.get('/', function(req, res) {
-		try {
-			res.sendFile(__rootPath + '/static/htmls/app.html');
+		switch (__userConfig.get('appTheam')) {
+			case 'Maze' : var appFile = __rootPath + '/static/htmls/app_2.html'; break;
+			default		: var appFile = __rootPath + '/static/htmls/app_1.html';
 		}
-		catch(err) {
-			res.sendfile(__rootPath + '/static/htmls/app.html');	
-		}
-		//response.render(template, data);
+		res.sendFile(appFile);
+	});
+	app.get('/auth/login', function(req, res) {
+		try {res.sendFile(__rootPath + '/static/htmls/auth/login.html');}
+		catch(err) {res.sendfile(__rootPath + '/static/htmls/auth/login.html');}
 	});
 	app.get('/apptest', function (req, res) {
     	res.end(req.query.callback+'('+JSON.stringify({'success':true})+')');

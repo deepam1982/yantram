@@ -43,6 +43,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
 		socket.on('getNetworkSettings', __.bind(this.getNetworkSettings, this));
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
+		socket.on('modifyTheamSettings', __.bind(this.modifyTheamSettings, this));
 		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
@@ -176,6 +177,14 @@ var CommandManager = BaseClass.extend({
 	},
 	getCloudSettings	: function (commandData, callback) {
 		callback({'success':true, 'email':__userConfig.get('email')})
+	},
+	modifyTheamSettings : function (commandData, callback) {
+		__userConfig.set('appTheam', commandData.theam);__userConfig.set('appColor', commandData.color);
+		__userConfig.save(function (err) {
+			if(err) return console.log(err);
+			console.log('App theam modification success');
+			callback({'success':true});
+		});
 	},
 	modifyCloudSettings : function (commandData, callback) {
 		var email = __userConfig.get('email');

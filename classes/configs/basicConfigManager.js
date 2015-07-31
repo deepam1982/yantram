@@ -52,12 +52,15 @@ var BasicConfigManager = BaseClass.extend({
 				callback && callback(err);
 				return;
 			}
-			try{data = JSON.parse(data);}
+			try{
+				data = JSON.parse(data);
+				callback && callback(null,  data);
+			}
 			catch(err){
 				console.log("############ ERR ########",file, err)
 				data={};
 			}
-			callback && callback(null,  data);
+			
 		});
 	}
 

@@ -27,15 +27,15 @@
 		#header {
 			padding:20px 20px 0 20px;
 		}
-		.slim #header {
-			padding:10px 10px 0 10px;
-		}
 		#appCont {
 			min-height:500px;
 			padding:0 20px 20px 20px;
-		}
-		.slim #appCont {
-			padding:0 10px 10px 10px;
+			background-color: rgb(255,255,255);
+			border-width:0px;
+/*			border-left-width:20px; 
+			border-right-width:20px; 
+*/			border-style:solid;
+
 		}
 		#menuCont {
 			min-height:100%;
@@ -71,10 +71,10 @@
 			border-style:solid;
 		}
 		.moodTitleCont, .titleCont, .roomTitleCont {
-			padding:1px 3px;
+			padding:2px 5px;
 			color: white;
 			font-weight: 200;	
-			font-size: 14px;
+			font-size: 16px;
 			border-radius: 3px;
 		}
 		.moodTitleCont {
@@ -96,7 +96,7 @@
 			font-weight:400; 
 		}
 		.groupView {
-			/*margin: 10px 0px 0px;*/
+			margin: 10px 0px 0px;
 		}
 		.popupPannel, .moodView, .editViewCont .groupView {
 			background:white;
@@ -110,17 +110,6 @@
 		}
 		.editViewCont .powerButton {
 			display: none;
-		}
-
-		.powerButton {
-			width:13px;
-			float:right;
-			margin-top:1px;
-			cursor:pointer;
-			position:absolute;
-			right:-7px;
-			top:-9px;
-			padding:10px;
 		}
 		.editButton {
 			display: none;
@@ -207,7 +196,7 @@
 
 		.basicSwitchTemplate {
 			float:left;background-color:white;position:relative;border-radius:3px;
-			margin:10px 0px;padding-top:2px;
+			margin-bottom:20px;padding-top:2px;
 		}
 
 		.schedularCont .done,
@@ -314,7 +303,7 @@
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#EE972D; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
-		<div id='mainCont'>
+		<div class='' id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
@@ -484,7 +473,8 @@
 	<script type="text/template" id="theamSettingTemplate">
 		<div class="theamSettingPage translucentBg30">
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Theam Settings</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Theam Settings</span></div>
+			<br/>
 			<div class='paddingDiv'>
 			<div class='helpText'>Sellect one of the following theams</div>
 			<br/>
@@ -578,11 +568,12 @@
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style=""/>
+				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
 				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
 				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
+			<br/>
 			<div class='switchCont'>
 				
 			</div>

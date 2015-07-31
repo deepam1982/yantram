@@ -128,7 +128,11 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             ]);
 */
             //io.set('log level', 1);
-            //var auth = require(__rootPath+"/classes/auth/server");
+//             try{
+// //              var auth = require(__rootPath+"/classes/auth/server");
+//               var auth = require(__rootPath+"/classes/auth/jwt");
+//             }
+//             catch(err){console.log("Error while starting auth server -----", err);}
             server.listen(80);
 
 
