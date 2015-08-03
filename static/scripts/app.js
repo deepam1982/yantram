@@ -65,11 +65,24 @@ var showBurgerMenu = function () {
 		setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
 	}
 };
-var setAppTheamColor = function (color) {
-		if(typeof appTheam == 'undefined') appTheam = 'Clasic';
+var setAppTheamColor = function (appTheme, themeColor) {
 		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
-		if(!color) color=(servedFromCloud)?"#69C1A8":(appTheam == "Maze")?"#832A28":"#EE972D;";
-		inputColor=(servedFromCloud)?"#69C1A8":(appTheam == "Maze")?"#A58F8F":"#EE972D;";
+		if(typeof themeColor == 'undefined') themeColor = 'Orange';
+		if(typeof appTheam == 'undefined') appTheam = 'Clasic';
+		appTheam = appTheam.toLowerCase();
+		themeColor = themeColor.toLowerCase();
+		switch(themeColor) {
+			case "orange" : var color = "#EE972D", traprntColor = "", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = '#F3CBCB', traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = '#93CBEB', traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
+			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = '#E3DBCB', traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;
+		}
+
+		color=(servedFromCloud)?"#69C1A8":color;
+		inputColor=(servedFromCloud)?"#69C1A8":inputColor;
+
+		
+//		inputColor=(servedFromCloud)?"#69C1A8":(appTheam == "Maze")?"#A58F8F":"#EE972D;";
 		var $sheet = $("<style>\
 	hr {\
 		border-top-color: "+color+"\
@@ -78,13 +91,18 @@ var setAppTheamColor = function (color) {
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
 	.theamBGColor{background-color: "+color+";}\
+	.onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
 	input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+inputColor+";}\
+	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
+	.translucentBg45 {background-color: rgba("+traprntColor+",0.45);}\
+	#groupTitleHeaderForTrapTheam{border-bottom-color:rgba("+traprntColor+",0.45);}\
+	.brightColor {color:"+brightColor+";}\
 	</style>");
 		$('body').append($sheet);	
 }
 var servedFromCloud = false;
-setAppTheamColor();
+//setAppTheamColor();
 var ioSocket, pingTimeStamp = Date.now();
 hashChanged = function (hash) {
 	if(!window.location.hash) return;
@@ -110,9 +128,10 @@ hashChanged = function (hash) {
 	}
 	if(removeHash)window.location.hash = '';
 };
-var connectSocket = function () {
+var connectSocket = function (callback) {
 		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
 			);
+		if(callback) ioSocket.on('connect', callback);
 		ioSocket.on('connect', showBurgerMenu);
 		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
 		ioSocket.on('roomConfigUpdated', function (config) {
@@ -147,7 +166,12 @@ var connectSocket = function () {
 		}});
 	});
 };
-connectSocket();
+var setTheme = function () {
+	ioSocket.emit('getThemeSettings', {}, function (rsp) {
+		setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
+	});
+}
+connectSocket(setTheme);
 var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
 sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 sideMenu.render();
@@ -218,8 +242,8 @@ var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
 $('#appCont').append(configureModulePage.$el);
 var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});
 $('#appCont').append(cloudSettingPage.$el);
-var theamSettingPage = new TheamSettingPageView({socket:ioSocket});
-$('#appCont').append(theamSettingPage.$el);
+var themeSettingPage = new ThemeSettingPageView({socket:ioSocket});
+$('#appCont').append(themeSettingPage.$el);
 var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
 $('#appCont').append(networkSettingPage.$el);
 var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});

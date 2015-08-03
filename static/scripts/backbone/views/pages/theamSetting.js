@@ -1,4 +1,4 @@
-TheamSettingPageView = BaseView.extend({
+ThemeSettingPageView = BaseView.extend({
 	templateSelector:"#theamSettingTemplate",
 	_getJsonToRenderTemplate : function () {return {'theams':['Clasic', 'Maze'], 'colors':['Orange','Red','Blue','Green']};},
 	events: {
@@ -9,7 +9,7 @@ TheamSettingPageView = BaseView.extend({
 		if(!theamJson) return alert('Make a selection.');
 		console.log(theamJson);
 		theamJson = JSON.parse(theamJson);
-		this.options.socket.emit("modifyTheamSettings", theamJson, _.bind(function (rsp) {
+		this.options.socket.emit("modifyThemeSettings", theamJson, _.bind(function (rsp) {
 			location.reload();
 		}, this));
 	}

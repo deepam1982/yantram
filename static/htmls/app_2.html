@@ -57,10 +57,12 @@
 			min-height:100%;
 			padding:3px 0px 0 10px;
 			font-size: 14px;
-			color: #F3CBCB;
 			font-weight: 400;
 			text-align:left;
 			position:relative;
+		}
+		.brightColor {
+			color: #F3CBCB;
 		}
 		#menuCont .options {
 			padding:8px 0px;
@@ -87,7 +89,7 @@
 		}
 		.moodTitleCont, .titleCont, .roomTitleCont {
 			padding:10px 20px;
-			color: #FFC2C2;
+			/*color: #FFC2C2;*/
 			font-weight: 200;	
 			font-size: 14px;
 			/*border-radius: 3px;*/
@@ -105,7 +107,7 @@
 
 		.editViewCont .roomTitleCont {
 			font-size: 14px;
-			margin-bottom: -13px;
+			/*margin-bottom: -13px;*/
 			font-weight:400; 
 		}
 		.groupView {
@@ -214,7 +216,6 @@
 			padding-top:20px;
 			margin: -12px 0px 0 0;
 			text-align:center;
-			color:#A58F8F;
 		}
 		.disabledScreen {
 			position:absolute;
@@ -254,7 +255,6 @@
 		}
 
 		.onBackdrop .basicSwitchTemplate {
-			background-color: #832A28;
 			padding-top: 10px; margin-top: 7px;
 		}
 
@@ -280,7 +280,6 @@
 
 		.editTemplateCont {
 			margin-top:-20px;
-			background-color:#832A28;
 		}
 
 		.translucentBg30{
@@ -398,7 +397,7 @@
 	</style>
 	</head>
 
-	<body class='trapTheam'>
+	<body class='trapTheam theamTextColor'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#832A28; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
@@ -409,7 +408,7 @@
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin:-43px 0 -1000px 0;padding:0 0 1000px; width:100%;">
 						<div style='padding:0 20px;'>
-							<a href='' style='text-decoration:none;'><span style="color:#A58F8F;">ino</span><span style='color:#F3CBCB;'>ho</span></a>
+							<a href='' style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 								<img id='burgerImage' class='' style='width:25px;' src="/static/images/transparentBurgerIcon_2.png"></img>
 							</div>	
@@ -439,14 +438,14 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
-		<div id='menuCont' class='menuArea'>
+		<div id='menuCont' class='menuArea brightColor'>
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
 			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
-			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='theamSettingPage'>Theam Settings</div>
+			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
 			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
@@ -540,7 +539,7 @@
 	</script>
 	<script type="text/template" id="checkUpdateTemplate">
 		<div>
-			<div class="titleCont theamBGColor"><span style="text-align:left;">Check Updates</span></div>
+			<div class="titleCont theamBGColor brightColor"><span style="text-align:left;">Check Updates</span></div>
 			<br/><br/>
 			<div class="loader" style="text-align:center;"><img src="static/images/loading.gif"/></div>
 			<div class="msgBox helpText" style="display:none;"></div>
@@ -550,7 +549,7 @@
 	<script type="text/template" id="cloudSettingTemplate">
 		<div class="cloudSettingPage translucentBg30">
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Cloud Settings</span></div>
+			<div class="titleCont brightColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
 			<div class='paddingDiv'>
 			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
@@ -578,9 +577,9 @@
 	<script type="text/template" id="theamSettingTemplate">
 		<div class="theamSettingPage translucentBg30">
 			<br/>
-			<div class="titleCont"><span style="text-align:left;">Theam Settings</span></div>
+			<div class="titleCont"><span style="text-align:left;">Theme Settings</span></div>
 			<div class='paddingDiv'>
-			<div class='helpText'>Sellect one of the following theams</div>
+			<div class='helpText'>Sellect one of the following themes</div>
 			<br/>
 			<div class='theamTable helpText'>
 				<div class='tableBox'></div>
@@ -611,12 +610,12 @@
 		<div class="moodProxyCont" style='padding:0px 15px; text-align:center;'></div>
 	</script>
 	<script type="text/template" id="moodViewTemplate">
-		<div class='popupPannel editTemplateCont theamBorderColor' style='display:none; width:100%;position:relative;margin-top:-20px;'>
-			<div class='cross' style='top:10px;'><b>Done</b></div>
+		<div class='popupPannel editTemplateCont theamBGColor theamBorderColor' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+			<div class='cross theamTextColor' style='top:10px;'><b>Done</b></div>
 		</div>
 		<div style='clear:both;'></div>	
 		<div class='moodView theamBorderColor'>
-			<div class="moodTitleCont theamBGColor" style=''>
+			<div class="moodTitleCont theamBGColor brightColor" style=''>
 				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
 				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
 				<span class='editButton deleteMood' style='float:right;margin:0px; padding:10px;'>delete</span>
@@ -671,11 +670,11 @@
 	<script type="text/template" id="groupTemplate">
 		<div class='groupView theamBorderColor'>
 			<div id='groupTitleHeaderForTrapTheam'></div>
-			<div class="roomTitleCont translucentBg45" style='position:relative;'>
+			<div class="roomTitleCont translucentBg45 brightColor" style='position:relative;'>
 				<span style="text-align:left;text-transform: uppercase;"><%=name%></span>
 				<img class='powerButton' src="static/images/power2.png" style=""/>
-				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
-				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
+				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 0 20px;'>delete</span>
+				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 0 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
 			<div class='translucentBg50'>
@@ -683,8 +682,8 @@
 				<div style='clear:both;'></div>
 			</div>	
 			<div id='groupFooterForTrapTheam'></div>
-			<div class='advancePannel editTemplateCont theamTextColor' style='display:none; width:100%;position:relative;'>
-				<div class='cross' style='top:10px;'><b>Done</b></div>
+			<div class='advancePannel editTemplateCont theamBGColor theamTextColor' style='display:none; width:100%;position:relative;'>
+				<div class='cross theamTextColor' style='top:10px;'><b>Done</b></div>
 			</div>
 			<div style='clear:both;'></div>	
 		</div>	
@@ -713,21 +712,21 @@
 					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((state=="on")?"on":"off")%>/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch font12' style='text-transform: uppercase;white-space:nowrap;line-height:2;color:<%print((state=="on")?"#F3CBCB":"#A58F8F")%>'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
+				<span class='toggelSwitch font12 <%print((state=="on")?"brightColor":"theamTextColor")%>' style='text-transform: uppercase;white-space:nowrap;line-height:2;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
 				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
-				<div style='color:<%print((state=="on")?"#F3CBCB":"#A58F8F")%>;position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
+				<div class='<%print((state=="on")?"brightColor":"theamTextColor")%>' style='position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
 			<%}%>
 
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross'><b>Done</b></div>
+				<div class='cross theamTextColor'><b>Done</b></div>
 			</div>
 			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div class="titleCont theamBGColor">
+		<div class="titleCont theamBGColor brightColor">
 		<span style="text-align:left;">Device Settings</span>
 		<span class='helpText' style='float:right;'>Long press device icon to edit device parameters</span>
 		<br/>
@@ -738,7 +737,7 @@
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editMoodPageTemplate">
-		<div class="titleCont theamBGColor"><span style="text-align:left;">Mood Settings</span></div>
+		<div class="titleCont theamBGColor brightColor"><span style="text-align:left;">Mood Settings</span></div>
 		<br/>
 		<span class='helpText' style=''></span>
 		<span class='editButton addMoodButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add mood</span>
