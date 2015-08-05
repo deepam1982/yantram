@@ -57,7 +57,7 @@ var EditManager = BaseClass.extend({
 			
 			var dataArr = __.sortBy(__.values(moodConfig.data), 'rank');
 			__.each(dataArr, function (data, indx) {
-				if(data === rankObj) return data.rank = rank;
+				if(__.isEqual(data, rankObj)) return data.rank = rank;
 				if (indx+1 < rank) return data.rank = indx+1;
 				return data.rank = indx+2;
 			});
@@ -96,7 +96,7 @@ var EditManager = BaseClass.extend({
 			console.log(rank, currentRank, rankObj);
 			var dataArr = __.sortBy(__.values(groupConfig.data), 'rank');
 			__.each(dataArr, function (data, indx) {
-				if(data === rankObj) return data.rank = rank;
+				if(__.isEqual(data, rankObj)) return data.rank = rank;
 				if (indx+1 < rank) return data.rank = indx+1;
 				return data.rank = indx+2;
 			});

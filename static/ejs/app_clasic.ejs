@@ -1,0 +1,799 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<style>
+		body{
+			width:100%;
+			height: 100%;
+			padding:0;
+			margin:0;
+			text-align: center;
+			background-color: rgb(215,211,182);
+			font-family: "Arial, Helvetica Neue", Helvetica, sans-serif;
+			color:gray;
+			font-weight: lighter;
+		}
+		#mainCont{
+			min-height:100%;
+			max-width:500px;			
+			margin:auto;
+			background-color: rgb(255,255,255);
+			text-align:left;
+			overflow: hidden;
+			position: relative;
+		}
+		#header {
+			padding:20px 20px 0 20px;
+		}
+		#appCont {
+			min-height:500px;
+			padding:0 20px 20px 20px;
+			background-color: rgb(255,255,255);
+			border-width:0px;
+/*			border-left-width:20px; 
+			border-right-width:20px; 
+*/			border-style:solid;
+
+		}
+		#menuCont {
+			min-height:100%;
+			padding:20px 0px 0 10px;
+			font-size: 14px;
+			color: white;
+			font-weight: 400;
+			text-align:left;
+			position:relative;
+		}
+		#menuCont .options {
+			padding:8px 0px;
+			margin-top:6px;
+			cursor:pointer;
+		}
+/*		#menuCont .options.selected {
+			border : 1px solid white;
+			font-size: 12px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+*/
+		.moodWidgetArea {
+			min-height:50px;
+			width:100%;
+			max-width:500px;
+			position: fixed;
+			bottom: 0px;
+			border:0px;
+/*			border-top: 1px solid white;
+*/			z-index: 100;
+			border-top-width:2px; 
+			border-style:solid;
+		}
+		.moodTitleCont, .titleCont, .roomTitleCont {
+			padding:2px 5px;
+			color: white;
+			font-weight: 200;	
+			font-size: 16px;
+			border-radius: 3px;
+		}
+		.moodTitleCont {
+			border-bottom-right-radius: 0px;
+			border-bottom-left-radius: 0px;
+		}
+
+		.moodGroupCont {
+			padding:15px 0 0 55px;
+			font-size: 14px;
+			color: black;
+		}
+
+		.editViewCont .roomTitleCont {
+			background:white;
+			color: black;
+			font-size: 15px;
+			margin-bottom: -20px;
+			font-weight:400; 
+		}
+		.groupView {
+			margin: 10px 0px 0px;
+		}
+		.popupPannel, .moodView, .editViewCont .groupView {
+			background:white;
+			border-width:1px; 
+			border-style:solid;
+			border-radius: 5px;
+			padding-bottom: 5px;
+		}
+		.moodView{
+			margin-bottom: 15px;
+		}
+		.editViewCont .powerButton {
+			display: none;
+		}
+		.editButton {
+			display: none;
+			font-size: 12px;
+			cursor: pointer;
+			font-weight:100;
+			padding:10px 0;
+			margin-top:-7px;
+		}
+		.deleteMood, .editMood, .editViewCont .editButton {display: block;}
+
+		.switchCont {
+			font-size: 14px;
+		}
+
+		.helpText {
+			color:#BBBBBB;
+			font-size: 12px;
+		}
+
+		.button {
+		  cursor: pointer;
+		  outline: none;
+		  padding: 5px;
+		  border-width:1px;
+		  border-style:solid;
+		  	font-weight: 200;
+			font-size: 16px;
+		  	-moz-border-radius: 3px;
+    		-webkit-border-radius: 3px;
+		}
+		.errorMsgDiv{
+			display: none;
+			font-weight: 100;
+			font-size: 12px;
+		}
+		#experiment, #experiment1{
+			margin-left: 20px;
+			font-size: 15px;
+			color:red;
+		}
+		.popupPannel{
+
+		}
+		.popupPannel .cross, .advancePannel .cross {
+			position:absolute;
+			right:5px;top:4px;
+			cursor:pointer;
+			font-size:10px;
+			height:35px; width:50px;
+			padding-top:20px;
+			margin: -12px 0px 0 0;
+			text-align:center;
+			color:black;
+		}
+		.disabledScreen {
+			position:absolute;
+			height:40px; width:40px;
+			background-image: url("/static/images/transparentExclamation.png");
+			background-size:40px 40px;
+			background-repeat: no-repeat;
+			right: 0px;
+			bottom: 15px;
+			border-radius: 22px;
+		}
+
+		.tick {
+			width:20px; height:20px;
+			background-image: url("/static/images/transparentTick.png");
+			background-size: cover; 
+			position:absolute; right:0px; top:13px; z-index: 1;
+			border-radius: 10px;
+			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale');
+		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale')";
+
+		}
+		.tickLable {
+			position:absolute; right:0px; top:38px; z-index: 1; font-weight:bold;
+		}
+		.editMoodCont .toggelSwitchBackgroundDiv{
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+		}
+
+		.basicSwitchTemplate {
+			float:left;background-color:white;position:relative;border-radius:3px;
+			margin-bottom:20px;padding-top:2px;
+		}
+
+		.schedularCont .done,
+		.schedularCont .cancel,
+		.schedularCont .edit,
+		.schedularCont .remove,
+		.schedularCont .enable,
+		.schedularCont .disable {
+			padding:10px 0;
+			cursor: pointer;
+		}
+		.editColumn {
+			margin-left:-60px;float:left;
+			font-size:12px; 
+			font-weight:500;	
+		}
+		.font12 {font-size:12px;}
+		.font10 {font-size:10px;}
+
+		.whiteBG{background-color: white;}
+		.whiteBorderColor{border-color:white;}
+
+		.theamTable .tableBox {
+			float: left;
+			width: 50px;
+			min-height:5px;
+			text-align: center;
+		}
+
+		.appColor_orange .theamBGColor{background-color:#EE972D;}
+		.appColor_red .theamBGColor{background-color:#9E171D;}
+		.appColor_blue .theamBGColor{background-color:#5EA5F3;}
+		.appColor_green .theamBGColor{background-color:#69C1A8;}
+
+
+
+		input[type=range] {
+		    -webkit-appearance: none;
+		    background-color: black;
+		    height:2px;
+		}
+
+		input[type="range"]::-webkit-slider-thumb {
+		     -webkit-appearance: none;
+		    width: 15px;
+		    height: 45px;
+		    padding: 5px;
+		    border-radius: 20px;
+		    border: double 0px transparent;/* change pixel value to change the padding around slider*/
+		    background-clip: padding-box;
+
+		    position:relative;
+		    top:10px;
+		    cursor:pointer;
+		}
+		
+		input[type=password], input[type=text], input[type=radio], textarea {
+		  @include transition(all 0.30s ease-in-out);
+		  outline: none;
+		  padding: 3px 0px 3px 3px;
+		  margin: 5px 1px 3px 0px;
+		  border-width: 1px; 
+		  border-style:solid;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		 
+		input[type=password]:focus, input[type=text]:focus, textarea:focus {
+		  @include box-shadow(0 0 5px #EE972D);
+		  padding: 3px 0px 3px 3px;
+		  margin: 5px 1px 3px 0px;
+		  	-moz-border-radius: 3px; 
+    		-webkit-border-radius: 3px; 			
+		}
+		input[type=radio] {
+			border-radius: 10px;
+		    cursor: pointer;
+		    display: inline-block;
+		    height: 15px;
+		    margin: 0 5px 0 5px;
+		    position: relative;
+		    width: 15px;
+		    -webkit-appearance: none;
+		}
+		input[type="radio"]:checked:after {
+		    border-radius: 25px;
+		    content: '';
+		    display: block;
+		    height: 7px;
+		    position: relative;
+		    width: 7px;
+		}
+
+		hr {
+			border:0;
+			margin: 0px;
+			border-top: 1px solid #eeeeee;
+			border-bottom: 1px solid #ffffff;
+		}
+		input[type='radio']:checked:after {}​
+		input[type='radio'][disabled='true'],
+		input[type='radio']:disabled {
+			background-color: #DDDDDD;
+		}​
+
+	</style>
+	</head>
+
+	<body class='appColor_<$=appColor$>'>
+		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
+		</div>
+		<div class='' id='mainCont'>
+			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
+				<div id='header'>
+					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
+						<a href='' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
+						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
+							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
+						</div>	
+					</div>
+				</div>
+				<br/>
+				<div id='appCont' class='appArea'></div>
+			</div>
+			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			<div style='clear:both;'></div>	
+			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
+		</div>		
+		<img src="static/images/loading.gif" style="display:none;"/>
+	</body>
+	<script type="text/javascript" src="/static/scripts/iefix.js"></script>
+<!--	
+	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
+-->
+	<script type="text/javascript" src="/static/scripts/jquery/jquery.1.9.0.min.js"></script>
+	<script>Zepto=$</script>
+	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.7.0.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
+	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
+	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
+	<script type="text/template" id="sideMenuTemplate">
+		<div id='menuCont' class='menuArea theamBGColor'>
+			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
+			<br/><br/><br/>
+			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
+			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
+			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
+			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
+			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
+			<br/><br/><br/>
+			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
+			<div class='options logout' ><a href='logout' style='text-decoration:none;color:inherit'>Logout</a></div>
+		</div>
+	</script>
+	<script type="text/template" id="addNewModuleTemplate">
+		<div>
+			<img src='/static/images/connected_module.png' style='width:100%;'/>
+			<br/>
+			<div class='configuredModuleDisplay' style='display:none;'>
+				<div class='helpText'>Please wait till the exclamation mark go away, should be about 30 seconds.</div>
+			</div>
+			<div class='connectedConfigDone' style='display:none;'>
+				<br/>
+				<span class='button theamBorderColor theamTextColor' id='configMore'>Configure More</span>
+				<span class='button theamBorderColor theamTextColor' id='configDone' style='margin-left:30px;'>Done</span>
+			</div>
+			<div class='moduleAttached' style='display:none;'>
+				<span style='margin-right:10px'>Enter module name</span>
+				<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='moduleName'></input>
+				<div class='helpText'>e.g. module1. You can change the name of the module any time latter.</div>
+				<br/>
+				<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
+				<br/>
+				<span class='button theamBorderColor theamTextColor' id='configureNewModuleButton'>Configure</span>
+			</div>
+			<div class='moduleNotAttached'>
+				<span class='connectModuleMsg'>Connect Switchboard module to Home controller using serial cable.</span>
+				<span class='retryMsg' style='display:none;'>Oh no!! Home controller cannot communicate with Switchboard module. Check the connections of serial cable(disconnect-reconnect) and then retry.</span>
+				<br/><br/>
+				<span class='button theamBorderColor theamTextColor' id='retryButton'>Try now</span>
+			</div>
+			<div class="loader" style="text-align:center;display:none;"><img src="static/images/loading.gif"/></div>	
+			
+		</div>
+	</script>
+	<script type="text/template" id="homeControllerDownTemplate">
+		<div>
+			<br/><br/>
+			<span>Oops! Inoho cloud server is unable to reach your home controller.</span><br/><br/>
+			<span class='helpText'>This could be because of </span><br/>
+			<span class='helpText'>1) The home controller is not powered on.</span><br/>
+			<span class='helpText'>2) The home controller is not connected to the wifi router.</span><br/>
+			<span class='helpText'>3) The internet connection at your home is down.</span>
+		</div>
+	</script>
+	<script type="text/template" id="networkSettingTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
+			<br/>
+			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
+			<br/>
+			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
+			<br/> -->
+			<span style='margin-right:10px'>Network Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKey'></input>
+			<br/>
+			<span style='margin-right:10px'>Confirm Password</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='nwkSecKeyCnf'></input>
+			<br/>
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
+			<br/>
+			<span class='button theamBorderColor theamTextColor' id='modifyNwkSecKeyButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipNwkSecButton' style='margin-left:30px;display:none;'>Skip</span>
+
+			
+		</div>
+	</script>
+	<script type="text/template" id="welcomeScreenTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Welcome to Inoho!</span></div>
+			<br/>
+			
+			<span class='helpText'>We will now take you through 3 step installation process.</span>
+			<br/><br/>
+			<span>Step 1 Network Configuration.</span><br/>
+			<span class='helpText'>inoho home controller comes with default network settings, we recommend that you configure network with your own password.</span>
+			<br/><br/>
+			<span>Step 2 Cloud Configuration.</span><br/>
+			<span class='helpText'>In order to use inoho over the internet, you will have to create an account with inoho cloud services.</span>
+			<br/><br/>
+			<span>Step 3 Module Configuration.</span>
+			<br/><span class='helpText'>Each switch board module needs to be configured with inoho home controller.</span>
+			<br/><br/><br/>
+			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
+
+			
+		</div>
+	</script>
+	<script type="text/template" id="checkUpdateTemplate">
+		<div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Check Updates</span></div>
+			<br/><br/>
+			<div class="loader" style="text-align:center;"><img src="static/images/loading.gif"/></div>
+			<div class="msgBox helpText" style="display:none;"></div>
+			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
+		</div>
+	</script>
+	<script type="text/template" id="cloudSettingTemplate">
+		<div>
+			<br/>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
+			<br/>
+			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
+			<br/>
+			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
+			<br/>
+	<!--	<span style='margin-right:10px'>Confirm email id</span>
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmailCnf'></input>
+			<br/>
+	-->		<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwd'></input>
+			<br/>
+			<span style='margin-right:10px'>Confirm password</span>
+			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwdCnf'></input>
+
+			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
+			<br/><br/>
+			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
+			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
+			<br/><br/>
+			
+		</div>
+	</script>
+	<script type="text/template" id="theamSettingTemplate">
+		<div class="theamSettingPage translucentBg30">
+			<br/>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Theme Settings</span></div>
+			<br/>
+			<div class='paddingDiv'>
+			<div class='helpText'>Sellect one of the following themes</div>
+			<br/>
+			<div class='theamTable helpText'>
+				<div class='tableBox'></div>
+				<div class='tableBox'>Orange</div>
+				<div class='tableBox'>Red</div>
+				<div class='tableBox'>Blue</div>
+				<div class='tableBox'>Green</div>
+				<% for(var i=0; i<theams.length; i++) { var curTheme='<$=appTheme$>',curColor='<$=appColor$>';%>
+					<br/><br/><div class='tableBox'><%=theams[i]%></div>
+					<%for(var j=0; j<colors.length; j++) {%>
+						<div class='tableBox'>
+							<input type="radio" name="theamColor" value='{"theam":"<%=theams[i]%>","color":"<%=colors[j]%>"}' <% print((curTheme==theams[i]&&curColor==colors[j].toLowerCase())?'checked="checked"':'' )%>/>
+						</div>
+				<%}}%>
+				<div style='clear:both;'></div>
+			</div>
+			<br/>
+			<span class='button theamBorderColor theamTextColor' id='applyTheamButton' style='float:right;'>Apply</span>
+		</div>
+	</script>
+	<script type="text/template" id="moodProxyTemplate">
+		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block;margin:0px 5px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
+			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
+			<span><%=name%></span>
+		</div>
+	</script>
+	<script type="text/template" id="moodStripTemplate">
+		<div class="moodProxyCont" style='padding:0px 15px; text-align:center;'></div>
+	</script>
+	<script type="text/template" id="moodViewTemplate">
+		<div class='popupPannel editTemplateCont theamBorderColor' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+			<div class='cross' style='top:10px;'><b>Done</b></div>
+		</div>
+		<div style='clear:both;'></div>	
+		<div class='moodView theamBorderColor'>
+			<div class="moodTitleCont theamBGColor" style=''>
+				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
+				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
+				<span class='editButton deleteMood' style='float:right;margin:0px; padding:10px;'>delete</span>
+				<span class='editButton editMood' style='float:right;margin:0px; padding:10px;'>edit</span>
+				<div style='clear:both;'></div>
+			</div>
+			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
+				<div class='moodGroupCont'>
+					<div style='margin-left:-50px;'><%=group.name%></div>
+					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
+						<div class='iconPartition' style='width:55px;float:left;text-align:center;cursor:pointer;'>
+							<div style='width:54px;height:54px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
+								<img style="width:55px;height:55px;cursor:pointer;margin-top:-1px;" src='static/images/transparent/<%=ctl.icon%>.png' />
+							</div>	
+							<span class='font12'><%=ctl.name%></span>
+						</div>
+					<%}%>	
+				</div>
+				<div style='clear:both;'></div>	
+			<%}%>	
+		</div>	
+	</script>
+	<script type="text/template" id="editMoodTemplate">
+		<div class='editMoodCont' style='padding:0px 0px 0px 70px;'>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Name</span>
+			<div><input style='width:180px; max-width:70%;margin:0px;' type='text' class='moodName' value='<%=name%>'></input></div>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Icon</span>
+			<div class='moodIconCont'>
+				<% for(var i=0; i<iconNameArray.length; i++){%>
+					<div class='font10 moodIcon' moodName='<%=iconNameArray[i]%>' style='float:left;margin-right:10px; width:40px;text-align:center;color:black;position:relative;'>
+						<div style='width:40px; height:40px; background-image:url("static/images/moods/<%=iconNameArray[i]%>.png"); background-size:40px 40px;'></div>
+						<span><%=iconNameArray[i]%></span>
+						<div class='tick theamBGColor' style='<% print((icon == iconNameArray[i])?"":"display:none;");%>'></div>
+					</div>	
+				<%}%>	
+				<div style='clear:both'></div>
+			</div>
+			<br/>
+			<%if(typeof count != 'undefined') {%>
+				<span style='margin-left:-60px;float:left;'>Rank</span>
+				<%for(var i=1 ;i<=count; i++) {%>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
+				<%}%>	
+				<br/><br/>
+			<%}%>
+			<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
+			<br/><br/>
+		</div>	
+	</script>
+	<script type="text/template" id="groupTemplate">
+		<div class='groupView theamBorderColor'>
+			<div class="roomTitleCont theamBGColor" style='position:relative;'>
+				<span style="text-align:left;"><%=name%></span>
+				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
+				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
+				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
+				<div style='clear:both;'></div>
+			</div>
+			<br/>
+			<div class='switchCont'>
+				
+			</div>
+			<div style='clear:both;'></div>
+			<div class='advancePannel editTemplateCont' style='display:none; width:100%;position:relative;margin-top:-20px;'>
+				<div class='cross' style='top:10px;'><b>Done</b></div>
+			</div>
+			<div style='clear:both;'></div>	
+		</div>	
+	</script>
+	<script type="text/template" id="editGroupTemplate">
+		<div class='editGroupCont' style='padding:0px 0px 0px 70px;'>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Name</span>
+			<div><input style='width:180px;max-width:70%;margin:0px;' type='text' class='groupName' value='<%=name%>'></input></div>
+			<br/>
+			<%if(typeof count != 'undefined') {%>
+				<span style='margin-left:-60px;float:left;'>Rank</span>
+				<%for(var i=1 ;i<=count; i++) {%>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='one'><%=i%></label>&nbsp;&nbsp;&nbsp;
+				<%}%>	
+				<br/><br/>
+			<%}%>
+			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
+			<br/><br/>
+		</div>	
+	</script>
+	<script type="text/template" id="basicSwitchTemplate">
+		<div class='basicSwitchTemplate' style=''>
+			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
+				<div style='width:74px;height:74px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
+					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/transparent/<%=icon%>.png' />
+					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
+				</div>	
+				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
+				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
+				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
+
+			</div>
+			<% if(typeof autoToggleTime != 'undefined') {%>
+				<div class='theamTextColor' style='position:absolute;right:24px;top:-9px;width:26px;height:12px;font-size:10px;font-weight:bold;'><%=autoToggleTime%></div>
+			<%}%>
+
+			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
+				<div class='cross'><b>Done</b></div>
+			</div>
+			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
+		</div>
+	</script>
+	<script type="text/template" id="editPageTemplate">
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+		<br/>
+		<span class='helpText' style=''>Long press device icon to edit device parameters</span>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
+		<br/><br/>
+		<div class='editViewCont'></div>
+	</script>
+	<script type="text/template" id="editMoodPageTemplate">
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Mood Settings</span></div>
+		<br/>
+		<span class='helpText' style=''></span>
+		<span class='editButton addMoodButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add mood</span>
+		<br/><br/>
+		<div class='moodViewCont'></div>
+	</script>
+	<script type="text/template" id="editSwitchTemplate">
+		<div style='padding:0px 10px 10px 70px;'>
+			<br/>
+			<span class='editColumn'>Name</span>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
+			<br/>
+			<span class='editColumn'>Type</span>
+			<div class='typeRadioCont'>
+				<input id='normal' <% if(type=="normal")print("class='checked'")%>type="radio" name="type" value="normal" <% if(type=='normal')print("checked")%>/><label for='normal'>Normal</label>
+				<span style='<% if(typeof dimmable == 'undefined'||!dimmable) print("display:none")%>;'>
+				<input id='dimmer' <% if(type=="dimmer")print("class='checked'")%> type="radio" name="type" value="dimmer" <% if(type=='dimmer')print("checked")%>/><label for='dimmer'>Dimmer</label>
+				</span>
+			</div>
+			<br/>
+			<span class='editColumn'>Auto-off</span>
+			<div class='autoOffRadioCont' style='margin-top:-2px;'>
+				<span class='autoOffTimeSelect' style='display:none;padding:0 5px;'>in&nbsp;&nbsp;
+					<select style=' font-size:12px;'>
+						<option value="5">5 minutes</option>
+						<option value="10">10 minutes</option>
+						<option value="15">15 minutes</option>
+						<option value="20">20 minutes</option>
+						<option value="30">30 minutes</option>
+						<option value="45">45 minutes</option>
+						<option value="60">1 hour</option>
+						<option value="75">1 hour, 15 minutes</option>
+						<option value="90">1 hour, 30 minutes</option>
+						<option value="105">1 hour, 45 minutes</option>
+						<option value="120">2 hours</option>
+						<option value="150">2 hours, 30 minutes</option>
+						<option value="180">3 hours</option>
+					</select>
+				</span>
+				<span class='autoOffEnable'><input id='autoOffEnable' type="radio" name="autoOff" value="enabled" <% if(typeof autoOff != 'undefined' && autoOff.enabled)print("checked")%>/><label for='autoOffEnable'>Enable</label></span>
+				<span class='autoOffDisable'><input id='autoOffDisable' type="radio" name="autoOff" value="disabled" <% if(typeof autoOff == 'undefined' || !autoOff.enabled)print("checked")%>/><label for='autoOffDisable'>Disable</label></span>
+			</div>
+			<br/>
+			<span class='editColumn'>Schedules</span>
+			<div class='schedularCont'>
+				<div id='scheduleEditor' class='editSchedule' style='display:none;'></div>
+				<% if(typeof schedules != 'undefined')for(var i=0; i<schedules.length; i++){ var sch = schedules[i]; %>
+					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin-bottom:8px;'>&nbsp;
+						<span style="<% if(!sch.enabled) print('color:#CCCCCC;')%>font-weight:bold;">
+							<% print((sch.type == 'on')?'Turn-on at':'Turn-off at')%> <%if(sch.hour<10)print('0')%><%=sch.hour%>:<%if(sch.minute<10)print('0')%><%=sch.minute%>  <%=sch.amPm%>
+						</span>&nbsp;
+						<span style='float:right;margin-right:0px;'>
+							<span class="<% print((sch.enabled)?'disable':'enable') %> theamTextColor font12"><% print((sch.enabled)?'disable':'enable') %></span>&nbsp;
+							<span class="edit theamTextColor font12">edit</span>&nbsp;
+							<span class="remove theamTextColor font12">remove</span>
+						</span>	
+					</div>
+				<%}%>
+				<div class='addShdlBtnCont'>
+					<span class='theamTextColor font12 addNewSchedule'>&nbsp;&nbsp;add new</span>
+				</div>
+			</div>
+			<br/>
+			<span class='editColumn'>Icon</span>
+			<div class='iconCont'></div>
+			 
+		</div>
+	</script>
+	<script type="text/template" id="editScheduleTemplate">
+		<select class='scheduleType font12'>
+			<option value="on">Turn-on at</option>
+			<option value="off">Turn-off at</option>
+		</select>&nbsp;&nbsp;
+		<select class='scheduleHour font12'>
+			<% for(var i=1; i<=12; i++) {%>
+				<option value="<%=i%>" <% if(i==6)print("selected") %> ><%print((i<10)?'0':'')%><%=i%></option>
+			<%}%>
+		</select> : 
+		<select class='scheduleMinute font12'>
+			<% for(var i=0; i<12; i++) {%>
+				<option value="<% print(i*5) %>"><%print((i<2)?'0':'')%><% print(i*5) %></option>
+			<%}%>
+		</select>&nbsp;&nbsp;
+		<select class='scheduleAmPm font12'>
+			<option value="AM">AM</option>
+			<option value="PM">PM</option>
+		</select>
+		<span class='theamTextColor font12 cancle cancel' style='float:right;margin:5px;'>cancel</span>
+		<span class='theamTextColor font12 done' style='float:right;margin:5px;'>done</span>
+		<div style='clear:both;'></div>	
+	</script>
+	<script type="text/template" id="selectSwitchIconTemplate">
+		<div style="width:45px; height:45px; float:left;position:relative;">
+			<div class='tick theamBGColor' style='display:none;'></div>
+			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>'/>
+			<div style='width:45px; height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
+		</div>	
+	</script>
+	<script type="text/template" id="switchProxyTemplate">
+		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
+			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected)?"":"display:none;"); print((task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
+			<% if(task == "moodSelection" && selected){%>
+				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
+			<%}%>
+			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
+				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
+				<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
+			</div>
+		</div>
+	</script>
+	<script type="text/template" id="deviceGroupTemplate">
+		<div style='size:40px; margin:18px 0 0 -60px; font-size:10px; float:left;'><%=name%></div>
+		<div class="switchProxyCont"></div>
+		<div style='clear:both;'></div>	
+		<br/>
+	</script>
+	<script type="text/template" id="fileReaderTemplate">
+		<br/>
+		<span>Absolute Path:</span>
+		<input type='text' id='filePath' style='width:50%'></input>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type='submit' id='submitFilePath' style=''></input>
+		<br/><br/><br/>
+		<div class='fileContentArea font10'></div>
+	</script>
+	<script type="text/template" id="commandPosterTemplate">
+		<br/>
+		<span>Event name:</span>&nbsp;&nbsp;<input type='text' class='eventName' style='width:30%'></input>
+		<br/><br/>
+		<span>Enter Json:</span>&nbsp;&nbsp;&nbsp;&nbsp;<textarea class='textJson' style='width:100%; height:200px;'></textarea>
+		<br/><br/><br/>
+		<input type='submit' id='postJson' style=''></input>
+	</script>	
+	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/group/view1.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/moods/moodStrip.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/moods/editMood.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/moods/moodView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/mainPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editMoodPage.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
+	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/update.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/theamSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/readFile.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/commandPoster.js"></script>
+	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/static/scripts/app.js"></script>
+	
+<HTML>	

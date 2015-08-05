@@ -20,12 +20,14 @@ Backdrop = BaseView.extend({
 		$elm.css('width', $elm.width());
 		$elm.css('z-index', this.options.zIndex+1);
 		$elm.css('position', 'absolute');
+		$elm.addClass('onBackdrop');
 		this.elmArr.push($elm);
 	},
 	erase : function () {
 		_.each(this.elmArr, function ($elm) {
 			$elm.css('width', $elm.attr('cssWidth'));
 			$elm.attr('style', $elm.attr('oldStyle'));
+			$elm.removeClass('onBackdrop');
 			if(this.cloneOnPullup) $elm.next().remove();
 		}, this);
 		this.$el.remove();
@@ -132,7 +134,7 @@ AdvanceFanSwitch = AdvanceSwitch.extend({
 	},
 	render	:	function () {
  		AdvanceSwitch.prototype.render.apply(this, arguments);
- 		this.$slider = $('<input type="range" class="inside" min="30" max="95" value="50" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
+ 		this.$slider = $('<input type="range" class="inside fanSlider" min="30" max="95" value="50" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
  		this.$el.find('.advancePannel').append(this.$slider);
  		this.$slider.width(Math.max(120,this.$el.parent().width() - 2*this.$el.find('.toggelSwitch').width() - 20));
  		var duty = parseInt(100*parseInt(this.model.get('duty'))/255);

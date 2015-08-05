@@ -43,6 +43,8 @@ var CommandManager = BaseClass.extend({
 		socket.on('modifyNetworkSecurityKey', __.bind(this.onModifyNetworkSecurityKey, this));
 		socket.on('getNetworkSettings', __.bind(this.getNetworkSettings, this));
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
+		socket.on('getThemeSettings', __.bind(this.getThemeSettings, this));
+		socket.on('modifyThemeSettings', __.bind(this.modifyThemeSettings, this));
 		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
@@ -174,8 +176,19 @@ var CommandManager = BaseClass.extend({
 			callback && callback((!err)?true:false);	
 		});		
 	},
+	getThemeSettings	: function (commandData, callback) {
+		callback({'success':true, 'data':{'appTheme' : __userConfig.get('appTheam'), 'appColor':__userConfig.get('appColor')}})
+	},
 	getCloudSettings	: function (commandData, callback) {
 		callback({'success':true, 'email':__userConfig.get('email')})
+	},
+	modifyThemeSettings : function (commandData, callback) {
+		__userConfig.set('appTheam', commandData.theam);__userConfig.set('appColor', commandData.color);
+		__userConfig.save(function (err) {
+			if(err) return console.log(err);
+			console.log('App theam modification success');
+			callback({'success':true});
+		});
 	},
 	modifyCloudSettings : function (commandData, callback) {
 		var email = __userConfig.get('email');

@@ -28,8 +28,7 @@ var BasicConfigManager = BaseClass.extend({
 		var val = this.data;
 		while(val && path.length) 
 			val = val[path.shift()];
-		//TODO return cloned value.
-		return val;
+		return (val)?JSON.parse(JSON.stringify(val)):val;
 	},
 	set : function (path, value) {
 		path = path.split('.');
@@ -53,12 +52,15 @@ var BasicConfigManager = BaseClass.extend({
 				callback && callback(err);
 				return;
 			}
-			try{data = JSON.parse(data);}
+			try{
+				data = JSON.parse(data);
+				callback && callback(null,  data);
+			}
 			catch(err){
 				console.log("############ ERR ########",file, err)
 				data={};
 			}
-			callback && callback(null,  data);
+			
 		});
 	}
 

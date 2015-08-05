@@ -27,9 +27,15 @@
 		#header {
 			padding:20px 20px 0 20px;
 		}
+		.slim #header {
+			padding:10px 10px 0 10px;
+		}
 		#appCont {
 			min-height:500px;
 			padding:0 20px 20px 20px;
+		}
+		.slim #appCont {
+			padding:0 10px 10px 10px;
 		}
 		#menuCont {
 			min-height:100%;
@@ -65,10 +71,10 @@
 			border-style:solid;
 		}
 		.moodTitleCont, .titleCont, .roomTitleCont {
-			padding:2px 5px;
+			padding:1px 3px;
 			color: white;
 			font-weight: 200;	
-			font-size: 16px;
+			font-size: 14px;
 			border-radius: 3px;
 		}
 		.moodTitleCont {
@@ -90,7 +96,7 @@
 			font-weight:400; 
 		}
 		.groupView {
-			margin: 10px 0px 0px;
+			/*margin: 10px 0px 0px;*/
 		}
 		.popupPannel, .moodView, .editViewCont .groupView {
 			background:white;
@@ -104,6 +110,17 @@
 		}
 		.editViewCont .powerButton {
 			display: none;
+		}
+
+		.powerButton {
+			width:13px;
+			float:right;
+			margin-top:1px;
+			cursor:pointer;
+			position:absolute;
+			right:-7px;
+			top:-9px;
+			padding:10px;
 		}
 		.editButton {
 			display: none;
@@ -190,7 +207,7 @@
 
 		.basicSwitchTemplate {
 			float:left;background-color:white;position:relative;border-radius:3px;
-			margin-bottom:20px;padding-top:2px;
+			margin:10px 0px;padding-top:2px;
 		}
 
 		.schedularCont .done,
@@ -212,6 +229,14 @@
 
 		.whiteBG{background-color: white;}
 		.whiteBorderColor{border-color:white;}
+
+		.theamTable .tableBox {
+			float: left;
+			width: 50px;
+			min-height:5px;
+			text-align: center;
+		}
+
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -328,6 +353,7 @@
 			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
 			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
@@ -455,6 +481,32 @@
 			
 		</div>
 	</script>
+	<script type="text/template" id="theamSettingTemplate">
+		<div class="theamSettingPage translucentBg30">
+			<br/>
+			<div class="titleCont"><span style="text-align:left;">Theme Settings</span></div>
+			<div class='paddingDiv'>
+			<div class='helpText'>Sellect one of the following themes</div>
+			<br/>
+			<div class='theamTable helpText'>
+				<div class='tableBox'></div>
+				<div class='tableBox'>Orange</div>
+				<div class='tableBox'>Red</div>
+				<div class='tableBox'>Blue</div>
+				<div class='tableBox'>Green</div>
+				<% for(var i=0; i<theams.length; i++) {%>
+					<br/><br/><div class='tableBox'><%=theams[i]%></div>
+					<%for(var j=0; j<colors.length; j++) {%>
+						<div class='tableBox'>
+							<input type="radio" name="theamColor" value='{"theam":"<%=theams[i]%>","color":"<%=colors[j]%>"}'/>
+						</div>
+				<%}}%>
+				<div style='clear:both;'></div>
+			</div>
+			<br/>
+			<span class='button theamBorderColor theamTextColor' id='applyTheamButton' style='float:right;'>Apply</span>
+		</div>
+	</script>
 	<script type="text/template" id="moodProxyTemplate">
 		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block;margin:0px 5px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
 			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
@@ -526,12 +578,11 @@
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
+				<img class='powerButton' src="static/images/power.png" style=""/>
 				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
 				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
-			<br/>
 			<div class='switchCont'>
 				
 			</div>
@@ -740,252 +791,12 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/theamSetting.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/readFile.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/commandPoster.js"></script>
 	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
-	<script>
-		var hashChanged = function () {console.log('Hash Changed!!')};
-		if ("onhashchange" in window) { // event supported?
-			window.onhashchange = function () {hashChanged(window.location.hash);}
-		}
-		else { // event not supported:
-			var storedHash = window.location.hash;
-			window.setInterval(function () {(window.location.hash != storedHash) && (storedHash = window.location.hash) && hashChanged(storedHash);}, 500);
-		}
-	</script>
-	<script>
-		$('#burgerImageCont').on('tap', function () {
-			var $menuContPar = $('#menuCont').parent();
-			var $appContPar = $('#appCont').parent();
-			if($menuContPar.css('display') == 'block') {
-				$menuContPar.hide();
-				$appContPar.css('width', '100%');
-			}
-			else {
-				$menuContPar.show();
-				$appContPar.css('width', '62%');				
-			}
-		});
-		fixMoodStrip = false; //true; //false;
-		lastScrollTop=0;
-		hideMoodStrip = function () {
-			$('.footer').animate({'bottom':-parseInt($('.footer').height())}, 300);
-		};
-		hideMoodStripTimer = setTimeout(hideMoodStrip, 5000);
-		$(window).scroll(function (){
-			if(fixMoodStrip || !moodStrip || !moodStrip.rendered) return ;//hideMoodStrip();
-			hideMoodStripTimer && clearTimeout(hideMoodStripTimer);
-			hideMoodStripTimer = setTimeout(hideMoodStrip, 5000);
-			var curScrollTop = $(window).scrollTop(), delta = curScrollTop-lastScrollTop;
-			var ftrBtmPos = parseInt($('.footer').css('bottom'), 10)+delta;
-			ftrBtmPos = Math.min(0, Math.max(ftrBtmPos, -parseInt($('.footer').height(), 10)));
-			$('.footer').css('bottom', ftrBtmPos+'px');
-			lastScrollTop=curScrollTop;
-		});
-	
-	</script>
-	<script>
-//	  setInterval(function () {$('#experiment').html(Date().substr(16,8));} , 1000)
-	  var configurationWorkFlow = function (pageName) {
-			var pageObjName;
-			switch(pageName) {
-				case "welcomeScreen" : pageObjName = 'welcomeScreenPage'; break;
-				case "networkSetting" : pageObjName = 'networkSettingPage'; break;
-				case "cloudSetting" : pageObjName = 'cloudSettingPage'; break;
-				case "configureModule" : pageObjName = 'configureModulePage'; break;
-			}
-			if(pageObjName) {
-				$('.hideWhileConfigureFlow').hide();
-				sideMenu.switchPage(pageObjName);
-				try {window[pageObjName].forIntalonFlow();}catch(err){}
-				window[pageObjName].onDone = function () {
-					$('.hideWhileConfigureFlow').show();
-					ioSocket.emit("checkConfigurations")
-				};
-			}
-			else 
-				sideMenu.switchPage('mainPageView');
-	  }
-	  var showBurgerMenu = function () {
-	  	$('#burgerImageCont').show();
-	  	if(servedFromCloud) {
-	  		$('.nwkStng, .cldStng, .cnfrMdl, .chkUpdt').hide();
-	  	}else {
-	  		$('.logout').hide();
-	  		setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
-	  	}
-	  };
-	  var setAppTheamColor = function (color) {
-	  		/*<!-Orange - #EE972D; green - #69C1A8; blue-#5ED5F3; red-#9E171D->*/
-	  		if(!color) color=(servedFromCloud)?"#69C1A8":"#EE972D";
-	  		var $sheet = $("<style>\
-			hr {\
-				border-top-color: "+color+"\
-			}\
-			.whiteBG{background-color: white;}\
-			.whiteBorderColor{border-color:white;}\
-			input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+color+";}\
-			.theamBGColor{background-color: "+color+";}\
-			.theamTextColor{color:"+color+";}\
-			input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+color+";}\
-			</style>");
-	  		$('body').append($sheet);	
-	  }
-	  var servedFromCloud = false;
-	  setAppTheamColor();
-	  var ioSocket, pingTimeStamp = Date.now();
-	  hashChanged = function (hash) {
-		if(!window.location.hash) return;
-		var removeHash = false;
-		switch(window.location.hash) {
-			case '#updatenow'				: 	ioSocket.emit('updateNow');removeHash=true;break;
-			case '#restorenetwork'			: 	ioSocket.emit('restoreNetwork');removeHash=true;break;
-			case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
-			case '#restartzigbee'			: 	ioSocket.emit('restartZigbee');removeHash=true;break;
-			case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
-			case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
-			case '#restorefactorysetting'	: 	if(confirm("Are you sure you wanna restore factory setting?")){
-													ioSocket.emit('restoreFactory', function (rsp) {
-														if(!rsp.success) alert(rsp.msg);
-													});
-												};removeHash=true;break;
-
-			case '#shownetworksettings'		:	sideMenu.switchPage('networkSettingPage');break;
-			case '#showfilereader'			:	sideMenu.switchPage('fileReaderPage');break;
-			case '#showcommandposter'		:	sideMenu.switchPage('commandPosterPage');break;
-
-
-		}
-		if(removeHash)window.location.hash = '';
-	  };
-	  var connectSocket = function () {
-	  		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
-	  			);
-	  		ioSocket.on('connect', showBurgerMenu);
-	  		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
-	  		ioSocket.on('roomConfigUpdated', function (config) {
-				gC.set(config, {merge: true, remove: false});
-			});
-			ioSocket.on('deleteGroup', function (groupId) {
-				if(!groupId) return;
-				gC.remove(gC.get(groupId));
-			});
-			ioSocket.on('onDeviceUpdate', function (config) {
-				dC.set(config, {merge: true, remove: false});
-			});
-			ioSocket.on('moodConfigUpdate', function (config) {
-				mC.set(config, {merge: true, remove: false});
-			});
-			ioSocket.on('deleteMood', function (moodId) {
-				if(!moodId) return;
-				mC.remove(mC.get(moodId));
-			});
-			ioSocket.on('noHomeControllerPresent', function () {
-				sideMenu.switchPage('homeControllerDownPage');
-				$('#appLoadingVeil').hide();
-			});
-			ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
-			ioSocket.on('switchPage', configurationWorkFlow);
-			ioSocket.on('homeControllerLocalIpAddress', function (add) {
-				var arr = window.location.href.split("/");
-				if(arr[2] == add) return;
-				$.ajax({crossDomain: true,dataType: "jsonp",
-					"url":"http://"+add+"/apptest", success:function (rsp){
-					if(rsp && rsp.success) window.location.href="http://"+add
-				}});
-			});
-	  };
-	  connectSocket();
-	</script>
-	<script>
-		var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
-		sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
-		sideMenu.render();
-		var backboneAjax = Backbone.ajax;
-		var d = new Date();
-		Backbone.ajax = function (obj) {
-			var success = obj.success;
-			obj.success = function (data) {
-				console.log(obj.url, new Date()-d);
-				success.apply(this, arguments);
-			}
-			if(!obj.useSocket) return backboneAjax.apply(this, arguments);
-			ioSocket.emit(obj.url, obj.data, obj.success);
-		}
-		var RoomCollection = Backbone.Collection.extend({
-			url: '/group/list',
-			model:RoomModel
-		});
-		var DeviceCollection = Backbone.Collection.extend({
-			url: '/device/list'
-		});
-		var MoodCollection = Backbone.Collection.extend({
-			url: '/mood/list',
-			model:BaseModel
-		});
-		var gC = new RoomCollection();
-		var dC = new DeviceCollection();
-		var mC = new MoodCollection();
-		gC.comparator = function (model) {return parseInt(model.get('rank'));};
-		mC.comparator = function (model) {return parseInt(model.get('rank'));};
-		
-		dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
-		
-		gC.on("add", function(roomModel){
-			roomModel.on('change', function (model, data) {
-				console.log("change called on "+model.get('name'));
-				console.log(model);
-			});
-			(gC.models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
-		})
-//		gC.on("sort", function () {console.log(gC.pluck('name'));});
-//		mC.on("add", function(model){console.log(model);})
-		// gc should follow dc and mc ... others wise page takes longer to load.
-		var fetchCount = 0;
-		var fetchComplete = function () {
-			if(++fetchCount == 3)setTimeout(function () {
-				$('#appLoadingVeil').hide();
-				console.log('Veil lifted at:', new Date()-d);
-			}, 200);
-		};
-		dC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
-		mC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
-		gC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
-		
-		deviceCollection = dC;
-		var mainPageView = new MainPageView({'collection':gC});
-		var moodStrip = mainPageView.moodStrip = new MoodStripView({'collection':mC, 'el':$('.moodWidgetArea')});
-		$('#appCont').append(mainPageView.$el);
-		mainPageView.render();
-		sideMenu.currentPage = mainPageView;
-		var editPageView = new EditPageView({'collection':gC});
-		$('#appCont').append(editPageView.$el);
-		// editPageView.render();
-		// sideMenu.currentPage = editPageView;
-		var editMoodView = new EditMoodPageView({'collection':mC});
-		$('#appCont').append(editMoodView.$el);
-		var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
-		$('#appCont').append(configureModulePage.$el);
-		var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});
-		$('#appCont').append(cloudSettingPage.$el);
-		var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
-		$('#appCont').append(networkSettingPage.$el);
-		var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});
-		$('#appCont').append(welcomeScreenPage.$el);
-		var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
-		$('#appCont').append(checkUpdatePage.$el);
-		var fileReaderPage = new FileReaderPageView({socket:ioSocket});
-		$('#appCont').append(fileReaderPage.$el);
-		var commandPosterPage = new CommandPosterPageView({socket:ioSocket});
-		$('#appCont').append(commandPosterPage.$el);
-		var HomeControllerDownPageView = BaseView.extend({
-			templateSelector:"#homeControllerDownTemplate"
-		});
-		var homeControllerDownPage = new HomeControllerDownPageView();
-		$('#appCont').append(homeControllerDownPage.$el);
-
-	</script>
+	<script type="text/javascript" src="/static/scripts/app.js"></script>
 	
 <HTML>	
