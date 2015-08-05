@@ -10,7 +10,7 @@ module.exports = function(app) {
 			case 'Maze' : var appFile = __rootPath + '/static/ejs/app_maze.ejs'; break;
 			default		: var appFile = __rootPath + '/static/ejs/app_clasic.ejs';
 		}
-		var appColor = __userConfig.get('appColor').toLowerCase() || 'orange'
+		var appColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme});
 		// try {res.sendFile(appFile);}
 		// catch(err) {res.sendfile(appFile);}
