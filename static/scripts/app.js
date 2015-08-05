@@ -91,7 +91,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
 	.theamBGColor{background-color: "+color+";}\
-	.onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
+	.appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
 	input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+inputColor+";}\
 	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\

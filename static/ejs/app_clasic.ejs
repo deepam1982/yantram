@@ -124,6 +124,9 @@
 		.switchCont {
 			font-size: 14px;
 		}
+		.editViewCont .switchCont {
+			margin-top:15px;
+		}
 
 		.helpText {
 			color:#BBBBBB;
@@ -146,6 +149,13 @@
 			font-weight: 100;
 			font-size: 12px;
 		}
+		.switchToggleSpinner {
+			position:absolute;left:12px;top:14px;
+		}
+		.powerOffSpinner {
+			position:absolute;right:-11px;top:-13px;
+		}
+
 		#experiment, #experiment1{
 			margin-left: 20px;
 			font-size: 15px;
@@ -305,7 +315,7 @@
 	</style>
 	</head>
 
-	<body class='appColor_<$=appColor$>'>
+	<body class='appColor_<$=appColor$> appTheme<$=appTheme$>'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
@@ -575,8 +585,8 @@
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
 				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
-				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
-				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
+				<span class='editButton deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
+				<span class='editButton editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
