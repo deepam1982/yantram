@@ -135,7 +135,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 //             catch(err){console.log("Error while starting auth server -----", err);}
             server.listen(80);
 
-
+            app.set('view engine', 'ejs');
             app.use(favicon(__rootPath + '/static/images/favicon.ico'));
             //app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
             app.use('/static/images', express.static(__rootPath + '/static/images', {maxAge:86400}));

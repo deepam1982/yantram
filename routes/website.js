@@ -1,14 +1,19 @@
 var express = require('express');
+var ejs = require('ejs');
+ejs.delimiter = '$';
 // var RoomController = require(__rootPath+"/controllers/roomController");
 module.exports = function(app) {
 	
 	app.get('/', function(req, res) {
+		var appTheme = __userConfig.get('appTheam') || 'Clasic';
 		switch (__userConfig.get('appTheam')) {
-			case 'Maze' : var appFile = __rootPath + '/static/htmls/app_2.html'; break;
-			default		: var appFile = __rootPath + '/static/htmls/app_1.html';
+			case 'Maze' : var appFile = __rootPath + '/static/ejs/app_maze.ejs'; break;
+			default		: var appFile = __rootPath + '/static/ejs/app_clasic.ejs';
 		}
-		try {res.sendFile(appFile);}
-		catch(err) {res.sendfile(appFile);}
+		var appColor = __userConfig.get('appColor').toLowerCase() || 'orange'
+		res.render(appFile,{'appColor':appColor,'appTheme':appTheme});
+		// try {res.sendFile(appFile);}
+		// catch(err) {res.sendfile(appFile);}
 
 	});
 	app.get('/auth/login', function(req, res) {

@@ -72,7 +72,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 		appTheam = appTheam.toLowerCase();
 		themeColor = themeColor.toLowerCase();
 		switch(themeColor) {
-			case "orange" : var color = "#EE972D", traprntColor = "", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = '#F3CBCB', traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
 			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = '#F3CBCB', traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
 			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = '#93CBEB', traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
 			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = '#E3DBCB', traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;

@@ -312,6 +312,11 @@
 			text-align: center;
 		}
 
+		.appColor_orange .theamBGColor{background-color:#CE771D;}
+		.appColor_red .theamBGColor{background-color:#832A28;}
+		.appColor_blue .theamBGColor{background-color:#42487B;}
+		.appColor_green .theamBGColor{background-color:#406E38;}
+
 		* {
 			-o-user-select: none;
 			-webkit-touch-callout: none;
@@ -397,8 +402,8 @@
 	</style>
 	</head>
 
-	<body class='trapTheam theamTextColor'>
-		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; background-color:#832A28; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
+	<body class='trapTheam theamTextColor appColor_<$=appColor$>'>
+		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
 		<div id='bgImageContWrapper'><div id='bgImageCont'></div></div>
@@ -410,7 +415,7 @@
 						<div style='padding:0 20px;'>
 							<a href='' style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
-								<img id='burgerImage' class='' style='width:25px;' src="/static/images/transparentBurgerIcon_2.png"></img>
+								<img id='burgerImage' class='' style='width:25px;' src="/static/images/burgerIcon_<$=appColor$>.png"></img>
 							</div>	
 						</div>	
 					</div>
@@ -587,11 +592,11 @@
 				<div class='tableBox'>Red</div>
 				<div class='tableBox'>Blue</div>
 				<div class='tableBox'>Green</div>
-				<% for(var i=0; i<theams.length; i++) {%>
+				<% for(var i=0; i<theams.length; i++) { var curTheme='<$=appTheme$>',curColor='<$=appColor$>';%>
 					<br/><br/><div class='tableBox'><%=theams[i]%></div>
 					<%for(var j=0; j<colors.length; j++) {%>
 						<div class='tableBox'>
-							<input type="radio" name="theamColor" value='{"theam":"<%=theams[i]%>","color":"<%=colors[j]%>"}'/>
+							<input type="radio" name="theamColor" value='{"theam":"<%=theams[i]%>","color":"<%=colors[j]%>"}' <% print((curTheme==theams[i]&&curColor==colors[j].toLowerCase())?'checked="checked"':'' )%>/>
 						</div>
 				<%}}%>
 				<div style='clear:both;'></div>
@@ -709,11 +714,11 @@
 		<div class='basicSwitchTemplate' style=''>
 			<div class='iconPartition' style='width:65px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
 				<div style='width:65px;height:45px;position:relative;'>
-					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((state=="on")?"on":"off")%>/blue/<%=icon%>.png' />
+					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((state=="on")?"on":"off")%>/<$=appColor$>/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
 				<span class='toggelSwitch font12 <%print((state=="on")?"brightColor":"theamTextColor")%>' style='text-transform: uppercase;white-space:nowrap;line-height:2;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
-				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
+				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator_<$=appColor$>.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
 				<div class='<%print((state=="on")?"brightColor":"theamTextColor")%>' style='position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
@@ -728,6 +733,7 @@
 	<script type="text/template" id="editPageTemplate">
 		<div class="titleCont theamBGColor brightColor">
 		<span style="text-align:left;">Device Settings</span>
+		<br/><br/>
 		<span class='helpText' style='float:right;'>Long press device icon to edit device parameters</span>
 		<br/>
 		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
