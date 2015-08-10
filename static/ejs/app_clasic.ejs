@@ -749,8 +749,8 @@
 	</script>
 	<script type="text/template" id="switchProxyTemplate">
 		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
-			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected)?"":"display:none;"); print((task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
-			<% if(task == "moodSelection" && selected){%>
+			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected)?"":"display:none;"); print((typeof task != "undefined" &&  task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
+			<% if(typeof task != "undefined" && task == "moodSelection" && selected){%>
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">

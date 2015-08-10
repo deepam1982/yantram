@@ -6,12 +6,33 @@ var BasicConfigManager = BaseClass.extend({
 	init : function (obj) {this.load((obj||{}).callback);},
 	load : function (calback) {
 		this.readfile(__rootPath+this.file, __.bind(function (err, data) { 
-			this.data = data || {};
-			calback && calback(err);
+			if(err && (err+" ").indexOf("SyntaxError") != -1) {
+				var splitPath = (__rootPath+this.file).split("/");
+				var fileName  = splitPath.pop();
+				this.readfile(splitPath.join("/")+"/bkp/"+fileName, __.bind(function (err, data) { 
+					this.data = data || {};
+					calback && calback(err);
+				}, this))
+			}
+			else {
+				this.data = data || {};
+				calback && calback(err);
+				return;
+			}
 		}, this))
 	},
 	save : function (callback) {
-		fs.writeFile(__rootPath+this.file, JSON.stringify(this.data, null, 4), callback);
+		fs.writeFile(__rootPath+this.file, JSON.stringify(this.data, null, 4), __.bind(function(err) {
+			try{callback && callback(err);}
+			catch(e) {if (e) console.log("####### Error while executing save callback", e.stack);}
+			var splitPath = (__rootPath+this.file).split("/");
+			var fileName  = splitPath.pop();
+			try {fs.mkdirSync(splitPath.join("/")+"/bkp/");} 
+			catch(e) {if ( e.code != 'EEXIST' ) throw e;}
+			fs.writeFile(splitPath.join("/")+"/bkp/"+fileName, JSON.stringify(this.data, null, 4), function(err) {
+				if(err) console.log("######## Error:", err);
+			})
+		}, this));
 	}, 
 	has : function (path) {
 		path = path.split('.');
@@ -58,7 +79,7 @@ var BasicConfigManager = BaseClass.extend({
 			}
 			catch(err){
 				console.log("############ ERR ########",file, err)
-				data={};
+				callback && callback(err);
 			}
 			
 		});
