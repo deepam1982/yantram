@@ -23,6 +23,7 @@ var CommandManager = BaseClass.extend({
 	setCommonEventListners : function (socket) {
 		socket.on('toggleSwitch', this.onToggleSwitchCommand);
 		socket.on('setDuty', this.onSetDutyCommand);
+		socket.on('moveCurtain', this.onMoveCurtainCommand);
 		socket.on('groupOff', __.bind(this.groupOff, this));
 		socket.on('updateNow', __.bind(this.updateNow, this));
 		socket.on('restartHomeController', __.bind(this.restartHomeController, this));
@@ -36,6 +37,7 @@ var CommandManager = BaseClass.extend({
 		switch(commandData.actionName) {
 			case 'toggleSwitch' : this.onToggleSwitchCommand(commandData); break;
 			case 'setDuty' 		: this.onSetDutyCommand(commandData); break;
+			case 'moveCurtain'	: this.onMoveCurtainCommand(commandData); break;
 		}
 	},
 	onLocalConnection : function (socket) {
@@ -137,7 +139,7 @@ var CommandManager = BaseClass.extend({
 	configureConnectedModule : function (commandData, callback) {
 		if(!commandData.moduleName)
 			commandData.moduleName = 'Module-'+(1+__.keys(__remoteDevInfoConf.data).length);
-		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd){
+		deviceManager.communicator.configureModule(commandData.moduleName, __.bind(function (err, macAdd, moduleType){
 			if(!err){
 				macAdd = macAdd+"";
 				var groupIds = [];
@@ -148,18 +150,26 @@ var CommandManager = BaseClass.extend({
 					}
 					if(groupIds.length) return callback(null, groupIds);	
 				}
-				var noDim=1, swCnt=5;
-				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt}, "loadInfo":{},"deviceCode":"xxx"};
+				switch(moduleType){
+					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0;
+					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0;
+					case "CNCR01" : var noDim=0, swCnt=3, crtnCnt=1;
+					default		  : var noDim=1, swCnt=5, crtnCnt=0;
+				}
+				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt, "curtain":crtnCnt}, "loadInfo":{},"deviceCode":"xxx", "category":moduleType};
 				for(var i=0; i<swCnt; i++) {
 					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
 					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
+				}
+				for(var i=0; i<crtnCnt; i++) {
+					devInfo.loadInfo[swCnt+i] = {"type":"curtain", "icon":"curtain", "devId":macAdd, "name":"Device-"+(swCnt+i+1)};
 				}
 				__remoteDevInfoConf.set(macAdd, devInfo);
 				__remoteDevInfoConf.save();
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
 				if(!maxId || maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}
-				for(var i=0; i<swCnt; i++) {
+				for(var i=0; i<swCnt+crtnCnt; i++) {
 					group.controls.push({"id":i+1, "devId":macAdd, "switchID":i});
 				}
 				groupConfig.set((++maxId)+"", group);
@@ -323,14 +333,27 @@ var CommandManager = BaseClass.extend({
 			});	
 		},this));
 	},
+	onMoveCurtainCommand : function (commandData) {
+		var devId = commandData.devId, switchId = commandData.switchId, direction=commandData.direction;
+		var device = deviceManager.getDevice(devId);
+		if(!device) 
+			return console.log('device not found');
+  // TODO event should get logged only after curtain action is fully performed.		
+  //	  eventLogger.addEvent("setDuty", {
+  //           'boardId':devId, 
+  //           'pointId':devId+'-l'+switchId,
+  //           'pointKey':switchId,
+  //           'remoteDevice':commandData.deviceType, 
+  //           'state':direction
+  //      });
+		device.moveCurtain(switchId, direction)
+	},
 	onSetDutyCommand : function (commandData) {
 		console.log('setDuty called');
 		var devId = commandData.devId, switchId = commandData.switchId, duty=commandData.duty;
 		var device = deviceManager.getDevice(devId);
-		if(!device) {
-			console.log('device not found');
-			return;
-		}
+		if(!device) 
+			return console.log('device not found');
 		eventLogger.addEvent("setDuty", {
             'boardId':devId, 
             'pointId':devId+'-l'+switchId,

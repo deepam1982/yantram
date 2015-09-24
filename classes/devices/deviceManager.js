@@ -1,10 +1,9 @@
 var __ = require("underscore");
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var BaseDevice = require(__rootPath+"/classes/devices/baseDevice");
-var SwitchBoardV1 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV1");
-var SwitchBoardV2 = require(__rootPath+"/classes/devices/switchBoards/switchBoardV2");
 var SwBd01 = require(__rootPath+"/classes/devices/switchBoards/swBd01");
 var SwBd02 = require(__rootPath+"/classes/devices/switchBoards/swBd02");
+var CrtnCtrl01 = require(__rootPath+"/classes/devices/curtainControllers/crtnCtrl01");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
@@ -74,10 +73,9 @@ var DeviceManager = BaseClass.extend({
 	_registerNewDevice : function (type, deviceId, callback) {
 		if(this._deviceMap[deviceId]) return;
 		switch (type) {
-			case "SWITCHBOARDV1" : var device = new SwitchBoardV1 (deviceId, this); break;
-			case "SWITCHBOARDV2" : var device = new SwitchBoardV2 (deviceId, this); break;
 			case "SWBD01"		 : var device = new SwBd01 (deviceId, this); break;
 			case "SWBD02"		 : var device = new SwBd02 (deviceId, this); break;
+			case "CNCR01"		 : var device = new CrtnCtrl01 (deviceId, this); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);

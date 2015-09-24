@@ -242,6 +242,14 @@
 		.appColor_green .theamBGColor{background-color:#69C1A8;}
 
 
+		.unselectable {
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -315,7 +323,7 @@
 	</style>
 	</head>
 
-	<body class='appColor_<$=appColor$> appTheme<$=appTheme$>'>
+	<body class='unselectable appColor_<$=appColor$> appTheme<$=appTheme$>'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>

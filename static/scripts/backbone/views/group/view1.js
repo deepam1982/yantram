@@ -1,6 +1,7 @@
 SwitchViewFactory = function (options) {
 	switch (options.model.get('type')) {
 		case 'dimmer'	: return new AdvanceFanSwitch(options);
+		case 'curtain'	: return new AdvanceCurtainSwitch(options);
 		default		: return new BasicSwitch(options);
 	}
 }

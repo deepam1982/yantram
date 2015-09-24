@@ -123,18 +123,34 @@ EditSwitchParams = BaseView.extend({
 	},
 	setIcon : function (iconName) {
 		var idx = _.indexOf(this.iconList, this.currentIcon);
+		console.log(idx);
 		if(idx != -1)this.iconViewArray[idx].repaint();
 		this.currentIcon = iconName;
 		idx = _.indexOf(this.iconList, iconName);
+		console.log(idx, iconName);
 		var $div = this.iconViewArray[idx].$el.find('img').parent();
 		$div.addClass('theamBGColor');
 		$div.find('.tick').show();
 	}
 });
 
+EditCurtainParams = EditSwitchParams.extend({
+	iconList : ['curtain']
+});
+
+EditParamFactory = function (options) {
+	switch (options.model.get('type')) {
+		case 'curtain'	: return new EditCurtainParams(options);
+		default		: return new EditSwitchParams(options);
+	}
+}
 
 EditableSwitch = AdvanceSwitch.extend({
-	subViews : [{'viewClassName':'EditSwitchParams', 'reference':'editView', 'parentSelector':'.advancePannel', 'model':'this.model', 'supressRender':true}],
+	subViews : [{'viewClassName':'EditParamFactory', 'reference':'editView', 'parentSelector':'.advancePannel', 'model':'this.model', 'supressRender':true}],
+	toggelSwitch : function (event) {
+		if(this.model.get('type') != "curtain")
+			return AdvanceSwitch.prototype.toggelSwitch.apply(this, arguments);
+	},
 	showAdvancePannel : function () {
 		this.$el.find('.iconPartition').hide();
 		AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);

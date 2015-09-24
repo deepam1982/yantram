@@ -120,6 +120,73 @@ AdvanceSwitch = BasicSwitch.extend(AdvancePannel).extend({
 		}
 	}
 })
+
+AdvanceCurtainSwitch = AdvanceSwitch.extend({
+	initialize : function () {
+		AdvanceSwitch.prototype.initialize.apply(this, arguments);
+		this._moveCurtain = _.throttle(_.bind(this.model.moveCurtain, this.model), 200);
+	},
+	render	:	function () {
+ 		AdvanceSwitch.prototype.render.apply(this, arguments);
+ 		var state = this.model.get("state");
+ 		if(!this.$curtainControls)
+ 		this.$curtainControls = $(
+ 			"<div class='unselectable' style='text-align:center; width:200px; margin:auto;'>\
+ 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"whiteBG")+"' style='float:left; margin:15px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
+ 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"whiteBG")+"' style='float:right; margin:15px 60px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
+ 				<div style='clear:both'></div>\
+ 			</div>"
+ 		)//don't convert background-image div to img-tag, as on phones it dosn't trigger touchend after longtab.
+ 		this.$el.find('.advancePannel').append(this.$curtainControls);
+ 		return this;
+ 	},
+ 	erase	: function () {
+ 		if(!this.openCurtainTimer && !this.closeCurtainTimer && this.$curtainControls)
+ 		{console.log("removing curtain control UI!!");this.$curtainControls.remove(); this.$curtainControls=null;}
+ 		return AdvanceSwitch.prototype.erase.apply(this, arguments);
+ 	},
+ 	showAdvancePannel : function () {
+ 		if(this.model.get('disabled')) return;
+ 		return AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
+ 	},
+ 	done : function () {
+ 		this.stopCurtain();
+ 		return AdvanceSwitch.prototype.done.apply(this, arguments);
+ 	},
+ 	events  : { //TODO extend events hirarchy is not working 
+ 		"tap .advancePannel .cross" : "done"
+		,"tap .toggelSwitch" : "showAdvancePannel"
+		,"longTap .toggelSwitch" : "showAdvancePannel"
+		,"touchstart .openCurtain" : "openCurtain"
+		,"touchstart .closeCurtain" : "closeCurtain"
+		,"touchend .openCurtain" : "stopCurtain"
+		,"touchend .closeCurtain" : "stopCurtain"
+		
+	},
+	closeCurtain : function (event) {
+		if(!event && this.model.get("state") == "off") return this.stopCurtain();
+		console.log("closeCurtain");
+		this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		this.model.moveCurtain("close");
+		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 400);
+	},
+	openCurtain : function (event) {
+		if(!event && this.model.get("state") == "off") return this.stopCurtain();
+		console.log("openCurtain");
+		this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		this.model.moveCurtain("open");
+		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 400);
+	},
+	stopCurtain : function() {
+		console.log("stopCurtain");
+		this.model.moveCurtain("stop");
+		clearTimeout(this.openCurtainTimer);
+		clearTimeout(this.closeCurtainTimer);
+		this.openCurtainTimer = this.closeCurtainTimer = null;
+		this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+	}
+})
+
 AdvanceFanSwitch = AdvanceSwitch.extend({
 	initialize : function () {
 		_.bindAll(this, 'onDutyChange');

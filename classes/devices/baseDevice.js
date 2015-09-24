@@ -2,6 +2,7 @@ var BaseClass = require(__rootPath+"/classes/baseClass");
 var BaseVirtualDevice = require(__rootPath+"/classes/virtualDevices/baseDevice");
 var Load = require(__rootPath+"/classes/virtualDevices/load");
 var Sensor = require(__rootPath+"/classes/virtualDevices/sensor");
+var CurtainControl = require(__rootPath+"/classes/virtualDevices/curtainControl");
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var __ = require("underscore");
 __.mixin({
@@ -16,12 +17,15 @@ var BaseDevice = BaseClass.extend({
 	numberOfSwitches : 0,
 	numberOfDimmers : 0,
 	numberOfSensors : 0,
+	numberOfCurtainControls : 0,
 	id : null,
 	init : function (deviceId, router) {
 		this.reachable = true;
 		this.switchState = [];
 		this.dimmerState = [];
 		this.sensorState = [];
+		this.curtainControlState = [];
+		this.curtainControl
 		this.isSensorActive = [];
 		this.virtualNodes = {};
 		this.id = deviceId;
@@ -30,9 +34,19 @@ var BaseDevice = BaseClass.extend({
 		this._initSwitches();
 		this._initDimmers();
 		this._initSensors();
+		this._initCurtainControl();
 		this.syncCallbackStack = [];
 		this.syncState();
 
+	},
+	_initCurtainControl : function () {
+		__.times(this.numberOfCurtainControls, function(indx){
+			this.curtainControlState.push(0);
+			var opnSwIndx = this.numberOfSwitches - 2*(this.numberOfCurtainControls-indx), cloSwIndx = 1+opnSwIndx;
+			var curtainSwitches = [this.virtualNodes[this.id+"-l"+opnSwIndx],this.virtualNodes[this.id+"-l"+cloSwIndx]]
+			var crtnCtrl = new CurtainControl({'state':0, 'id':this.id+"-c"+indx, 'deviceId':this.id, 'switches':curtainSwitches});
+			this.virtualNodes[crtnCtrl.id] = crtnCtrl;
+		}, this);
 	},
 	_initSwitches : function () {
 		__.times(this.numberOfSwitches, function(indx){
@@ -97,8 +111,6 @@ var BaseDevice = BaseClass.extend({
 			var vDev = this.getVirtualLoad(indx);//this.virtualNodes[this.id+"-l"+indx];
 			if(vDev._initSyncDone && !vDev.syncPending && vDev.state ^ this.switchState[indx]) {
 				console.log("@@@@@@@@@ switch manually toggelled @@@@@@@@@@@");
-				//TODO get rid of following hack.
-				if(-1 == __.indexOf(['0041544e-l0','0041544e-l1','0041544e-l2','0041544e-l5'], vDev.id))
 				eventLogger.addEvent("toggelSwitch", {
 					'boardId':this.id, 
 					'pointId':vDev.id,
@@ -157,9 +169,12 @@ var BaseDevice = BaseClass.extend({
 	_makeStateJson : function () {
 		var switchState = {}
 		__(this.numberOfSwitches).times(function (i) {
-			switchState[i+""] = {"state":this.switchState[i]}
-//			var vDev = this.virtualNodes[this.id+"-l"+i];
-//			switchState[i+""] = {"state":this.switchState[i], "followCount":__.keys(vDev.followObjs).length};
+			if(i <  (this.numberOfSwitches - 2*this.numberOfCurtainControls))
+				switchState[i+""] = {"state":this.switchState[i]}
+		}, this);
+		var curtainControlState = {};
+		__(this.numberOfCurtainControls).times(function (i) {
+			curtainControlState[i+""] = {"state":this.curtainControlState[i]};
 		}, this);
 		var dimmerState = {}
 		__(this.numberOfDimmers).times(function (i) {
@@ -170,7 +185,7 @@ var BaseDevice = BaseClass.extend({
 			sensorState[i+""] = {"state":this.sensorState[i], "Active":this.isSensorActive[i]};
 		}, this);
 		var retObj = {reachable : this.reachable};
-		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState};
+		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState, "curtain":curtainControlState};
 		this.stateJson = retObj;
 	},
 	applyConfig : function (conf) {

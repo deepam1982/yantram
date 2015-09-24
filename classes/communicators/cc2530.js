@@ -40,7 +40,8 @@ var CC2530Controller = BaseCommunicator.extend({
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0302')
-		 	 // console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		 	// console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		if(data.length < 8 && msgTypeCode == '0302') return; 	 
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		if(!clbk && msgTypeCode == '0302') msgTypeCode = '0302a'
 		this._pendingReqCallbackMap[msgTypeCode] = null;
@@ -130,7 +131,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		var nwkAdd = devId?this._getNwkAdd(devId):'';
 		var queryInHexStr = this._buildQuery(queryObj)
 		var cbk = function (err, results, queryInHxStr) {
-//			console.log( "$$$$$$$$$$$$$$$$$$$$$ sent query - "+queryInHxStr);
+			// console.log( "$$$$$$$$$$$$$$$$$$$$$ sent query - "+queryInHxStr);
 			callback && callback(err, results, queryInHxStr);
 		}
 		this._queryQ.push({'query':"\x2B"+queryInHexStr+nwkAdd+"\x0D", 'callback':cbk, 'queryInHexStr':queryInHexStr});
@@ -144,6 +145,8 @@ var CC2530Controller = BaseCommunicator.extend({
 			}, this), 10); // this was earlier 50ms, but then I thought 10ms is fine.
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
+		if(queryInHexStr == "0302")
+			this._pendingReqCallbackMap["0302"] = function() {};
 	},
 	getNetworkKey : function (callback, retrying) {
 		var qry="0102";
@@ -220,11 +223,13 @@ var CC2530Controller = BaseCommunicator.extend({
 			this._pendingReqCallbackMap["0202"] = __.bind(function (err, macId) {
 				if(err) callback(err);
 				console.log("got response of 0202 query");
-				console.log(macId)
+				console.log(macId);
+				var moduleType = macId.substr(16,6)
+				macId = macId.substr(0,16);
 				this.sendQuery(null, {name:"0102"}); //send network info on serial
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
-				callback(err, macId);
+				callback(err, macId, moduleType);
 				setTimeout(__.bind(function () {
 					this.sendQuery(null, {name:"0200"}); // restart connected device to disable UART
 					this.sendQuery(null, {name:"0100"});

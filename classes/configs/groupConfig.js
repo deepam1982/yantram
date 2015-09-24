@@ -39,6 +39,8 @@ var GroupConfigManager = BasicConfigManager.extend({
 		conf.disabledCtls = 0; 
 		__.each(conf.controls, function (ctl) {
 			var cnt = __.keys(ctl).length;
+			var curtainId = parseInt(ctl.switchID) - parseInt(__remoteDevInfoConf.get(ctl.devId+'.loads.normal'));
+			if(curtainId > -1) ctl['curtainId'] = curtainId;
 			__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
 				ctl[key] = val;
 			});
@@ -46,8 +48,17 @@ var GroupConfigManager = BasicConfigManager.extend({
 			var config = deviceManager.getConfig(ctl.devId);
 			ctl.disabled = (!config)?true:((!config.reachable)?true:false);
 			(ctl.disabled && conf.disabledCtls++);
-			ctl.state = (!config)?false:config[ctl.devId]["switch"][ctl.switchID]["state"];
-			ctl.state = (ctl.state)?'on':'off';
+			ctl.state = false;
+			if(config){
+				if(curtainId > -1){
+					ctl.state = config[ctl.devId]["curtain"][ctl.curtainId]["state"];
+					ctl.state = (ctl.state)?ctl.state:'off';
+				}
+				else{
+					ctl.state = config[ctl.devId]["switch"][ctl.switchID]["state"];
+					ctl.state = (ctl.state)?'on':'off';
+				}
+			}
 			var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);
 			ctl.autoOff = timers.autoOff[0];
 			if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
@@ -64,7 +75,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 					ctl.autoToggleTime = ((hour<10)?'0':'')+hour+':'+((min<10)?'0':'')+min;	
 				}
 			}
-			if (config && (ctl.switchID == 0 || ctl.switchID == 1)) {
+			if (config && config[ctl.devId]["dimmer"] && config[ctl.devId]["dimmer"][ctl.switchID]) {
 				ctl.duty = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
 			}
 		});
