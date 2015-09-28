@@ -98,11 +98,12 @@ var BaseDevice = BaseClass.extend({
 	_logDVST : function (msg) {
 		console.log("#### DVST of "+this.id+" is " + msg.substr(4));
 	},
-	_onMsgRecieved : function (type, msg) {
+	_onMsgRecieved : function (type, msg, callback) {
 		if (type == "DVST") {
 			this._recordDeviceStatus(msg);
 		}
 		else console.log(((type)?type:"")+msg);
+		if(callback) callback();
 	},
 	_recordDeviceStatus : function (msg) {
 		this._logDVST(msg);

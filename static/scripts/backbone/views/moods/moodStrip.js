@@ -15,7 +15,7 @@ MoodStripView = BaseView.extend({
 		var $elm = $(event.target).closest('.moodIcon');
 		var moodModel = this.collection.get($elm.attr('moodId'));
 		console.log(moodModel);
-		$elm.append('<img src="static/images/loading.gif" style="position:absolute;left:-6px;top:0px;"/>')
+		$elm.append('<img src="static/images/loading.gif" style="position:absolute;left:-9px;top:-2px;width:60px;"/>')
 		moodModel.sendActionRequest("applyMood", {'id':$elm.attr('moodId'), 'icon':$elm.attr('moodIconName')}, function (err){
 			setTimeout(function (){$elm.find('img').remove()}, 1000);
 			if(err)console.log(err)

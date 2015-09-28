@@ -61,7 +61,7 @@ var DeviceManager = BaseClass.extend({
 				deviceInfoConfig.save();
 			}
 		}
-		if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg); // its device's job to handel its own msg
+		if (this._deviceMap[deviceId]) this._deviceMap[deviceId].emit('msgRecieved', type, msg, callback); // its device's job to handel its own msg
 		else {
 			// message from unregistered device
 			console.log("#### Msg:"+msg+" from Unregistered Device:"+deviceId);
