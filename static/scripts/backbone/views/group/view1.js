@@ -38,7 +38,8 @@ GroupView1 = BaseView.extend({
 	},
 	onPowerOffClick : function (event) {
 		var $loader;
-		$(event.target).closest('.roomTitleCont').append($loader=$('<img class="powerOffSpinner" src="static/images/loading.gif"/>'))
+//		$(event.target).closest('.roomTitleCont').append($loader=$('<img class="powerOffSpinner" src="static/images/loading.gif"/>'))
+		$(event.target).closest('.roomTitleCont').append($loader=$('<i class="powerOffSpinner brightColor fa fa-spinner fa-spin"></i>'))
 		this.model.powerOff(function () {setTimeout(function (){$loader.remove()}, 1000)});
 	}
 });

@@ -11,11 +11,11 @@ $('#burgerImageCont').on('tap', function () {
 	var $appContPar = $('#appCont').parent();
 	if($menuContPar.css('display') == 'block') {
 		$menuContPar.hide();
-		$appContPar.css('width', '100%');
+//		$appContPar.css('width', '100%');
 	}
 	else {
 		$menuContPar.show();
-		$appContPar.css('width', '62%');				
+//		$appContPar.css('width', '62%');				
 	}
 });
 fixMoodStrip = false; //true; //false;
@@ -72,10 +72,10 @@ var setAppTheamColor = function (appTheme, themeColor) {
 		appTheam = appTheam.toLowerCase();
 		themeColor = themeColor.toLowerCase();
 		switch(themeColor) {
-			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = '#F3CBCB', traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
-			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = '#F3CBCB', traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
-			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = '#93CBEB', traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
-			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = '#E3DBCB', traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;
+			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = (appTheam=='maze')?'#F3CBCB':"#EE972D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = (appTheam=='maze')?'#F3CBCB':"#9E171D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = (appTheam=='maze')?'#93CBEB':"#5EA5F3", traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
+			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = (appTheam=='maze')?'#E3DBCB':"#69C1A8", traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;
 		}
 
 		color=(servedFromCloud)?"#69C1A8":color;

@@ -10,8 +10,8 @@ Backdrop = BaseView.extend({
 		if(!this.elmArr) this.elmArr = [];
 		$elm.attr('oldStyle', $elm.attr('style'));
 		if(this.cloneOnPullup) $elm.after($elm.clone());
-		var left = $elm.offset().left - this.$el.offset().left;
-		var top = $elm.offset().top - this.$el.offset().top;
+		var left = $elm.position().left - this.$el.position().left;
+		var top = $elm.position().top - this.$el.position().top;
 		$elm.css('left', left);
 		$elm.css('top', top);
 		var match = $elm.attr('style').match(/[^-]width[: ]+([0-9]+)/);
@@ -66,11 +66,11 @@ AdvancePannel = {
 		"tap .advancePannel .cross" : "done"
 	},
 	done : function () {
-		this.animateAdvancePannel=true;
+//		this.animateAdvancePannel=true;
 		this.hideAdvancePannel();
 	},
 	showAdvancePannel : function () {
-		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
+//		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
 		if(this.bd) return;
 		this.bd = new Backdrop({'$parent':$('#mainCont')});
 		this.bd.cloneOnPullup = true;
@@ -194,8 +194,13 @@ AdvanceFanSwitch = AdvanceSwitch.extend({
 		this.animateAdvancePannel=true;
 		AdvanceSwitch.prototype.initialize.apply(this, arguments);
 	},
+	done : function () {
+		this.animateAdvancePannel=true;
+		AdvanceSwitch.prototype.done.apply(this, arguments);
+	},
 	showAdvancePannel : function () {
 		this.$slider.hide();
+		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
 		AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
 		this.$slider.show();
 	},

@@ -3,7 +3,18 @@
 <HTML>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
 	<style>
+		*::selection {background-color:transparent;} 
+		*::-moz-selection{background-color:transparent;}
+		*{-webkit-user-select: none;-moz-user-select: -moz-none;
+		    /*IE10*/-ms-user-select: none; user-select: none;
+		    /*You just need this if you are only concerned with android and not desktop browsers.*/
+		    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}    
+		input[type="text"], textarea, [contenteditable]
+		{ -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;}
+
 		html, body{
 			width:100%;
 			height: 100%;
@@ -161,8 +172,9 @@
 			padding:10px;
 		}
 		.trapTheam .powerButton {
+			font-size: 20px;
 			right:15px;
-			top:-7px;
+			top:-4px;
 		}
 		.editButton {
 			display: none;
@@ -173,6 +185,9 @@
 			margin-top:-7px;
 		}
 		.deleteMood, .editMood, .editViewCont .editButton {display: block;}
+		.addGroupButton.editButton {
+			padding:0px;
+		}
 
 		.switchCont {
 			font-size: 14px;
@@ -200,10 +215,10 @@
 			font-size: 12px;
 		}
 		.switchToggleSpinner {
-			position:absolute;left:3px;top:-4px;width:60px;
+			position:absolute;left:9px;top:-2px;font-size:50px;
 		}
 		.powerOffSpinner {
-			position:absolute;right:14px;top:-4px;width:40px;
+			position:absolute;right:14px;top:-4px;font-size:40px;
 		}
 
 		#experiment, #experiment1{
@@ -216,7 +231,7 @@
 		}
 		.popupPannel .cross, .advancePannel .cross {
 			position:absolute;
-			right:5px;top:4px;
+			right:-10px;top:-12px;
 			cursor:pointer;
 			font-size:10px;
 			height:35px; width:50px;
@@ -256,6 +271,8 @@
 		.basicSwitchTemplate {
 			float:left;position:relative;border-radius:3px;
 			margin:20px 5px 30px;padding-top:2px;
+			border-width: 0px; 
+		  	border-style:solid;
 		}
 		.trapTheam .basicSwitchTemplate {
 			margin:18px 5px 5px;
@@ -263,6 +280,7 @@
 
 		.onBackdrop .basicSwitchTemplate {
 			padding-top: 10px; margin-top: 7px;
+			border-width: 0px;
 		}
 
 		.schedularCont .done,
@@ -300,6 +318,10 @@
 		.translucentBg50{
 			background-color:rgba(0,0,0,0.5);
 		}
+		.translucentBg70{
+			background-color:rgba(0,0,0,0.7);
+		}
+
 
 		.fanSlider {
 			margin:20px 0 0 10px !important;
@@ -428,7 +450,7 @@
 			<div class='headerCont' style='width:100%;float:left;'>
 				<div class='translucentBg30' style='width:100%;height:50px;box-shadow: 0px 1px 10px #333333;'></div>
 				<div id='header'>
-					<div style="font-weight:200;font-size:28px;margin:-43px 0 -1000px 0;padding:0 0 1000px; width:100%;">
+					<div style="font-weight:200;font-size:28px;margin:-43px 0 0 0;padding:0; width:100%;">
 						<div style='padding:0 20px;'>
 							<a href='' style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
@@ -441,7 +463,7 @@
 				<div id='appCont' class='appArea'></div>
 			</div>
 			
-			<div id='sideMenuCont' class='translucentBg30' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			<div id='sideMenuCont' class='translucentBg70' style='position:absolute; top:0px; bottom:0px; right:0px; width:38%; z-index:99; display:none'></div>
 			<div style='clear:both;'></div>	
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer'></div>
 		</div>
@@ -461,6 +483,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea brightColor'>
+			<i class='fa fa-arrow-right hideMe' style='position:absolute;top:2px;right:11px;font-size:23px;cursor:pointer; padding:10px'></i>
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
@@ -476,7 +499,10 @@
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
 		<div style='padding:20px;' class='translucentBg50'>
-			<img class='whiteBG' src='/static/images/connected_module.png' style='width:100%;'/>
+			<div style='position:relative;'>
+				<img class='whiteBG' src='/static/images/connected_module.png' style='width:100%;'/>
+				<div class='theamBGColor whiteImageMask' style='position:absolute;top:0px; bottom:0px;width:100%; opacity:0.2; filter:alpha(opacity=20);'></div>
+			</div>
 			<br/><br/>
 			<div class='configuredModuleDisplay' style='display:none;'>
 				<div class='helpText'>Please wait till the exclamation mark go away, should be about 40 seconds.</div>
@@ -694,9 +720,10 @@
 			<div id='groupTitleHeaderForTrapTheam'></div>
 			<div class="roomTitleCont translucentBg45 brightColor" style='position:relative;'>
 				<span style="text-align:left;text-transform: uppercase;float:left;padding: 0 0 10px 0;"><%=name%></span>
-				<img class='powerButton' src="static/images/power2.png" style=""/>
-				<span class='editButton theamTextColor deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
-				<span class='editButton theamTextColor editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
+				<i class='powerButton fa fa-power-off'></i>
+				<i class='editButton deleteGroup fa fa-trash-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
+				<i class='editButton editGroup fa fa-pencil-square-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
+				
 				<div style='clear:both;'></div>
 			</div>
 			<div class='translucentBg50'>
@@ -742,7 +769,11 @@
 			<%}%>
 
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross theamTextColor'><b>Done</b></div>
+				<div class='cross theamTextColor'>
+				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+				<br/>
+				<b>Done</b>
+				</div>
 			</div>
 			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
 		</div>
@@ -751,15 +782,17 @@
 		<div class="titleCont theamBGColor brightColor">
 		<span style="text-align:left;">Device Settings</span>
 		<br/><br/>
-		<span class='helpText' style='float:left;'>Long press device icon to edit device parameters</span>
-		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
+		<span class='helpText' style='float:left;'>Long press icons to edit parameters</span>
+		<i class='editButton addGroupButton fa fa-object-group' style='float:right;display:block;margin:-28px 20px 0 0; font-size:22px;'></i>
+		<br/>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px -3px 10px 0;'>create group</span>
 		<div style='clear:both;'></div>
 		</div>
 		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editMoodPageTemplate">
-		<div class="titleCont theamBGColor brightColor"><span style="text-align:left;">Mood Settings</span></div>
+		<div class="titleCont theamBGColor brightColor" style="padding-bottom:10px;"><span style="text-align:left;">Mood Settings</span></div>
 		<br/>
 		<span class='helpText' style=''></span>
 		<span class='editButton addMoodButton brightColor' style='float:right;display:block;margin-right:5px;'>add mood</span>
@@ -770,7 +803,7 @@
 		<div class='theamTextColor' style='padding:0px 10px 10px 70px;'>
 			<br/>
 			<span class='editColumn'>Name</span>
-			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
 			<br/>
 			<span class='editColumn'>Type</span>
 			<div class='typeRadioCont'>
@@ -824,7 +857,11 @@
 			</div>
 			<br/>
 			<span class='editColumn'>Icon</span>
-			<div style='background-color:white;border-radius:4px;padding:5px;'><div class='iconCont'></div><div style='clear:both;'></div></div>
+			<div style='background-color:white;border-radius:4px;padding:5px;position:relative;'>
+				<div class='iconCont'></div>
+				<div class='theamBGColor' style='position:absolute;top:0px;bottom:0px;left:0px;right:0px;opacity:0.3;filter:alpha(opacity=30);'></div>
+				<div style='clear:both;'></div>
+			</div>
 			 
 		</div>
 	</script>

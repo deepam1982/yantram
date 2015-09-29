@@ -3,7 +3,18 @@
 <HTML>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
 	<style>
+		*::selection {background-color:transparent;} 
+		*::-moz-selection{background-color:transparent;}
+		*{-webkit-user-select: none;-moz-user-select: -moz-none;
+		    /*IE10*/-ms-user-select: none; user-select: none;
+		    /*You just need this if you are only concerned with android and not desktop browsers.*/
+		    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}    
+		input[type="text"], textarea, [contenteditable]
+		{ -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;}
+
 		body{
 			width:100%;
 			height: 100%;
@@ -93,7 +104,8 @@
 			color: black;
 			font-size: 15px;
 			margin-bottom: -20px;
-			font-weight:400; 
+			font-weight:400;
+			padding-top: 8px; 
 		}
 		.groupView {
 			margin: 10px 0px 0px;
@@ -110,6 +122,16 @@
 		}
 		.editViewCont .powerButton {
 			display: none;
+		}
+		.powerButton {
+			width:15px;
+			float:right;
+			margin-top:1px;
+			cursor:pointer;
+			position:absolute;
+			right:-5px;
+			top:-8px;
+			padding:10px;
 		}
 		.editButton {
 			display: none;
@@ -150,10 +172,10 @@
 			font-size: 12px;
 		}
 		.switchToggleSpinner {
-			position:absolute;left:-7px;top:-2px;width:90px;
+			position:absolute;left:2px;top:5px;font-size:70px;
 		}
 		.powerOffSpinner {
-			position:absolute;right:-16px;top:-12px;width:55px;
+			position:absolute;right:-8px;top:-10px;font-size:40px;
 		}
 
 		#experiment, #experiment1{
@@ -330,7 +352,7 @@
 		<div class='' id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
-					<div style="font-weight:200;font-size:28px;margin-bottom:18px;margin-bottom:-1000px;padding-bottom:1000px;">
+					<div style="font-weight:200;font-size:28px;margin-bottom:18px;">
 						<a href='' style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
 						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 							<img id='burgerImage' class='theamBGColor' style='width:25px;' src="/static/images/transparentBurgerIcon.png"></img>
@@ -340,7 +362,7 @@
 				<br/>
 				<div id='appCont' class='appArea'></div>
 			</div>
-			<div id='sideMenuCont' class='theamBGColor' style='float:left;width:38%;margin-bottom:-1000px;padding-bottom:1000px;display:none'></div>
+			<div id='sideMenuCont' class='theamBGColor' style='position:absolute; top:0px; bottom:0px; right:0px; width:38%; border-left:2px solid white;  z-index:99; display:none'></div>
 			<div style='clear:both;'></div>	
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
 		</div>		
@@ -360,6 +382,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea theamBGColor'>
+			<i class='fa fa-arrow-right hideMe' style='position:absolute;top:22px;right:22px;font-size:20px;cursor:pointer;padding:10px'></i>
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
@@ -592,9 +615,9 @@
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
-				<img class='powerButton' src="static/images/power.png" style="width:15px;float:right;margin-top:1px;cursor:pointer;position:absolute;right:-5px;top:-8px;padding:10px;"/>
-				<span class='editButton deleteGroup' style='float:right; padding:10px 0 10px 20px;'>delete</span>
-				<span class='editButton editGroup' style='float:right; padding:10px 0 10px 20px;'>edit</span>
+				<i class='powerButton fa fa-power-off'></i>
+				<i class='editButton deleteGroup fa fa-trash-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
+				<i class='editButton editGroup fa fa-pencil-square-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
 				<div style='clear:both;'></div>
 			</div>
 			<br/>
@@ -650,12 +673,12 @@
 	<script type="text/template" id="editPageTemplate">
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
 		<br/>
-		<span class='helpText' style=''>Long press device icon to edit device parameters</span>
+		<span class='helpText' style='float:left;'>Long press icons to edit parameters</span>
 		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
 		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
-	<script type="text/template" id="editMoodPageTemplate">
+	<script type="text/tonlyemplate" id="editMoodPageTemplate">
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Mood Settings</span></div>
 		<br/>
 		<span class='helpText' style=''></span>
@@ -667,7 +690,7 @@
 		<div style='padding:0px 10px 10px 70px;'>
 			<br/>
 			<span class='editColumn'>Name</span>
-			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>'></input></div>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
 			<br/>
 			<span class='editColumn'>Type</span>
 			<div class='typeRadioCont'>

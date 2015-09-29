@@ -119,6 +119,7 @@ EditSwitchParams = BaseView.extend({
 		this.setIcon(this.model.get('icon'));
 		this._showHideAutoOff(this.$el.find('.autoOffRadioCont input[type="radio"]#autoOffEnable:checked').length);
 		this.schEditor.scheduleId = null;
+		setTimeout(_.bind(function(){this.$el.find('.switchName').removeAttr('readonly')}, this),500);
 		return this;
 	},
 	setIcon : function (iconName) {
@@ -154,11 +155,10 @@ EditableSwitch = AdvanceSwitch.extend({
 	showAdvancePannel : function () {
 		this.$el.find('.iconPartition').hide();
 		AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
-		this.$el.css('top', '50px');
-		this.editView.render();		
-		var top = this.$el.closest('.groupView').offset().top
-		top = top - Math.max(150+top + this.editView.$el.height(), $('body').height()) + $('body').height()
-		this.$el.css('top', top+'px');
+		this.editView.render();	
+		var left = this.$el.offset().left;
+		var top = ($(window).height() - this.$el.height())/2
+		if(top > 0) this.$el.css('top', top+'px').css('left', left+'px').css('position','fixed');
 		setTimeout(_.bind(function () {this.$el.find('.checked').prop("checked", true);}, this), 20);
 	},
 	hideAdvancePannel : function () {
