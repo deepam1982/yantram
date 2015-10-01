@@ -21,7 +21,8 @@ $('#burgerImageCont').on('tap', function () {
 fixMoodStrip = false; //true; //false;
 lastScrollTop=0;
 hideMoodStrip = function () {
-	$('.footer').animate({'bottom':-parseInt($('.footer').height())}, 300);
+	if($(document).height() - $(window).height() - $(window).scrollTop() > $('.footer').height())
+		$('.footer').animate({'bottom':-parseInt($('.footer').height())}, 300);
 };
 hideMoodStripTimer = setTimeout(hideMoodStrip, 5000);
 $(window).scroll(function (){
@@ -72,7 +73,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 		appTheam = appTheam.toLowerCase();
 		themeColor = themeColor.toLowerCase();
 		switch(themeColor) {
-			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = (appTheam=='maze')?'#F3CBCB':"#EE972D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
+			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = (appTheam=='maze')?'#F3CBCB':"#EE972D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#E7CDB0':color; break;
 			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = (appTheam=='maze')?'#F3CBCB':"#9E171D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
 			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = (appTheam=='maze')?'#93CBEB':"#5EA5F3", traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
 			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = (appTheam=='maze')?'#E3DBCB':"#69C1A8", traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;
