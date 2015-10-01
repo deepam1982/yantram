@@ -110,6 +110,9 @@
 		.groupView {
 			margin: 10px 0px 0px;
 		}
+		.onBackdrop .groupView {
+			margin: 0px 0px 0px;
+		}
 		.popupPannel, .moodView, .editViewCont .groupView {
 			background:white;
 			border-width:1px; 
@@ -143,6 +146,9 @@
 		}
 		.deleteMood, .editMood, .editViewCont .editButton {display: block;}
 
+		.deleteMood.editButton, .editMood.editButton {
+			margin-top:0px;	
+		}
 		.switchCont {
 			font-size: 14px;
 		}
@@ -188,7 +194,7 @@
 		}
 		.popupPannel .cross, .advancePannel .cross {
 			position:absolute;
-			right:5px;top:4px;
+			right:-5px;top:-4px;
 			cursor:pointer;
 			font-size:10px;
 			height:35px; width:50px;
@@ -199,13 +205,14 @@
 		}
 		.disabledScreen {
 			position:absolute;
-			height:40px; width:40px;
-			background-image: url("/static/images/transparentExclamation.png");
+			height:41px; width:41px;
+			/*background-image: url("/static/images/transparentExclamation.png");*/
 			background-size:40px 40px;
 			background-repeat: no-repeat;
 			right: 0px;
 			bottom: 15px;
 			border-radius: 22px;
+			font-size: 38px;
 		}
 
 		.tick {
@@ -224,6 +231,17 @@
 		.editMoodCont .toggelSwitchBackgroundDiv{
 			opacity: 0.5;
 			filter: alpha(opacity=50);
+		}
+		.editMoodCont .iconPartition {
+			margin: 5px 0px;
+		}
+		.editMoodCont .switchProxyCont {
+			border-bottom: 1px solid #CCCCCC;
+			margin:0px 10px 0 8px;
+		}
+
+		.deviceGroupCont .switchProxyCont{
+			margin-bottom:10px;
 		}
 
 		.basicSwitchTemplate {
@@ -245,8 +263,10 @@
 			font-size:12px; 
 			font-weight:500;	
 		}
+		.font14 {font-size:14px;}
 		.font12 {font-size:12px;}
 		.font10 {font-size:10px;}
+		.font8 {font-size:8px;}
 
 		.whiteBG{background-color: white;}
 		.whiteBorderColor{border-color:white;}
@@ -272,6 +292,8 @@
 			-ms-user-select: none;
 			user-select: none;
 		}
+
+		.overflowScroll {overflow:auto}
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -554,32 +576,41 @@
 		<div class="moodProxyCont" style='padding:0px 15px; text-align:center;'></div>
 	</script>
 	<script type="text/template" id="moodViewTemplate">
-		<div class='popupPannel editTemplateCont theamBorderColor' style='display:none; width:100%;position:relative;margin-top:-20px;'>
-			<div class='cross' style='top:10px;'><b>Done</b></div>
+		<div class='popupPannel theamBorderColor' style='display:none; width:100%;position:relative;'>
+			<div class='editTemplateCont' style='position:relative;'>
+				<div class='cross' style='top:5px;right:0px;'>
+					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+					<br/>
+					<b>Done</b>
+				</div>
+			</div>	
 		</div>
 		<div style='clear:both;'></div>	
 		<div class='moodView theamBorderColor'>
 			<div class="moodTitleCont theamBGColor" style=''>
 				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
 				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
-				<span class='editButton deleteMood' style='float:right;margin:0px; padding:10px;'>delete</span>
-				<span class='editButton editMood' style='float:right;margin:0px; padding:10px;'>edit</span>
+				<i class='editButton deleteMood fa fa-trash-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
+				<i class='editButton editMood fa fa-pencil-square-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
 				<div style='clear:both;'></div>
 			</div>
 			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
-				<div class='moodGroupCont'>
+<!--			<div class='moodGroupCont'>
 					<div style='margin-left:-50px;'><%=group.name%></div>
-					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
-						<div class='iconPartition' style='width:55px;float:left;text-align:center;cursor:pointer;'>
-							<div style='width:54px;height:54px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
-								<img style="width:55px;height:55px;cursor:pointer;margin-top:-1px;" src='static/images/transparent/<%=ctl.icon%>.png' />
+-->					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
+						<div class='iconPartition' style='margin:5px 0px;width:65px;float:left;text-align:center; cursor:pointer;'>
+							<div style='width:64px;height:64px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
+								<img style="width:65px;height:65px;cursor:pointer;margin-top:-1px;" src='static/images/transparent/<%=ctl.icon%>.png' />
 							</div>	
-							<span class='font12'><%=ctl.name%></span>
+							<span class='font14'><%=ctl.name%></span>
+							<br/>
+							<span class='font8'>(<%=group.name%>)</span>
 						</div>
 					<%}%>	
-				</div>
+<!--			</div>
 				<div style='clear:both;'></div>	
-			<%}%>	
+-->			<%}%>
+			<div style='clear:both;'></div>		
 		</div>	
 	</script>
 	<script type="text/template" id="editMoodTemplate">
@@ -607,8 +638,9 @@
 				<%}%>	
 				<br/><br/>
 			<%}%>
-			<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
+			&nbsp;&nbsp;<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
 			<br/><br/>
+			<div class='deviceGroupCont'></div>
 		</div>	
 	</script>
 	<script type="text/template" id="groupTemplate">
@@ -626,7 +658,11 @@
 			</div>
 			<div style='clear:both;'></div>
 			<div class='advancePannel editTemplateCont' style='display:none; width:100%;position:relative;margin-top:-20px;'>
-				<div class='cross' style='top:10px;'><b>Done</b></div>
+				<div class='cross' style='top:10px;right:0px;'>
+					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+					<br/>
+					<b>Done</b>
+				</div>
 			</div>
 			<div style='clear:both;'></div>	
 		</div>	
@@ -646,6 +682,7 @@
 			<%}%>
 			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
 			<br/><br/>
+			<div class='deviceGroupCont'></div>
 		</div>	
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
@@ -665,9 +702,15 @@
 			<%}%>
 
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
-				<div class='cross'><b>Done</b></div>
+				<div class='cross theamTextColor'>
+					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+					<br/>
+					<b>Done</b>
+				</div>
 			</div>
-			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'></div>
+			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'>
+				<i class='fa fa-exclamation-circle' style='color:white; position:absolute;top:1px;left:4px;'></i>
+			</div>
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
@@ -794,7 +837,6 @@
 		<div style='size:40px; margin:18px 0 0 -60px; font-size:10px; float:left;'><%=name%></div>
 		<div class="switchProxyCont"></div>
 		<div style='clear:both;'></div>	
-		<br/>
 	</script>
 	<script type="text/template" id="fileReaderTemplate">
 		<br/>

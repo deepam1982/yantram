@@ -9,9 +9,16 @@ MoodView = BaseView.extend(Popup).extend({
  	}),
  	showPopUp : function () {
 		this.editPannel.render();
-		return Popup.showPopUp.apply(this, arguments);
+		this.$popup = Popup.showPopUp.apply(this, arguments);
+		var left = this.$popup.offset().left;
+		var top = Math.max(0,($(window).height() - this.$popup.height())/2);
+		this.$popup.css('top', top+'px').css('left', left+'px').css('position','fixed');
+		this.$popup.find('.editTemplateCont').css('max-height',$(window).height()+'px').addClass('overflowScroll');
+		return this.$popup;
  	},
  	hidePopUp : function () {
+ 		this.$popup.find('.editTemplateCont').css('max-height','').removeClass('overflowScroll');
+ 		this.$popup.css('top', '').css('left', '').css('position','');
  		this.editPannel.erase();
 		return Popup.hidePopUp.apply(this, arguments);
  	},

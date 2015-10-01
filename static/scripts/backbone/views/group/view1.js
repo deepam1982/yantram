@@ -76,7 +76,7 @@ DeviceGroupView = BaseView.extend({
 EditGroupPannel = BaseView.extend({
 	name : "EditGroupPannel",
 	templateSelector:"#editGroupTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.editGroupCont', 'array':'deviceCollection'}],
+	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'deviceCollection'}],
 	render : function () {
 		deviceCollection.each(function (dev) {
 			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
@@ -130,10 +130,18 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
 		this.$el.find('.roomTitleCont').hide();
 		this.$el.find('.switchCont').hide();
 		this.editPannel.render();
-		this.$el.css('top',Math.max(10,Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top))+"px");
+
+		var left = this.$el.offset().left;
+		var top = Math.max(0,($(window).height() - this.$el.height())/2)
+		this.$el.css('top', top+'px').css('left', left+'px').css('position','fixed');
+		this.$el.find('.groupView').css('max-height',$(window).height()+'px').addClass('overflowScroll');
+
+//		this.$el.css('top',Math.max(10,Math.min($('body').height()-this.editPannel.$el.height()-30, this.editPannel.$el.offset().top))+"px");
 		
  	},
  	hideAdvancePannel : function () {
+ 		this.$el.find('.groupView').css('max-height','').removeClass('overflowScroll');
+ 		this.$el.css('top', '').css('left', '').css('position','');
  		this.editPannel.erase();
  		this.$el.find('.switchCont').show();
  		this.$el.find('.roomTitleCont').show();

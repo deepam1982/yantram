@@ -45,7 +45,8 @@ Popup = {
 		this.bd.cloneOnPullup = true;
 		var $last = $(_.last(this.$el.find('.popupPannel'))).show();
 		this.bd.pullItOver($last);
-		$last[0].scrollIntoView();
+//		$last[0].scrollIntoView();
+		return $last;
 	},
 	hidePopUp : function () {
 		if(!this.bd) return;
