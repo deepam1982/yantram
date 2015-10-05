@@ -204,6 +204,10 @@
 			color:#BBBBBB;
 			font-size: 12px;
 		}
+		.editHelpText {
+			font-size:10px;padding:5px 0px 0px 20px;display:none;
+		}
+		.editViewCont .editHelpText {display: block;}
 
 		.button {
 		  cursor: pointer;
@@ -756,8 +760,11 @@
 				<div style='clear:both;'></div>
 			</div>
 			<div class='translucentBg50'>
+				<span class='brightColor editHelpText'>Long press following icons to edit device parameters</span>
+				<div style='clear:both;'></div>
 				<div class='switchCont'></div>
 				<div style='clear:both;'></div>
+				
 			</div>	
 			<div id='groupFooterForTrapTheam'></div>
 			<div class='advancePannel editTemplateCont theamBGColor theamTextColor' style='display:none; width:100%;position:relative;'>
@@ -822,7 +829,7 @@
 		<div class="titleCont theamBGColor brightColor">
 		<span style="text-align:left;">Device Settings</span>
 		<br/><br/>
-		<span class='helpText' style='float:left;'>Long press icons to edit parameters</span>
+		<span class='helpText' style='float:left; display:none;'>Long press icons to edit parameters</span>
 		<i class='editButton addGroupButton fa fa-object-group' style='float:right;display:block;margin:-28px 20px 0 0; font-size:22px;'></i>
 		<br/>
 		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px -3px 10px 0;'>create group</span>

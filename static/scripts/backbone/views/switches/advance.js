@@ -67,6 +67,7 @@ AdvancePannel = {
 		"tap .advancePannel .cross" : "done"
 	},
 	done : function () {
+		$('body').css('overflow', '');
 //		this.animateAdvancePannel=true;
 		this.hideAdvancePannel();
 	},
@@ -77,12 +78,15 @@ AdvancePannel = {
 		this.bd.cloneOnPullup = true;
 		this.bd.render();
 		this.bd.pullItOver(this.$el);
-		$(_.last(this.$el.find('.advancePannel'))).show().focus();
-
+		var $lastAdPnl = $(_.last(this.$el.find('.advancePannel')));
+		this.adPnlCss = $lastAdPnl.attr('style');
+		$lastAdPnl.show().focus();
+		$('body').css('overflow', 'hidden');
 	},
 	hideAdvancePannel : function () {
 		if(!this.bd) return;
-		$(_.last(this.$el.find('.advancePannel'))).hide();
+		var $lastAdPnl = $(_.last(this.$el.find('.advancePannel')));
+		$lastAdPnl.attr('style', this.adPnlCss).hide();
 		this.$el.css('position', 'inherit');
 		this.bd.removeView();
 		this.bd = null;
@@ -124,6 +128,7 @@ AdvanceSwitch = BasicSwitch.extend(AdvancePannel).extend({
 
 AdvanceCurtainSwitch = AdvanceSwitch.extend({
 	initialize : function () {
+		_.bindAll(this, 'stopCurtain');
 		AdvanceSwitch.prototype.initialize.apply(this, arguments);
 		this._moveCurtain = _.throttle(_.bind(this.model.moveCurtain, this.model), 200);
 	},
@@ -133,8 +138,8 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		if(!this.$curtainControls)
  		this.$curtainControls = $(
  			"<div class='unselectable' style='text-align:center; width:200px; margin:auto;'>\
- 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"whiteBG")+"' style='float:left; margin:15px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
- 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"whiteBG")+"' style='float:right; margin:15px 60px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
+ 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"whiteBG")+"' style='float:left; padding:15px; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
+ 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"whiteBG")+"' style='float:right; padding:15px; margin:0 40px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
  				<div style='clear:both'></div>\
  			</div>"
  		)//don't convert background-image div to img-tag, as on phones it dosn't trigger touchend after longtab.
@@ -148,10 +153,14 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  	},
  	showAdvancePannel : function () {
  		if(this.model.get('disabled')) return;
- 		return AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
+ 		var ret = AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
+ 		!this.touchendConnected && (this.touchendConnected = true) && $('body').on('touchend', this.stopCurtain)
+ 		return ret
  	},
  	done : function () {
  		this.stopCurtain();
+ 		$('body').off('touchend', this.stopCurtain);
+ 		this.touchendConnected = false;
  		return AdvanceSwitch.prototype.done.apply(this, arguments);
  	},
  	events  : { //TODO extend events hirarchy is not working 
@@ -160,8 +169,9 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 		,"longTap .toggelSwitch" : "showAdvancePannel"
 		,"touchstart .openCurtain" : "openCurtain"
 		,"touchstart .closeCurtain" : "closeCurtain"
-		,"touchend .openCurtain" : "stopCurtain"
-		,"touchend .closeCurtain" : "stopCurtain"
+		// ,"touchend .openCurtain" : "stopCurtain"
+		// ,"touchend .closeCurtain" : "stopCurtain"
+		// ,"touchleave .closeCurtain" : "stopCurtain" 
 		
 	},
 	closeCurtain : function (event) {
@@ -169,14 +179,14 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 		console.log("closeCurtain");
 		this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
 		this.model.moveCurtain("close");
-		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 400);
+		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 1000);
 	},
 	openCurtain : function (event) {
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("openCurtain");
 		this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
 		this.model.moveCurtain("open");
-		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 400);
+		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 1000);
 	},
 	stopCurtain : function() {
 		console.log("stopCurtain");

@@ -150,11 +150,12 @@ var CommandManager = BaseClass.extend({
 					}
 					if(groupIds.length) return callback(null, groupIds);	
 				}
+				console.log("@@@@@@@@@@@@@@@@@@ Module type is",moduleType)
 				switch(moduleType){
-					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0;
-					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0;
-					case "CNCR01" : var noDim=0, swCnt=3, crtnCnt=1;
-					default		  : var noDim=1, swCnt=5, crtnCnt=0;
+					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0; break;
+					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0; break;	
+					case "CNCR01" : var noDim=0, swCnt=3, crtnCnt=1; break;	
+					default		  : var noDim=0, swCnt=5, crtnCnt=0;
 				}
 				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt, "curtain":crtnCnt}, "loadInfo":{},"deviceCode":"xxx", "category":moduleType};
 				for(var i=0; i<swCnt; i++) {
