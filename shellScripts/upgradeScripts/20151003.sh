@@ -72,7 +72,7 @@ case "$1" in
     log_daemon_msg "Starting resize2fs_once" &&
     resize2fs /dev/root &&
     log_daemon_msg "Starting updateCron" &&
-    bash /home/admin/inoho/homeController/shellScripts/updateCron.sh &&
+    sudo bash /home/admin/inoho/homeController/shellScripts/updateCron.sh > /home/admin/inoho/logs/updateCron.log 1>&2 &&
     log_daemon_msg "Removing resize2fs_once" &&
     rm /etc/init.d/resize2fs_once &&
     update-rc.d resize2fs_once remove &&
