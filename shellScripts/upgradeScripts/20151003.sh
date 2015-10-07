@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file="/etc/init.d/resize2fs_once"
+file="/etc/init.d/continueInohoUpdate_once"
 if [ -f "$file" ]
 then
         echo "$file found."
@@ -52,6 +52,20 @@ w
 EOF
   ASK_TO_REBOOT=1
 
+#continueInohoUpdate script in init.d
+
+cat <<\EOF > /etc/init.d/continueInohoUpdate_once &&
+#!/bin/sh
+	while (!(ping -q -c 1 -W 1 google.com > /dev/null))
+	do
+		sleep 5
+	done
+	sudo bash /home/admin/inoho/homeController/shellScripts/updateCron.sh > /home/admin/inoho/logs/updateCron.log 1>&2 &&
+    rm /etc/init.d/continueInohoUpdate_once
+EOF
+
+chmod 755 /etc/init.d/continueInohoUpdate_once &&
+
   # now set up an init.d script
 cat <<\EOF > /etc/init.d/resize2fs_once &&
 #!/bin/sh
@@ -72,11 +86,11 @@ case "$1" in
     log_daemon_msg "Starting resize2fs_once" &&
     resize2fs /dev/root &&
     log_daemon_msg "Starting updateCron" &&
-    sudo bash /home/admin/inoho/homeController/shellScripts/updateCron.sh > /home/admin/inoho/logs/updateCron.log 1>&2 &&
     log_daemon_msg "Removing resize2fs_once" &&
     rm /etc/init.d/resize2fs_once &&
     update-rc.d resize2fs_once remove &&
     log_end_msg $?
+    sudo bash /etc/init.d/continueInohoUpdate_once &
     ;;
   *)
     echo "Usage: $0 start" >&2
