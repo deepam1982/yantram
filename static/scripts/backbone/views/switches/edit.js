@@ -3,7 +3,7 @@ ScheduleEditor = BaseView.extend({
 	templateSelector:"#editScheduleTemplate",
 	events : {
 		"tap .done" : "done",
-		"tap .cancle" : "cancle"
+		"tap .cancel" : "cancle"
 	},
 	set : function (schedule) {
 		schedule.type && this.$el.find('.scheduleType').val(schedule.type);

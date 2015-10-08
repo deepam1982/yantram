@@ -144,7 +144,6 @@
 		.editViewCont #groupTitleHeaderForTrapTheam, .editViewCont #groupFooterForTrapTheam {display: none;}
 
 		.popupPannel, .moodView, .editViewCont .groupView {
-			background:white;
 			border-width:1px; 
 			border-style:solid;
 			border-radius: 5px;
@@ -156,7 +155,7 @@
 		}
 
 		.moodView{
-			margin-bottom: 15px;
+			margin-bottom: 45px;
 			border-width:0px
 		}
 		.editViewCont .powerButton {
@@ -295,13 +294,17 @@
 			border-width: 0px;
 		}
 
+		.onBackdrop .togegelTime,
+		.onBackdrop .editHelpText 
+		{display:none;}
+
 		.schedularCont .done,
 		.schedularCont .cancel,
 		.schedularCont .edit,
 		.schedularCont .remove,
 		.schedularCont .enable,
 		.schedularCont .disable {
-			padding:10px 0;
+			padding:5px;
 			cursor: pointer;
 		}
 		.editColumn {
@@ -309,6 +312,8 @@
 			font-size:12px; 
 			font-weight:500;	
 		}
+		.font18 {font-size:18px;}
+		.font16 {font-size:16px;}
 		.font14 {font-size:14px;}
 		.font12 {font-size:12px;}
 		.font10 {font-size:10px;}
@@ -388,6 +393,12 @@
 		}
 
 		.overflowScroll {overflow:auto}
+
+		.rotateRight {
+		    -ms-transform: rotate(90deg); /* IE 9 */
+		    -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+		    transform: rotate(90deg);
+		}
 
 		input[type=range] {
 		    -webkit-appearance: none;
@@ -606,12 +617,17 @@
 		</div>
 	</script>
 	<script type="text/template" id="checkUpdateTemplate">
-		<div>
-			<div class="titleCont theamBGColor brightColor"><span style="text-align:left;">Check Updates</span></div>
-			<br/><br/>
+		<div class = 'translucentBg30'>
+			<div class="titleCont brightColor" style="padding-bottom:10px;"><span style="text-align:left;">Check Updates</span></div>
 			<div class="loader" style="text-align:center;"><i class="brightColor spinner fa fa-spinner fa-spin fa-5x"></i></div>
 			<div class="msgBox helpText" style="display:none;"></div>
-			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
+			<div class="updateNowMsg" style='display:none; padding:15px;'>
+				<span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.</span>
+				<br/><br/>
+				<span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span>
+				</div>
+			<div style='clear:both;'></div>
+			<br/>
 		</div>
 	</script>
 	<script type="text/template" id="cloudSettingTemplate">
@@ -688,15 +704,15 @@
 			</div>	
 		</div>
 		<div style='clear:both;'></div>	
-		<div class='moodView translucentBg30'>
-			<div class="moodTitleCont theamBGColor brightColor" style=''>
+		<div class='moodView'>
+			<div class="moodTitleCont translucentBg30 brightColor" style=''>
 				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
 				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
 				<i class='editButton deleteMood fa fa-trash-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
 				<i class='editButton editMood fa fa-pencil-square-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
 				<div style='clear:both;'></div>
 			</div>
-
+			<div class="translucentBg50">
 			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
 				<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
 					<div class='iconPartition' style='width:65px;float:left;text-align:center; margin:10px 5px 0px 1px;'>
@@ -711,7 +727,8 @@
 					</div>
 				<%}%>	
 			<%}%>
-			<div style='clear:both;'></div>		
+			<div style='clear:both;'></div>
+			</div>
 		</div>	
 	</script>
 	<script type="text/template" id="editMoodTemplate">
@@ -810,7 +827,7 @@
 				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator_<$=appColor$>.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
-				<div class='<%print((state=="on")?"theamTextColor":"brightColor")%>' style='position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
+				<div class='togegelTime <%print((state=="on")?"theamTextColor":"brightColor")%>' style='position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
 			<%}%>
 
 			<div class='advancePannel' style='display:none; width:0; float:left;position:relative'>
@@ -884,22 +901,27 @@
 			</div>
 			<br/>
 			<span class='editColumn'>Schedules</span>
-			<div class='schedularCont'>
+			<div class='schedularCont' style="margin-top:-10px;">
 				<div id='scheduleEditor' class='editSchedule' style='display:none;'></div>
 				<% if(typeof schedules != 'undefined')for(var i=0; i<schedules.length; i++){ var sch = schedules[i]; %>
-					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin-bottom:8px;'>&nbsp;
-						<span style="<% if(sch.enabled) print('color:#CCCCCC;')%>font-weight:bold;">
+					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin:-5px 0 0px -3px; padding-top:5px;'>
+						<span class="<% if(sch.enabled) print('brightColor')%> <% print((sch.enabled)?'disable':'enable') %>" style="font-weight:bold;padding:0px;">
+							<span class="<% print((sch.enabled)?'disable':'enable') %>" 
+								style="margin-right:<% print((sch.enabled)?'0':'2')%>px;">
+								<i class="fa fa<% print((sch.enabled)?'-check-':'-')%>square-o font14 <% print((sch.enabled)?'disable':'enable') %>"></i>
+							</span>	
 							<% print((sch.type == 'on')?'Turn-on at':'Turn-off at')%> <%if(sch.hour<10)print('0')%><%=sch.hour%>:<%if(sch.minute<10)print('0')%><%=sch.minute%>  <%=sch.amPm%>
-						</span>&nbsp;
-						<span style='float:right;margin-right:0px;'>
-							<span class="<% print((sch.enabled)?'disable':'enable') %> theamTextColor font12"><% print((sch.enabled)?'disable':'enable') %></span>&nbsp;
-							<span class="edit theamTextColor font12">edit</span>&nbsp;
-							<span class="remove theamTextColor font12">remove</span>
-						</span>	
+						</span>
+						<span class='theamTextColor' style='float:right;margin:5px 0px 0px;'>
+							<span class='edit'><i class='fa fa-pencil-square-o font14'></i></span>
+							<span class='remove'><i class='fa fa-trash-o font14'></i></span>
+						</span>
+						<div style='clear:both;'></div>		
 					</div>
 				<%}%>
-				<div class='addShdlBtnCont'>
-					<span class='theamTextColor font12 addNewSchedule'>&nbsp;&nbsp;add new</span>
+				<div class='addShdlBtnCont theamTextColor' style='padding:5px;'>
+					<span class='addNewSchedule'><i class='fa fa-sign-in font18 rotateRight'></i></span>
+					<span class='font12 addNewSchedule'>&nbsp;&nbsp;add new</span>
 				</div>
 			</div>
 			<br/>
@@ -912,27 +934,36 @@
 			 
 		</div>
 	</script>
-	<script type="text/template" id="editScheduleTemplate">
-		<select class='scheduleType font12'>
+		<script type="text/template" id="editScheduleTemplate">
+		<select class='scheduleType font10'>
 			<option value="on">Turn-on at</option>
 			<option value="off">Turn-off at</option>
 		</select>&nbsp;&nbsp;
-		<select class='scheduleHour font12'>
+		<select class='scheduleHour font10'>
 			<% for(var i=1; i<=12; i++) {%>
 				<option value="<%=i%>" <% if(i==6)print("selected") %> ><%print((i<10)?'0':'')%><%=i%></option>
 			<%}%>
 		</select> : 
-		<select class='scheduleMinute font12'>
+		<select class='scheduleMinute font10'>
 			<% for(var i=0; i<12; i++) {%>
 				<option value="<% print(i*5) %>"><%print((i<2)?'0':'')%><% print(i*5) %></option>
 			<%}%>
 		</select>&nbsp;&nbsp;
-		<select class='scheduleAmPm font12'>
+		<select class='scheduleAmPm font10'>
 			<option value="AM">AM</option>
 			<option value="PM">PM</option>
 		</select>
-		<span class='theamTextColor font12 cancle cancel' style='float:right;margin:5px;'>cancel</span>
-		<span class='theamTextColor font12 done' style='float:right;margin:5px;'>done</span>
+		<br/><br/>
+		<div class='theamTextColor font10 cancel' style='float:right;margin:-10px -10px 0 0;text-align:center;'>
+			<i class='fa fa-thumbs-o-down' style='font-size:20px;'></i>
+			<br/>
+			<b>Cancel</b>
+		</div>
+		<div class='theamTextColor font10 done' style='float:right;margin:-10px 10px 0 0;text-align:center;'>
+			<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+			<br/>
+			<b>Done</b>
+		</div>
 		<div style='clear:both;'></div>	
 	</script>
 	<script type="text/template" id="selectSwitchIconTemplate">
