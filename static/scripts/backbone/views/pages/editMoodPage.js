@@ -8,8 +8,8 @@ EditMoodPageView = BaseView.extend({
 	addNewMood : function () {
 		var dummyModel = new Backbone.Model({'name':'', "id":0, "icon":'', controls:[]});
 		var tmpClass = MoodView.extend({
-			hidePopUp : function () {
-				MoodView.prototype.hidePopUp.apply(this, arguments);	
+			_hidePopUp : function () {
+				MoodView.prototype._hidePopUp.apply(this, arguments);	
 				this.removeView();
 			}
 		});

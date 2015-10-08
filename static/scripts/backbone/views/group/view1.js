@@ -119,10 +119,13 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  		"tap .deleteGroup" : "deleteGroup"
  	}),
  	deleteGroup : function () {
- 		var groupInfo = this.model.toJSON();
-//		groupInfo.rank = groupInfo.id;
-		groupInfo.controls = [];
-		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+ 		confirmDialog.show("Are you sure, you want to delete group?", _.bind(function(sure){
+ 			if(!sure) return;
+ 			var groupInfo = this.model.toJSON();
+//			groupInfo.rank = groupInfo.id;
+			groupInfo.controls = [];
+			ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+ 		}, this));
  	},
  	showAdvancePannel : function () {
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
@@ -140,6 +143,16 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
 		
  	},
  	hideAdvancePannel : function () {
+ 		var groupName = this.$el.find('.groupName').val()
+ 		var groupSize = this.$el.find('.deviceGroupCont .tick:visible').length
+ 		if(groupName && groupSize) this._hideAdvancePannel();
+ 		else
+ 			confirmDialog.show("Group without "+((groupSize)?"name":"any device")+" cannot exist, are you sure you are done?", _.bind(function(sure) {
+ 				if (sure) this._hideAdvancePannel();	
+ 			},this));
+ 	},
+ 	_hideAdvancePannel : function () {
+ 		
  		this.$el.find('.groupView').css('max-height','').removeClass('overflowScroll');
  		this.$el.css('top', '').css('left', '').css('position','');
  		this.editPannel.erase();

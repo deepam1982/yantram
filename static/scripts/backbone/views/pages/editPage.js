@@ -8,8 +8,8 @@ EditPageView = MainPageView.extend({
 	addNewGroup : function () {
 		var dummyModel = new Backbone.Model({'name':'', "id":0});
 		var tmpClass = GroupEditView.extend({
-			hideAdvancePannel : function () {
-				GroupEditView.prototype.hideAdvancePannel.apply(this, arguments);	
+			_hideAdvancePannel : function () {
+				GroupEditView.prototype._hideAdvancePannel.apply(this, arguments);	
 				this.removeView();
 			}
 		});

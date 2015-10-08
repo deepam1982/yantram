@@ -17,16 +17,28 @@ MoodView = BaseView.extend(Popup).extend({
 		return this.$popup;
  	},
  	hidePopUp : function () {
+ 		var moodIcon = this.$el.find('.moodIconCont .tick:visible').length;
+ 		var moodSize = this.$el.find('.deviceGroupCont .tick:visible').length;
+ 		if(moodIcon && moodSize) this._hidePopUp();
+ 		else
+ 			confirmDialog.show("Mood without "+((moodSize)?"icon":"any device")+" cannot exist, are you sure you are done?", _.bind(function(sure) {
+ 				if (sure) this._hidePopUp();	
+ 			},this));
+ 	},
+ 	_hidePopUp : function () {	
  		this.$popup.find('.editTemplateCont').css('max-height','').removeClass('overflowScroll');
  		this.$popup.css('top', '').css('left', '').css('position','');
  		this.editPannel.erase();
 		return Popup.hidePopUp.apply(this, arguments);
  	},
  	deleteMood : function () {
- 		var moodInfo = this.model.toJSON();
-		moodInfo.rank = moodInfo.id;
-		moodInfo.controls = [];
-		ioSocket.emit("modifyMood", moodInfo, function (err){if(err)console.log(err)});
+ 		confirmDialog.show("Are you sure, you want to delete mood?", _.bind(function(sure){
+ 			if(!sure) return;
+	 		var moodInfo = this.model.toJSON();
+			moodInfo.rank = moodInfo.id;
+			moodInfo.controls = [];
+			ioSocket.emit("modifyMood", moodInfo, function (err){if(err)console.log(err)});
+ 		}, this)); 		
  	},
 	_getJsonToRenderTemplate : function () {
 		var moodJson = (this.model)?this.model.toJSON():{};

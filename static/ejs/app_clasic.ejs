@@ -114,7 +114,7 @@
 			margin: 0px 0px 0px;
 		}
 
-		.onBackdrop .togegelTime {display:none;}
+		.onBackdrop .togegelTime, .hide {display:none;}
 
 		.popupPannel, .moodView, .editViewCont .groupView {
 			background:white;
@@ -123,6 +123,10 @@
 			border-radius: 5px;
 			padding-bottom: 5px;
 		}
+		.dialogCont .dialog {
+			border-radius: 5px;
+		}
+
 		.moodView{
 			margin-bottom: 15px;
 		}
@@ -217,6 +221,11 @@
 			border-radius: 22px;
 			font-size: 38px;
 		}
+		.dialogCont{padding:20px;}
+		.dialog{padding:20px;}
+		.dialog .msgDiv {text-align: left;}
+		.dialog .buttonDiv {margin-top: 10px;}
+		.dialog .buttonDiv span{float: right;margin-left: 20px;}
 
 		.tick {
 			width:20px; height:20px;
@@ -725,18 +734,22 @@
 	</script>
 	<script type="text/template" id="editPageTemplate">
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
-		<br/>
-		<span class='helpText' style='float:left;'>Long press icons to edit parameters</span>
-		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add group</span>
 		<br/><br/>
+		<i class='editButton addGroupButton theamTextColor fa fa-object-group' style='float:right;display:block;margin:-28px 25px 0 0; font-size:22px;'></i>
+		<br/>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px 2px 0 0;'>create group</span>
+		<span class='helpText' style='float:left;margin-top:-5px;'>Long press icons to edit parameters</span>
+		<br/>
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/tonlyemplate" id="editMoodPageTemplate">
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Mood Settings</span></div>
-		<br/>
-		<span class='helpText' style=''></span>
-		<span class='editButton addMoodButton theamTextColor' style='float:right;display:block;margin-right:5px;'>add mood</span>
 		<br/><br/>
+		<i class='editButton addMoodButton theamTextColor fa fa-plus-circle' style='float:right;display:block; margin:-32px 18px 0 0; font-size:22px;'></i>
+		<br/>
+		<span class='editButton addMoodButton theamTextColor' style='float:right;display:block;margin:-20px 2px 0 0;'>add mood</span>
+		<span class='helpText' style=''></span>
+		<div style='clear:both;'></div>
 		<div class='moodViewCont'></div>
 	</script>
 	<script type="text/template" id="editSwitchTemplate">
@@ -877,8 +890,23 @@
 		<span>Enter Json:</span>&nbsp;&nbsp;&nbsp;&nbsp;<textarea class='textJson' style='width:100%; height:200px;'></textarea>
 		<br/><br/><br/>
 		<input type='submit' id='postJson' style=''></input>
-	</script>	
+	</script>
+	<script type="text/template" id="basicDilogTemplate">
+		<div class='dialogCont'>
+			<div class='dialog whiteBG'>
+				<div class='msgDiv'>Hey!!! This is dialog!</div>
+				<div class='buttonDiv'>
+					<span class='button theamBorderColor theamTextColor hide ok' id='ok'>Ok</span>
+					<span class='button theamBorderColor theamTextColor hide ok' id='yes'>Yes</span>
+					<span class='button theamBorderColor theamTextColor hide cancel' id='cancel'>Cancel</span>
+					<span class='button theamBorderColor theamTextColor hide cancel' id='no'>No</span>
+					<div style='clear:both;'></div>	
+				</div>
+			</div>
+		</div>
+	</script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/utility/dialog.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>

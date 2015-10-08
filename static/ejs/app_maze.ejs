@@ -149,6 +149,10 @@
 			border-radius: 5px;
 			padding-bottom: 5px;
 		}
+		.dialogCont .dialog {
+			border-radius: 5px;
+		}
+
 		.editViewCont .groupView {
 			background-color: transparent;
 			border-width: 0px;
@@ -261,6 +265,13 @@
 			font-size: 38px;
 		}
 
+		.dialogCont{padding:20px;}
+		.dialog{padding:20px;}
+		.dialog .msgDiv {text-align: left;}
+		.dialog .buttonDiv {margin-top: 10px;}
+		.dialog .buttonDiv span{float: right;margin-left: 20px;}
+
+
 		.tick {
 			width:20px; height:20px;
 			background-image: url("/static/images/transparentTick.png");
@@ -295,7 +306,8 @@
 		}
 
 		.onBackdrop .togegelTime,
-		.onBackdrop .editHelpText 
+		.onBackdrop .editHelpText,
+		.hide 
 		{display:none;}
 
 		.schedularCont .done,
@@ -844,22 +856,27 @@
 	</script>
 	<script type="text/template" id="editPageTemplate">
 		<div class="titleCont theamBGColor brightColor">
-		<span style="text-align:left;">Device Settings</span>
-		<br/><br/>
-		<span class='helpText' style='float:left; display:none;'>Long press icons to edit parameters</span>
-		<i class='editButton addGroupButton fa fa-object-group' style='float:right;display:block;margin:-28px 20px 0 0; font-size:22px;'></i>
-		<br/>
-		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px -3px 10px 0;'>create group</span>
-		<div style='clear:both;'></div>
+			<span style="text-align:left;">Device Settings</span>
+			<br/><br/>
+			<span class='helpText' style='float:left; display:none;'>Long press icons to edit parameters</span>
+			<i class='editButton addGroupButton fa fa-object-group' style='float:right;display:block;margin:-28px 20px 0 0; font-size:22px;'></i>
+			<br/>
+			<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px -3px 10px 0;'>create group</span>
+			<div style='clear:both;'></div>
 		</div>
 		<br/><br/>
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editMoodPageTemplate">
-		<div class="titleCont theamBGColor brightColor" style="padding-bottom:10px;"><span style="text-align:left;">Mood Settings</span></div>
-		<br/>
-		<span class='helpText' style=''></span>
-		<span class='editButton addMoodButton brightColor' style='float:right;display:block;margin-right:5px;'>add mood</span>
+		<div class="titleCont theamBGColor brightColor" style="padding-bottom:10px;">
+			<span style="text-align:left;">Mood Settings</span>
+			<br/><br/>
+			<span class='helpText' style=''></span>
+			<i class='editButton addMoodButton fa fa-plus-circle' style='float:right;display:block;margin:-28px 20px 0 0; font-size:22px;'></i>
+			<br/>
+			<span class='editButton addMoodButton brightColor' style='float:right;display:block;margin:-15px -3px 0 0;'>add mood</span>
+			<div style='clear:both;'></div>
+		</div>	
 		<br/><br/>
 		<div class='moodViewCont' style='padding:0px;'></div>
 	</script>
@@ -1010,7 +1027,22 @@
 		<br/><br/><br/>
 		<input type='submit' id='postJson' style=''></input>
 	</script>	
+	<script type="text/template" id="basicDilogTemplate">
+		<div class='dialogCont'>
+			<div class='dialog theamBGColor'>
+				<div class='msgDiv brightColor'>Hey!!! This is dialog!</div>
+				<div class='buttonDiv'>
+					<span class='button theamBorderColor theamTextColor hide ok' id='ok'>Ok</span>
+					<span class='button theamBorderColor theamTextColor hide ok' id='yes'>Yes</span>
+					<span class='button theamBorderColor theamTextColor hide cancel' id='cancel'>Cancel</span>
+					<span class='button theamBorderColor theamTextColor hide cancel' id='no'>No</span>
+					<div style='clear:both;'></div>	
+				</div>
+			</div>
+		</div>
+	</script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/utility/dialog.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>
