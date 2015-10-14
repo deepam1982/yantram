@@ -52,29 +52,56 @@ var BaseCommunicator = BaseClass.extend({
 		console.log("###### serialPort has oppened.")
 		this.serialPort.on('data', __.bind(this._onDataArrival, this));
 		setTimeout(__.bind(this.checkCommunication, this), 3000);
-		this._broadcastLoop();
+		this._broadcastLoop(5);
+		setTimeout(__.bind(function(){
+			setInterval(__.bind(this._checkConnectivity, this),5000);
+		}, this), 10000); //after 10 seconds
+		setTimeout(__.bind(function(){
+			this.restartBroadcasting(30);
+			this.networkPinger(); //start network pinger
+		}, this), 60000); //after 60 seconds	
 	},
-	_broadcastLoop : function () {
-		if(this._queryQ.length || ((new Date().getTime()/1000)-this.querySentTimeStamp) < 2) 
-			return setTimeout(__.bind(this._broadcastLoop, this), 1000);
+	stopBroadcasting : function () {
+		clearTimeout(this.broadcastLoopTimer);
+		this.broadcastLoopTimer = null;
+	},
+	restartBroadcasting : function (frq) {
+		if (!frq) frq=30;
+		console.log("############## restarting Broadcast with frq", frq)
+		this.muteNetworkPings = (frq <= 5);
+		this.stopBroadcasting();
+		this._broadcastLoop(frq);
+	},
+	_broadcastLoop : function (frq) { //frequency in seconds
+		if (!frq) frq=30;
+		if(this._queryQ.length || ((new Date().getTime()/1000)-this.querySentTimeStamp) < 0.5)
+			return this.broadcastLoopTimer = setTimeout(__.bind(this._broadcastLoop, this, frq), 200);
 		this._broadcast();
-		setTimeout(__.bind(this._broadcastLoop, this), 8000)
+		this.broadcastLoopTimer = setTimeout(__.bind(this._broadcastLoop, this, frq), frq*1000)
 	},
 	_checkConnectivity : function () {
-		if( ((new Date().getTime()/1000) - this.lastPacketRecievedAt) > 25) {
+		var allowedNoOfSeconds = 4*Math.max(10, this.deviceList.length) + 1;
+		if( ((new Date().getTime()/1000) - this.lastPacketRecievedAt) > allowedNoOfSeconds) {
 			console.log("########### Zigbee Module stopped responding")
 			this.zModRestartedAt = this.lastPacketRecievedAt = new Date().getTime()/1000;
 			__restartZigbeeModule();
 		}
-		var unreachableCount=0, maxTimeStamp=0;
+		var unreachableCount=0, maxTimeStamp=0, recheckList = [];
 		__.each(this.deviceList, function (dev) {
 			if(dev.unreachable) unreachableCount++;
 			maxTimeStamp=Math.max(maxTimeStamp, dev.lastSeenAt);
-			if((dev.lastSeenAt < ((Date.now()/1000) - 25)) && !dev.unreachable) { //8 X 3 =24 .. so 25 seconds is good number for 3 ping miss.
+			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds)) && !dev.unreachable) {
 				dev.unreachable = true;
 				this.emit("deviceUnreachable", dev.macAdd);
 			}
+			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds/2)) && !dev.unreachable) recheckList.push(dev);
 		}, this)
+		__.each(recheckList, function (dev, i) {
+			console.log("########### rechecking connectivity of",dev.macAdd)
+			setTimeout(__.bind(function(dInfo){
+				this._send("\x2B0302"+dInfo.nwkAdd+"\x0D", function () { });
+			},this, dev), i*100);
+		}, this);
 		maxTimeStamp=Math.max(maxTimeStamp, this.zModRestartedAt||0);
 		if(this.deviceList.length == unreachableCount) {
 			console.log("########### all",unreachableCount, "devices seems unreachable.");
@@ -97,7 +124,6 @@ var BaseCommunicator = BaseClass.extend({
 
 	},
 	_broadcast : function () {
-		this._checkConnectivity();	
 	},
 	_send : function (command, callback) {
 		this.querySentTimeStamp = new Date().getTime()/1000;
@@ -126,9 +152,15 @@ var BaseCommunicator = BaseClass.extend({
 	},
 	getNetworkKey : function (callback) {
 		callback && callback('noSupport');
+	},
+	onModuleConfigurationDone : function(err, macId, moduleType){
+		setTimeout(__.bind(function(){
+			this.restartBroadcasting(5);
+			setTimeout(__.bind(function(){
+				this.restartBroadcasting(30);
+			}, this), 60000); //after 60 seconds
+		}, this), 15000); //after 15 seconds	
 	}
-
-
 
 });
 module.exports = BaseCommunicator;

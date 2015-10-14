@@ -42,6 +42,7 @@ var EventLogger = BaseClass.extend({
 		}
 	},
 	addEvent : function (eventName, properties, callback) {
+		return callback && callback("NOSUPPORT");
 		!properties && (properties = {});
 		properties.user = __userEmail;
 		properties.keen={"timestamp":formatLocalDate()};

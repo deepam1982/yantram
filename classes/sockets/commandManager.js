@@ -150,7 +150,6 @@ var CommandManager = BaseClass.extend({
 					}
 					if(groupIds.length) return callback(null, groupIds);	
 				}
-				console.log("@@@@@@@@@@@@@@@@@@ Module type is",moduleType)
 				switch(moduleType){
 					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0; break;
 					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0; break;	

@@ -3,6 +3,15 @@ var __ = require("underscore");
 var BaseCommunicator = require(__rootPath+"/classes/communicators/baseCommunicator");
 var CC2530Controller = BaseCommunicator.extend({
 	baudrate: 115200,
+	networkPinger : function () {
+		var interval = Math.max(1000, parseInt(10000/this.deviceList.length));
+		__.each(this.deviceList, __.bind(function (devInfo, i) {
+			setTimeout(__.bind(function(dInfo){
+				!this.muteNetworkPings && this._send("\x2B0302"+dInfo.nwkAdd+"\x0D", function () { });
+			},this, devInfo), i*interval);
+		}, this));
+		setTimeout(__.bind(this.networkPinger, this), Math.max(10, this.deviceList.length)*1000); //every 10 seconds
+	},
 	_broadcast : function () {
 		this._send("\x2B0302FFFF\x0D", function () { // "\x2B0302FFFF"
 //			console.log('##### Sent broadcast')
@@ -88,7 +97,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
 		this.emit('msgRecieved', "DVST", state, macAdd);
 		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
-		if (listItem) {__.extend(listItem, {'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});}
+		if (listItem) {__.extend(listItem, {'nwkAdd':nwkAdd, 'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});}
 	},
 	_handleDevTypeResponse : function (macAdd, nwkAdd, deviceName) {
 		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
@@ -229,6 +238,7 @@ var CC2530Controller = BaseCommunicator.extend({
 				this.sendQuery(null, {name:"0102"}); //send network info on serial
 				this._pendingReqCallbackMap["0102"] = function (err, mmsg) {console.log(mmsg);}
 				this.checkSerialCable(function (err, mmsg) {console.log(mmsg);})
+				this.onModuleConfigurationDone(err, macId, moduleType);
 				callback(err, macId, moduleType);
 				setTimeout(__.bind(function () {
 					this.sendQuery(null, {name:"0200"}); // restart connected device to disable UART
