@@ -5,7 +5,6 @@ var pad = function (num) {
     norm = Math.abs(Math.floor(num));
     return (norm < 10 ? '0' : '') + norm;
 }
-
 var formatLocalDate = function () {
     var local = new Date();
     var tzo = -local.getTimezoneOffset();
