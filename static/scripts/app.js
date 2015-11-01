@@ -130,12 +130,13 @@ hashChanged = function (hash) {
 	if(removeHash)window.location.hash = '';
 };
 var connectSocket = function (callback) {
-		ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
-			);
-		if(callback) ioSocket.on('connect', callback);
-		ioSocket.on('connect', showBurgerMenu);
-		ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
-		ioSocket.on('roomConfigUpdated', function (config) {
+	ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
+		);
+	if(callback) ioSocket.on('connect', callback);
+	ioSocket.on('connect', showBurgerMenu);
+	ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
+	ioSocket.on('roomConfigUpdated', function (config) {
+		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
 		gC.set(config, {merge: true, remove: false});
 	});
 	ioSocket.on('deleteGroup', function (groupId) {
@@ -143,9 +144,11 @@ var connectSocket = function (callback) {
 		gC.remove(gC.get(groupId));
 	});
 	ioSocket.on('onDeviceUpdate', function (config) {
+		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
 		dC.set(config, {merge: true, remove: false});
 	});
 	ioSocket.on('moodConfigUpdate', function (config) {
+		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
 		mC.set(config, {merge: true, remove: false});
 	});
 	ioSocket.on('deleteMood', function (moodId) {
@@ -184,6 +187,22 @@ Backbone.ajax = function (obj) {
 		console.log(obj.url, new Date()-d);
 		success.apply(this, arguments);
 	}
+
+	obj.success = function (data) {
+		if(!_.isObject(data)){
+			try {
+				data = JSON.parse(data)	
+			}
+			catch (err) {
+				data = JSON.parse(JXG.decompress(data))
+			}
+		}
+		arguments[0] = data;
+		console.log(obj.url, new Date()-d);
+		success.apply(this, arguments);
+	}
+	obj.headers = {"Content-Encoding": "gzip"};
+    obj.dataType = 'text';
 	if(!obj.useSocket) return backboneAjax.apply(this, arguments);
 	ioSocket.emit(obj.url, obj.data, obj.success);
 }
