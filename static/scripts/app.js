@@ -185,10 +185,6 @@ Backbone.ajax = function (obj) {
 	var success = obj.success;
 	obj.success = function (data) {
 		console.log(obj.url, new Date()-d);
-		success.apply(this, arguments);
-	}
-
-	obj.success = function (data) {
 		if(!_.isObject(data)){
 			try {
 				data = JSON.parse(data)	
@@ -198,7 +194,6 @@ Backbone.ajax = function (obj) {
 			}
 		}
 		arguments[0] = data;
-		console.log(obj.url, new Date()-d);
 		success.apply(this, arguments);
 	}
 	obj.headers = {"Content-Encoding": "gzip"};
