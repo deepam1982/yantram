@@ -6,6 +6,7 @@ var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
+var zlib = require('zlib');
 
 var RequestManager = BaseClass.extend({
 	init : function (obj) {
@@ -26,15 +27,21 @@ var RequestManager = BaseClass.extend({
 	},
 	onDeviceListRequest : function (socket, reqData, calback) { 
 		//Fucking defer is required else callback gets delayed as it goes along with emit.
-		__.defer(function () {__.each(deviceInfoConfig.getList(), function (info) {
-			socket.emit('onDeviceUpdate', info);
-		})});
+		// __.defer(function () {__.each(deviceInfoConfig.getList(), function (info) {
+		// 	socket.emit('onDeviceUpdate', info);
+		// })});
+		zlib.gzip(JSON.stringify(deviceInfoConfig.getList()), function(err, buffer) {
+			socket.emit('onDeviceUpdate', (err)?"error in gzip":buffer.toString('base64'));
+		});
 		calback([]);
 	},
 	onMoodListRequest : function (socket, reqData, calback) {
-		__.defer(function () {__.each(moodConfig.getList(), function (info) {
-			socket.emit('moodConfigUpdate', info);
-		})});
+		// __.defer(function () {__.each(moodConfig.getList(), function (info) {
+		// 	socket.emit('moodConfigUpdate', info);
+		// })});
+		zlib.gzip(JSON.stringify(moodConfig.getList()), function(err, buffer) {
+			socket.emit('moodConfigUpdate', (err)?"error in gzip":buffer.toString('base64'));
+		});
 		calback([]);
 	},
 	onRoomListRequest : function (socket, reqData, calback) {
@@ -46,10 +53,13 @@ var RequestManager = BaseClass.extend({
 		// 	}, this.cloudSocket);
 		// var resp = groupConfig.getList();
 		// if(typeof calback == 'function') calback(resp);
-		__.each(__.keys(groupConfig.data), function (id, i) {
-			setTimeout(__.bind(function (idd) {
-				socket.emit('roomConfigUpdated', groupConfig.getGroupDetails(idd))
-			}, null, id),(i>5?500:0)+50*(i%5));
+		// __.each(__.keys(groupConfig.data), function (id, i) {
+		// 	setTimeout(__.bind(function (idd) {
+		// 		socket.emit('roomConfigUpdated', groupConfig.getGroupDetails(idd))
+		// 	}, null, id),(i>5?500:0)+50*(i%5));
+		// });
+		zlib.gzip(JSON.stringify(groupConfig.getList()), function(err, buffer) {
+			socket.emit('roomConfigUpdated', (err)?"error in gzip":buffer.toString('base64'));
 		});
 		if(typeof calback == 'function') calback([]);
 	}

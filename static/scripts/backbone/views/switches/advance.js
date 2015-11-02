@@ -47,6 +47,7 @@ AdvancePannel = {
 		this.adPnlCss = $lastAdPnl.attr('style');
 		$lastAdPnl.show().focus();
 		$('body').css('overflow', 'hidden');
+		this.advancePannelVisible = true;
 	},
 	hideAdvancePannel : function () {
 		if(!this.bd) return;
@@ -55,6 +56,7 @@ AdvancePannel = {
 		this.$el.css('position', 'inherit');
 		this.bd.removeView();
 		this.bd = null;
+		this.advancePannelVisible = false;
 	}
 
 }
@@ -117,7 +119,7 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		return AdvanceSwitch.prototype.erase.apply(this, arguments);
  	},
  	showAdvancePannel : function () {
- 		if(this.model.get('disabled')) return;
+ 		if(this.model.get('disabled') || this.advancePannelVisible) return;
  		var ret = AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
  		!this.touchendConnected && (this.touchendConnected = true) && $('body').on('touchend', this.stopCurtain)
  		return ret
@@ -132,8 +134,8 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		"tap .advancePannel .cross" : "done"
 		,"tap .toggelSwitch" : "showAdvancePannel"
 		,"longTap .toggelSwitch" : "showAdvancePannel"
-		,"touchstart .openCurtain" : "openCurtain"
-		,"touchstart .closeCurtain" : "closeCurtain"
+		,"longTap .openCurtain" : "openCurtain"
+		,"longTap .closeCurtain" : "closeCurtain"
 		// ,"touchend .openCurtain" : "stopCurtain"
 		// ,"touchend .closeCurtain" : "stopCurtain"
 		// ,"touchleave .closeCurtain" : "stopCurtain" 
@@ -143,15 +145,19 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("closeCurtain");
 		this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		this.$el.find('.openCurtain').removeClass('theamBGColor').addClass('whiteBG');		
 		this.model.moveCurtain("close");
 		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 1000);
+		clearTimeout(this.openCurtainTimer);this.openCurtainTimer = null;
 	},
 	openCurtain : function (event) {
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("openCurtain");
 		this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		this.$el.find('.closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
 		this.model.moveCurtain("open");
 		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 1000);
+		clearTimeout(this.closeCurtainTimer);this.closeCurtainTimer = null;
 	},
 	stopCurtain : function() {
 		console.log("stopCurtain");

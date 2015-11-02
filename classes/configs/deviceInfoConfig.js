@@ -6,7 +6,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 		var data = [];
 		__.each(this.toJSON(), function (conf, id) {
 			conf.id = id;
-			data.push(conf);
+			data.push(__.omit(conf,"category", "deviceCode", "loads"));
 		});
 		return data;
 	}
