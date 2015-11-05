@@ -15,8 +15,8 @@ module.exports ={
 			var fstCrtnSwIndx = this.numberOfSwitches - 2*this.numberOfCurtainControls;
 			if(indx < fstCrtnSwIndx) return;
 			var crtnIndx = parseInt((indx-fstCrtnSwIndx)/2);
-			if(!(indx-fstCrtnSwIndx)%2)this.curtainControlState[crtnIndx] = 0;
-			if(this.switchState[indx]) this.curtainControlState[crtnIndx] =((indx-fstCrtnSwIndx)%2)?"closing":"opening";
+			if(!(indx-(fstCrtnSwIndx+2*crtnIndx))%2)this.curtainControlState[crtnIndx] = 0;
+			if(this.switchState[indx]) this.curtainControlState[crtnIndx] =((indx-(fstCrtnSwIndx+2*crtnIndx))%2)?"closing":"opening";
 		}, this);
 	},
 	moveCurtain : function (switchId, state, callback) {

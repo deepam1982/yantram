@@ -6,7 +6,7 @@ var CurtainControlFunctions = require(__rootPath+"/classes/devices/decorators/cu
 var CrtnCtrl01 = BaseDevice.extend(CurtainControlFunctions).extend(SwitchFunctions).extend({
 	type : 'crtnCtrl01',
 	numberOfSwitches : 5,
-	numberOfCurtainControls : 1,
+	numberOfCurtainControls : 2,
 	_logDVST : function (msg) {
 		if(!this.avoidLogDVST)
 		console.log("#### DVST of "+this.id+" is " + this.switchState + "    " + this.curtainControlState);
