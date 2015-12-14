@@ -11,3 +11,5 @@ line="03 4,11,16,23 * * * sudo service inoho restart"
 echo "------ added crontab to restart inoho 4 times in a day -------";
 
 sudo npm install --unsafe-perm --prefix $DIR0 mjpeg-proxy
+
+sudo apt-get install autossh
