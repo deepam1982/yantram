@@ -127,6 +127,7 @@
 		}
 		.trapTheam .groupView {
 			margin: 0px 0px 20px;
+			overflow: hidden;
 		}
 
 		#groupTitleHeaderForTrapTheam {
@@ -141,7 +142,8 @@
 			border-left:500px solid transparent;
 		}
 		.trapTheam #groupTitleHeaderForTrapTheam, .trapTheam #groupFooterForTrapTheam {display: block;}
-		.editViewCont #groupTitleHeaderForTrapTheam, .editViewCont #groupFooterForTrapTheam {display: none;}
+		.editViewCont #groupTitleHeaderForTrapTheam, .editViewCont #groupFooterForTrapTheam,
+		#ipCamaraFeedViewerCont #groupTitleHeaderForTrapTheam, #ipCamaraFeedViewerCont #groupFooterForTrapTheam {display: none;}
 
 		.popupPannel, .moodView, .editViewCont .groupView {
 			border-width:1px; 
@@ -242,6 +244,12 @@
 		}
 		.popupPannel{
 
+		}
+		#ipCamaraFeedViewerCont .popupPannel{
+			background-color: white;
+		}
+		#ipCamaraFeedViewerCont .popupPannel .cross {
+			color:black;
 		}
 		.popupPannel .cross, .advancePannel .cross {
 			position:absolute;
@@ -404,6 +412,10 @@
 			user-select: none;
 		}
 
+		.camTab, .optionTab {
+			padding:8px;
+		}
+
 		.overflowScroll {overflow:auto}
 
 		.rotateRight {
@@ -509,6 +521,7 @@
 			<div id='sideMenuCont' class='translucentBg70' style='position:absolute; top:0px; bottom:0px; right:0px; width:38%; z-index:99; display:none'></div>
 			<div style='clear:both;'></div>	
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer'></div>
+			<div id='ipCamaraFeedViewerCont'></div>
 		</div>
 		<img src="static/images/loading.gif" style="display:none;"/>
 	</body>
@@ -534,13 +547,84 @@
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
-			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>	
+			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
 			<div class='options logout' ><a href='logout' style='text-decoration:none;color:inherit'>Logout</a></div>
 		</div>
 	</script>
+	<script type="text/template" id="ipCamaraFeedViewer">
+		<div class='popupPannel' style='padding:10px; display:none;'>
+			<div class='cross' style='top:5px;right:0px;'>
+				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+				<br/>
+				<b>Done</b>
+			</div>
+			<div class='theamBorderColor'>
+				<div class='camFeedCont' style='min-height:300px;'>
+				</div>
+				<dic class='camGroupCont'></div>
+			</div>
+			<div style='clear:both'></div>
+		</div>
+	</script>
+	<script type="text/template" id="configureIPCamaraTemplate">
+		<div>
+			<div style="text-align:center;margin-top:20px;">
+				<div style='position:relative;'>
+					<img class='whiteBG' src='/static/images/ipcamera.png' style='padding:30px 50px 0 50px;'/>
+					<div class='theamBGColor whiteImageMask' style='position:absolute;top:0px; bottom:0px;width:100%; opacity:0.2; filter:alpha(opacity=20);'></div>
+				</div>
+			</div>	
+			<br/><br/><br/>
+			<div style='position:relative;' class='translucentBg30'>
+				<div class='font14 theamBGColor brightColor' style='width:150px;padding:8px; position:absolute; top:-33px;'>
+					<div class='showMoreCams'>
+						<span class='camTab currentCam'>Add New</span><i class='font18 fa fa-arrow-right fa-chevron-circle-down' style='float:right;'/>
+					</div>	
+					<div class='camDropDown' style='padding-top:7px;display:none;'>
+						<hr/>
+						<div class='camTab'>Cam 1</div>
+						<div class='camTab'>Cam 2</div>
+						<div class='camTab'>Add New</div>
+					</div>	
+				</div>
+				<div id="camMetaData" class="theamBorderColor" style='padding:20px; border-width:1px; border-style:solid;'>
+					<div style='padding-left:130px;' class='font12'>
+						<span style='margin:8px 0 0 -130px;float:left;'>Camera Name:</span><input id='cameraName' type='text' placeholder='eg. Lobby Camera'></input>
+						</br>
+						<span style='margin:8px 0 0 -130px;float:left;'>Static IP:</span><input id='camaraIp' type='text' placeholder='eg. 192.168.0.147'></input>
+						</br>
+						<span style='margin:8px 0 0 -130px;float:left;'>Video Path:</span><input id='videoPath' type='text' placeholder='eg. /video.cgi'></input>
+						</br>
+						<span style='margin:8px 0 0 -130px;float:left;'>Basic Auth Username:</span><input id='userName' type='text' placeholder='eg. admin'></input>
+						</br>
+						<span style='margin:8px 0 0 -130px;float:left;'>Basic Auth Password:</span><input id='password' type='password'></input>
+						<br/><br/><br/>
+						<input style='display:none;' id='cameraId'></input>
+						<span style='margin:8px 0 0 -130px;float:left;' class='errorMsg theamTextColor font12'></span>
+						<span class='button theamBorderColor theamTextColor' id='submitCamData' style='float:right;'>Submit</span>
+						<div style='clear:both'></div>
+					</div>
+				</div>
+			</div>	
+			<div style='clear:both'></div>
+		</div>
+	</script>
 	<script type="text/template" id="addNewModuleTemplate">
+		<div class='font14 theamBGColor brightColor' style='width:250px;padding:8px; position:relative;'>
+				<div class='showMore' style=''>
+					<span class='currentOpt'>Configure switchboard module</span><i class='font18 fa fa-arrow-right fa-chevron-circle-down' style='float:right;'/>
+				</div>	
+				<div class='dropDownOptions font14 theamBGColor brightColor' style='width:100%; display:none; top:30px; left:0px; position:absolute; z-index:1'>
+					<hr/>
+					<div class='optionTab' viewName='cnfgrSMView'>Configure switchboard module</div>
+					<div class='optionTab' viewName='cnfgrIPCamView'>Configure IP camera</div>
+				</div>	
+		</div>
+		<div class='configurationAppCont'></div>
+	</script>
+	<script type="text/template" id="configureModuleTemplate">
 		<div style='padding:20px;' class='translucentBg50'>
 			<div style='position:relative;'>
 				<img class='whiteBG' src='/static/images/connected_module.png' style='width:100%;'/>
@@ -880,6 +964,16 @@
 		<br/><br/>
 		<div class='moodViewCont' style='padding:0px;'></div>
 	</script>
+	<script type="text/template" id="editIpCameraTemplate">
+		<div style='padding:0px 10px 10px 70px;'>
+			<br/>
+			<span class='editColumn'>Name</span>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
+			<br/>
+			<span class='editColumn'>Icon</span>
+			<div class='iconCont'></div>
+		</div>
+	</script>
 	<script type="text/template" id="editSwitchTemplate">
 		<div class='theamTextColor' style='padding:0px 10px 10px 70px;'>
 			<br/>
@@ -1055,6 +1149,7 @@
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editMoodPage.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
+	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureIpCamara.js"></script>
 	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/update.js"></script>
 	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>

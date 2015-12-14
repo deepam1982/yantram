@@ -86,13 +86,14 @@ var setAppTheamColor = function (appTheme, themeColor) {
 //		inputColor=(servedFromCloud)?"#69C1A8":(appTheam == "Maze")?"#A58F8F":"#EE972D;";
 		var $sheet = $("<style>\
 	hr {\
-		border-top-color: "+color+"\
+		border-top-color: "+color+";\
+		border-bottom-color: "+((appTheam=='maze')?brightColor:"white")+";\
 	}\
 	.whiteBG{background-color: white;}\
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
 	.theamBGColor{background-color: "+color+";}\
-	.appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
+	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
 	input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+inputColor+";}\
 	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
@@ -112,6 +113,7 @@ hashChanged = function (hash) {
 		case '#updatenow'				: 	ioSocket.emit('updateNow');removeHash=true;break;
 		case '#restorenetwork'			: 	ioSocket.emit('restoreNetwork');removeHash=true;break;
 		case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
+		case '#configurecloudtunnel'	: 	ioSocket.emit('configureCloudTunnel');removeHash=true;break;
 		case '#restartzigbee'			: 	ioSocket.emit('restartZigbee');removeHash=true;break;
 		case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
 		case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
@@ -279,3 +281,6 @@ var HomeControllerDownPageView = BaseView.extend({
 });
 var homeControllerDownPage = new HomeControllerDownPageView();
 $('#appCont').append(homeControllerDownPage.$el);
+
+var ipCamaraFeedViewer = new IpCamaraFeedViewer({'el':$("#ipCamaraFeedViewerCont")});
+ipCamaraFeedViewer.render();

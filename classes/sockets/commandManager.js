@@ -32,6 +32,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('restoreNetwork', __.bind(this.restoreNetwork, this));
 		socket.on('restartZigbee', __.bind(this.restartZigbee, this));
 		socket.on('applyMood', __.bind(this.activateMood, this));
+		socket.on('configureCloudTunnel', __.bind(this.configureCloudTunnel, this));
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
@@ -73,6 +74,14 @@ var CommandManager = BaseClass.extend({
 //		exec("sudo service inoho restart", foo);	
 		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh > "+__rootPath+"/../logs/updateCron.log", foo);	
 		console.log('starting update now')
+	},
+	configureCloudTunnel : function () {
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			console.log(error, stdout, stderr);
+		}
+		exec("sudo bash "+__rootPath+"/shellScripts/createCloudAccount.sh > "+__rootPath+"/../logs/configureCloudTunnel.log", foo);	
+		console.log('starting cloud tunnel configuration now')
 	},
 	restoreFactory : function (callback) {
 		var thisObj = this;

@@ -96,6 +96,7 @@ var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConf
 __systemConfig = new SystemConfigMngr({'callback':function(err){
         var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
         var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
+        var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
@@ -134,6 +135,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 //             }
 //             catch(err){console.log("Error while starting auth server -----", err);}
             server.listen(80);
+            var createPortProxy = require(__rootPath+"/classes/utils/portProxy");
+            createPortProxy(8080, 80)
 
             app.set('view engine', 'ejs');
             app.use(favicon(__rootPath + '/static/images/favicon.ico'));
@@ -287,6 +290,13 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             var ajaxRoutes = require(__rootPath + '/routes/ajax');
             websiteRoutes(app, socComMngr);
             ajaxRoutes(app, socComMngr);
+            try {
+              var cameraRoutes = require(__rootPath + '/routes/cam');
+              cameraRoutes(app, socComMngr)
+            }
+            catch (err) {
+              console.log("######### Err: Ip camera support failed ###########")
+            }
 
 
 

@@ -139,9 +139,22 @@ EditCurtainParams = EditSwitchParams.extend({
 	iconList : ['curtain']
 });
 
+EditIpCamParams = EditSwitchParams.extend({
+	templateSelector:"#editIpCameraTemplate",
+	iconList : ['ipCam','ipCam1','ipCam2','ipCam3'],
+	subViews : [],
+	render	:	function () {
+		BaseView.prototype.render.apply(this, arguments);
+		this.setIcon(this.model.get('icon'));
+		setTimeout(_.bind(function(){this.$el.find('.switchName').removeAttr('readonly')}, this),500);
+		return this;
+	}
+});
+
 EditParamFactory = function (options) {
 	switch (options.model.get('type')) {
 		case 'curtain'	: return new EditCurtainParams(options);
+		case 'ipCam'	: return new EditIpCamParams(options);
 		default		: return new EditSwitchParams(options);
 	}
 }
