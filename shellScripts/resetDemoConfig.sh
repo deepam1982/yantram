@@ -15,6 +15,8 @@ DIR2=$DIR1/configs
 
 conf1=`cat $DIR2/groupConfig_bkp.json`
 conf2=`cat $DIR2/groupConfig.json`
+conf3=`cat $DIR2/remoteDeviceInfoConfig_bkp.json`
+conf4=`cat $DIR2/remoteDeviceInfoConfig.json`
 
 if [ -f $DIR2/userConfig.json ]; then
 	json=$(<$DIR2/userConfig.json)
@@ -30,10 +32,11 @@ if [ "$email" != "inoho6@gmail.com" ]; then
 fi	
 
 
-if [ "$conf1" == "$conf2" ]; then
+if [ "$conf1" == "$conf2" && "$conf3" == "$conf4" ]; then
 	echo "Equal!!"
 else
 	echo "Not equal!!"
 	echo "$conf1" > $DIR2/groupConfig.json
+	echo "$conf3" > $DIR2/remoteDeviceInfoConfig.json
 	sudo service inoho restart
 fi		

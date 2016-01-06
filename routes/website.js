@@ -11,7 +11,9 @@ module.exports = function(app) {
 			default		: var appFile = __rootPath + '/static/ejs/app_clasic.ejs';
 		}
 		var appColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
-		res.render(appFile,{'appColor':appColor,'appTheme':appTheme});
+		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 
+			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
+			'revId':__systemConfig.get('revId')||'0000000'});
 		// try {res.sendFile(appFile);}
 		// catch(err) {res.sendfile(appFile);}
 

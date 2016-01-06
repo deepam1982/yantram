@@ -3,7 +3,7 @@
 <HTML>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/static/<$=revId$>/fontawesome/css/font-awesome.min.css">
 	<style>
 		*::selection {background-color:transparent;} 
 		*::-moz-selection{background-color:transparent;}
@@ -36,7 +36,7 @@
 			min-height:100%;
 			max-width:500px;			
 			margin:auto;
-			/*background-image: url("/static/images/backgrounds/app_2_2x.png");*/
+			/*background-image: url("/static/<$=revId$>/images/backgrounds/app_2_2x.png");*/
 			background-size: 100% 100%;
 		}
 		#mainCont{
@@ -264,7 +264,7 @@
 		.disabledScreen {
 			position:absolute;
 			height:33px; width:33px;
-			/*background-image: url("/static/images/transparentExclamation.png");*/
+			/*background-image: url("/static/<$=revId$>/images/transparentExclamation.png");*/
 			background-size:40px 40px;
 			background-repeat: no-repeat;
 			right: 0px;
@@ -282,12 +282,12 @@
 
 		.tick {
 			width:20px; height:20px;
-			background-image: url("/static/images/transparentTick.png");
+			background-image: url("/static/<$=revId$>/images/transparentTick.png");
 			background-size: cover; 
 			position:absolute; right:0px; top:13px; z-index: 1;
 			border-radius: 10px;
-			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale');
-		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/images/transparentTick.png', sizingMethod='scale')";
+			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/<$=revId$>/images/transparentTick.png', sizingMethod='scale');
+		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/<$=revId$>/images/transparentTick.png', sizingMethod='scale')";
 
 		}
 		.tickLable {
@@ -509,7 +509,7 @@
 						<div style='padding:0 20px;'>
 							<a href='' style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
-								<img id='burgerImage' class='' style='width:25px;' src="/static/images/burgerIcon_<$=appColor$>.png"></img>
+								<img id='burgerImage' class='' style='width:25px;' src="/static/<$=revId$>/images/burgerIcon_<$=appColor$>.png"></img>
 							</div>	
 						</div>	
 					</div>
@@ -523,20 +523,20 @@
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer'></div>
 			<div id='ipCamaraFeedViewerCont'></div>
 		</div>
-		<img src="static/images/loading.gif" style="display:none;"/>
+		<img src="static/<$=revId$>/images/loading.gif" style="display:none;"/>
 	</body>
-	<script type="text/javascript" src="/static/scripts/iefix.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/iefix.js"></script>
 <!--	
-	<script type="text/javascript" src="/static/scripts/zepto/zepto.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/zepto.js"></script>
 -->
-	<script type="text/javascript" src="/static/scripts/jquery/jquery.1.9.0.min.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/jquery/jquery.1.9.0.min.js"></script>
 	<script>Zepto=$</script>
-	<script type="text/javascript" src="/static/scripts/zepto/touch.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/underscore.1.7.0.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/backbone.1.0.0.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/touch.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/underscore.1.7.0.min.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/backbone.1.0.0.js"></script>
 	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
-	<script type="text/javascript" src="/static/scripts/backbone/models/baseModel.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/models/roomModel.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/baseModel.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/roomModel.js"></script>
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea brightColor'>
 			<i class='fa fa-arrow-right hideMe' style='position:absolute;top:2px;right:11px;font-size:23px;cursor:pointer; padding:10px'></i>
@@ -572,7 +572,7 @@
 		<div>
 			<div style="text-align:center;margin-top:20px;">
 				<div style='position:relative;'>
-					<img class='whiteBG' src='/static/images/ipcamera.png' style='padding:30px 50px 0 50px;'/>
+					<img class='whiteBG' src='/static/<$=revId$>/images/ipcamera.png' style='padding:30px 50px 0 50px;'/>
 					<div class='theamBGColor whiteImageMask' style='position:absolute;top:0px; bottom:0px;width:100%; opacity:0.2; filter:alpha(opacity=20);'></div>
 				</div>
 			</div>	
@@ -612,22 +612,24 @@
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
-		<div class='font14 theamBGColor brightColor' style='width:250px;padding:8px; position:relative;'>
-				<div class='showMore' style=''>
-					<span class='currentOpt'>Configure switchboard module</span><i class='font18 fa fa-arrow-right fa-chevron-circle-down' style='float:right;'/>
-				</div>	
-				<div class='dropDownOptions font14 theamBGColor brightColor' style='width:100%; display:none; top:30px; left:0px; position:absolute; z-index:1'>
-					<hr/>
-					<div class='optionTab' viewName='cnfgrSMView'>Configure switchboard module</div>
-					<div class='optionTab' viewName='cnfgrIPCamView'>Configure IP camera</div>
-				</div>	
-		</div>
+		<$ if(ipCamaraSupported) { $>
+			<div class='font14 theamBGColor brightColor' style='width:250px;padding:8px; position:relative;'>
+					<div class='showMore' style=''>
+						<span class='currentOpt'>Configure switchboard module</span><i class='font18 fa fa-arrow-right fa-chevron-circle-down' style='float:right;'/>
+					</div>	
+					<div class='dropDownOptions font14 theamBGColor brightColor' style='width:100%; display:none; top:30px; left:0px; position:absolute; z-index:1'>
+						<hr/>
+						<div class='optionTab' viewName='cnfgrSMView'>Configure switchboard module</div>
+						<div class='optionTab' viewName='cnfgrIPCamView'>Configure IP camera</div>
+					</div>	
+			</div>
+		<$ } $>
 		<div class='configurationAppCont'></div>
 	</script>
 	<script type="text/template" id="configureModuleTemplate">
 		<div style='padding:20px;' class='translucentBg50'>
 			<div style='position:relative;'>
-				<img class='whiteBG' src='/static/images/connected_module.png' style='width:100%;'/>
+				<img class='whiteBG' src='/static/<$=revId$>/images/connected_module.png' style='width:100%;'/>
 				<div class='theamBGColor whiteImageMask' style='position:absolute;top:0px; bottom:0px;width:100%; opacity:0.2; filter:alpha(opacity=20);'></div>
 			</div>
 			<br/><br/>
@@ -740,18 +742,21 @@
 	<!--	<span style='margin-right:10px'>Confirm email id</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmailCnf'></input>
 			<br/>
-	-->		<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;
+	-->		
+			<div class='passwordBlock'>
+			<span style='margin-right:10px'>Enter password</span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwd'></input>
 			<br/>
 			<span style='margin-right:10px'>Confirm password</span>
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='password' class='cloudPwdCnf'></input>
-
+			</div>
 			<div class='errorMsgDiv theamTextColor'><br/><span>error:</span></div>
 			<br/><br/>
+			<span class='button theamBorderColor theamTextColor' id='changePasswordButton' style='margin-right:30px;display:none;'>Change Password</span>
 			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
 			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
 			<br/><br/>
-			</div>
+
 		</div>
 	</script>
 	<script type="text/template" id="theamSettingTemplate">
@@ -782,7 +787,7 @@
 	</script>
 	<script type="text/template" id="moodProxyTemplate">
 		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block;margin:0px 5px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
-			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
+			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/<$=revId$>/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
 			<span><%=name%></span>
 		</div>
 	</script>
@@ -802,7 +807,7 @@
 		<div style='clear:both;'></div>	
 		<div class='moodView'>
 			<div class="moodTitleCont translucentBg30 brightColor" style=''>
-				<img src='static/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
+				<img src='static/<$=revId$>/images/moods/<%=icon%>.png' style='width:30px;margin:0px 5px;float:left;'></img>
 				<span style="float:left;margin:7px 0 0 10px;"><%=name%></span>
 				<i class='editButton deleteMood fa fa-trash-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
 				<i class='editButton editMood fa fa-pencil-square-o' style='float:right; padding:7px 10px;font-size:20px;'></i>
@@ -813,7 +818,7 @@
 				<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
 					<div class='iconPartition' style='width:65px;float:left;text-align:center; margin:10px 5px 0px 1px;'>
 						<div style='width:65px;height:45px;position:relative;'>
-							<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((ctl.state=="on")?"on":"off")%>/<$=appColor$>/<%=ctl.icon%>.png' />
+							<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/<%print((ctl.state=="on")?"on":"off")%>/<$=appColor$>/<%=ctl.icon%>.png' />
 							<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 						</div>	
 						<span class='toggelSwitch font12 <%print((ctl.state=="on")?"brightColor":"theamTextColor")%>' style='white-space:nowrap;line-height:2;'>
@@ -837,7 +842,7 @@
 			<div class='moodIconCont'>
 				<% for(var i=0; i<iconNameArray.length; i++){%>
 					<div class='font10 moodIcon' moodName='<%=iconNameArray[i]%>' style='float:left;margin-right:10px; width:40px;text-align:center;color:black;position:relative;'>
-						<div style='width:40px; height:40px; background-image:url("static/images/moods/<%=iconNameArray[i]%>.png"); background-size:40px 40px;'></div>
+						<div style='width:40px; height:40px; background-image:url("static/<$=revId$>/images/moods/<%=iconNameArray[i]%>.png"); background-size:40px 40px;'></div>
 						<span><%=iconNameArray[i]%></span>
 						<div class='tick theamBGColor' style='<% print((icon == iconNameArray[i])?"":"display:none;");%>'></div>
 					</div>	
@@ -916,11 +921,11 @@
 		<div class='basicSwitchTemplate' style=''>
 			<div class='iconPartition' style='width:65px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
 				<div style='width:65px;height:45px;position:relative;'>
-					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/images/<%print((state=="on")?"on":"off")%>/<$=appColor$>/<%=icon%>.png' />
+					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/<%print((state=="on")?"on":"off")%>/<$=appColor$>/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
 				<span class='toggelSwitch font12 <%print((state=="on")?"brightColor":"theamTextColor")%>' style='text-transform: uppercase;white-space:nowrap;line-height:2;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
-				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/images/auto<%print((state=="on")?"Off":"On")%>Indicator_<$=appColor$>.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
+				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/<$=revId$>/images/auto<%print((state=="on")?"Off":"On")%>Indicator_<$=appColor$>.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
 				<div class='togegelTime <%print((state=="on")?"theamTextColor":"brightColor")%>' style='position:absolute;right:19px;top:-14px;width:26px;height:12px;font-size:10px;font-weight:normal;'><%=autoToggleTime%></div>
@@ -1091,7 +1096,7 @@
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
-				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/images/transparent/<%=icon%>.png" />
+				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />
 				<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
 			</div>
 			<div class='maskTransparent toggelSwitch' style='z-index:5'></div>
@@ -1135,33 +1140,33 @@
 			</div>
 		</div>
 	</script>
-	<script type="text/javascript" src="/static/scripts/jsxcompressor.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/baseView.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/utility/dialog.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/switches/basic.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/switches/advance.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/switches/edit.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/group/view1.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/moods/moodStrip.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/moods/editMood.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/moods/moodView.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/mainPage.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editPage.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/editMoodPage.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureNewModule.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/configureIpCamara.js"></script>
-	<script type="text/javascript" src="/static/scripts/md5.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/update.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/welcomeScreen.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/networkSetting.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/cloudSetting.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/theamSetting.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/sideMenuView.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/readFile.js"></script>
-	<script type="text/javascript" src="/static/scripts/backbone/views/pages/commandPoster.js"></script>
-	<!-- <script type="text/javascript" src="/static/scripts/socket.io/socket.io.js"></script> -->
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/jsxcompressor.min.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/baseView.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/utility/dialog.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/basic.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/advance.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/edit.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/group/view1.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodStrip.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/editMood.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodView.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureNewModule.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureIpCamara.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/md5.min.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/update.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/welcomeScreen.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/networkSetting.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/cloudSetting.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/theamSetting.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/sideMenuView.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/readFile.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/commandPoster.js"></script>
+	<!-- <script type="text/javascript" src="/static/<$=revId$>/scripts/socket.io/socket.io.js"></script> -->
 	<script src="/socket.io/socket.io.js"></script>
 	<script>var appTheam='Maze'</script>
-	<script type="text/javascript" src="/static/scripts/app.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/app.js"></script>
 		
 <HTML>	

@@ -3,6 +3,7 @@ var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var zlib = require('zlib');
+var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 
 module.exports = function(app, cmdMngr) {
 	
@@ -23,12 +24,23 @@ module.exports = function(app, cmdMngr) {
 			res.end()
 		});
 	});
+	
 	app.get('/mood/list', function (req, res) {
 		zlib.gzip(JSON.stringify(moodConfig.getList()), function(err, buffer) {
 			res.send((err)?"error in gzip":buffer.toString('base64'));
 			res.end()
 		});
 	});
+
+	app.get('/sendquerytoremotedevice', function (req, res) {
+		var devId=req.query.devId, queryStr=req.query.queryStr;
+		if(!devId && !queryStr) return res.send("Invalid Params");
+		deviceManager.communicator.sendQuery(devId,{name:queryStr},function() {
+			console.log("query sent to", devId)
+		});
+		res.send("query sent to" + devId);
+	});	
+
 
 	// app.get('/group/list', function (req, res) {
 	// 	zlib.gzip(JSON.stringify(groupConfig.getList()), function(err, buffer) {

@@ -28,7 +28,7 @@ BaseModel = Backbone.Model.extend({
 		$.ajax({
 			url: this.url(),
 			data:data,
-			async:false,
+			async:true,
 			dataType: 'json',
 			success: _.bind(function(resp) {
 				if (!resp.success){

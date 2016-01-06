@@ -77,7 +77,7 @@ IpCamaraFeedViewer = BaseView.extend(Popup).extend({
 		this.grpView && this.grpView.removeView();
 		this.grpView = null;
 		this.$el.find('.camGroupCont').html=("");
-		this.$el.find('.camFeedCont').html("");
+		this.$el.find('.camFeedCont img').attr("src","about:blank"); // this is to make sure that stream ends
 		return Popup.hidePopUp.apply(this, arguments);
 	}
 });
