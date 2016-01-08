@@ -26,6 +26,7 @@ var BaseView = Backbone.View.extend({
         this._attachCollectionEvents();
         _.each(this.subViews, function (orignalParams) {
             var params = _.extend({}, orignalParams);
+            _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);
             if(params.model && _.isString(params.model)) eval('params.model='+params.model);
             if(params.collection && _.isString(params.collection)) eval('params.collection='+params.collection);
             params.parentView=this;

@@ -5,6 +5,7 @@ var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
+var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
 
 var EditManager = BaseClass.extend({
 	init : function (obj) {
@@ -23,7 +24,37 @@ var EditManager = BaseClass.extend({
 		socket.on('setSwitchParam', __.bind(this.modifySwitchParam, this));
 		socket.on('modifyGroup', __.bind(this.modifyGroup, this));
 		socket.on('modifyMood', __.bind(this.modifyMood, this));
+		socket.on('editIpCamaraData', __.bind(this.editIpCamaraData, this));
+		socket.on('getIpCamaraData', __.bind(this.getIpCamaraData, this));
 	},
+	getIpCamaraData : function (callback) {
+		callback({'success':true, 'data':ipCamaraConfig.data});		
+	},
+	modifyIpCamaraParam : function (obj, callback) {
+		var curObj=ipCamaraConfig.get(obj.switchId+"")
+		, params=__.pick(obj.params, __.keys(curObj));
+		__.extend(curObj, params);
+		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket	
+		__.defer(function (){
+			ipCamaraConfig.set(obj.switchId+"", curObj);
+			ipCamaraConfig.save(function (err) {if(err) console.log(err);});
+			deviceManager.emit('deviceStateChanged', obj.devId, null, 'switchParams');
+		}, this);
+	},
+	editIpCamaraData : function (obj, callback) {
+		var curObj;
+		if((parseInt(obj.id) && !(curObj=ipCamaraConfig.get(obj.id))) || !obj.name || !obj.ip || !obj.videoPath)
+			return callback && callback({'success':false, 'msg':'invalid parameters'});
+		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket	
+			obj.icon= obj.icon || ((curObj && curObj.icon)?curObj.icon:'ipCam');
+		__.defer(function (){
+			obj.id = Math.max(parseInt(obj.id), 0);
+			if(!obj.id) obj.id = 1 + __.max(__.map(ipCamaraConfig.data, function (val, key){return parseInt(key)}));
+			obj.id = Math.max(obj.id, 1);
+			ipCamaraConfig.set(obj.id+"", __.omit(obj,"id"));
+			ipCamaraConfig.save(function (err) {if(err) console.log(err);});
+		}, this);
+	},		
 	modifyMood : function (obj, callback) {
 		var curObj;
 		if((parseInt(obj.id) && !(curObj=moodConfig.get(obj.id))) || !obj.name || !obj.icon || !obj.controls || !__.isArray(obj.controls))
@@ -73,7 +104,10 @@ var EditManager = BaseClass.extend({
 			return callback && callback({'success':false, 'msg':'invalid parameters'});
 		var invalidParams = false, controls=[], id=0;
 		__.each(obj.controls, function (ctrl) {
-			if(!ctrl.devId || typeof ctrl.switchID == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchID))
+			if(ctrl.devId && ctrl.devId == "ipCamaras") {
+				if(typeof ctrl.switchID == "undefined") return invalidParams = true;
+			}
+			else if(!ctrl.devId || typeof ctrl.switchID == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchID))
 				return invalidParams = true;
 			controls.push({"id":++id, "devId":ctrl.devId, "switchID":ctrl.switchID})
 		}, this);
@@ -108,6 +142,7 @@ var EditManager = BaseClass.extend({
 	},
 	allowedSwitchParams : ["type", "icon", "devId", "name"], // why devId ???
 	modifySwitchParam : function (obj, callback) {
+		if(obj.devId == 'ipCamaras') return this.modifyIpCamaraParam(obj, callback);
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
 		if(obj.params.autoOff) { //TODO this piece of code should not be along with deviceInfoConfig

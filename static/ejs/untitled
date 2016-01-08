@@ -1,0 +1,10 @@
+	<script type="text/template" id="editIpCameraTemplate">
+		<div style='padding:0px 10px 10px 70px;'>
+			<br/>
+			<span class='editColumn'>Name</span>
+			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
+			<br/>
+			<span class='editColumn'>Icon</span>
+			<div class='iconCont'></div>
+		</div>
+	</script>

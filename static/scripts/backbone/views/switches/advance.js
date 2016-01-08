@@ -1,28 +1,4 @@
 
-
-Popup = {
-	events: {
-		"tap .popupPannel .cross" : "hidePopUp"
-	},
-	showPopUp : function () {
-		this.bd = new Backdrop({'$parent':$('#mainCont')});
-		this.bd.render();
-		this.bd.cloneOnPullup = true;
-		var $last = $(_.last(this.$el.find('.popupPannel'))).show();
-		this.bd.pullItOver($last);
-//		$last[0].scrollIntoView();
-		return $last;
-	},
-	hidePopUp : function () {
-		if(!this.bd) return;
-		this.bd.removeView();
-		this.bd = null;
-		var $last = $(_.last(this.$el.find('.popupPannel'))).hide();
-		$last.css('position', 'inherit');
-	}
-
-}
-
 AdvancePannel = {
  	render	:	function () {
  		if(this.bd) $(_.last(this.$el.find('.advancePannel'))).width(this.$el.parent().width() - this.$el.width()).show();
@@ -39,7 +15,7 @@ AdvancePannel = {
 	showAdvancePannel : function () {
 //		_.defer(_.bind(function () {this.animateAdvancePannel=false;}, this));
 		if(this.bd) return;
-		this.bd = new Backdrop({'$parent':$('#mainCont')});
+		this.bd = new Backdrop({'$parent':this.bdCont || $('#mainCont')});
 		this.bd.cloneOnPullup = true;
 		this.bd.render();
 		this.bd.pullItOver(this.$el);
@@ -79,6 +55,7 @@ AdvanceSwitch = BasicSwitch.extend(AdvancePannel).extend({
 		"longTap .toggelSwitch" : "showAdvancePannel"
 	}),
 	showAdvancePannel : function () {
+		this.bdCont = this.$el.closest('.switchCont');
 		this.showPannelOnrender = false;
 		AdvancePannel.showAdvancePannel.apply(this, arguments);
 		this.$el.css('width', 'auto');

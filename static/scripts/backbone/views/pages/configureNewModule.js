@@ -1,6 +1,6 @@
 
-ConfigureNewModuleView = BaseView.extend({
-	templateSelector:"#addNewModuleTemplate",
+ConfigureSwitchboardModuleView = BaseView.extend({
+	templateSelector:"#configureModuleTemplate",
 	events: {
 		"tap .moduleNotAttached #retryButton" : "tryCommunication",
 		"tap .moduleAttached #configureNewModuleButton" : "configureModule",
@@ -89,6 +89,28 @@ ConfigureNewModuleView = BaseView.extend({
 				this.configureModule();
 			}
 		}, this));
+	}
+
+});
+
+ConfigureNewModuleView = BaseView.extend({
+	templateSelector:"#addNewModuleTemplate",
+	events : {
+		"tap .showMore" : "toggleList",
+		"tap .optionTab" : "switchView"
+	},
+	subViews : [{'viewClassName':'ConfigureSwitchboardModuleView', 'reference':'cnfgrSMView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':false},
+				{'viewClassName':'ConfigureIpCamaraView', 'reference':'cnfgrIPCamView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':true}],
+	toggleList : function() {
+		var $list = this.$el.find('.dropDownOptions');
+		if($list.is(':visible')) $list.hide();
+		else $list.show();
+	},
+	switchView : function (event) {
+		this.cnfgrSMView.erase();	this.cnfgrIPCamView.erase();
+		this[$(event.target).attr('viewName')].render();
+		this.$el.find(".currentOpt").html($(event.target).html())
+		this.toggleList();
 	}
 
 });

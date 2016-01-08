@@ -8,6 +8,7 @@ var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
+var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
 
 var CommandManager = BaseClass.extend({
 	init : function (obj) {
@@ -32,6 +33,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('restoreNetwork', __.bind(this.restoreNetwork, this));
 		socket.on('restartZigbee', __.bind(this.restartZigbee, this));
 		socket.on('applyMood', __.bind(this.activateMood, this));
+		socket.on('configureCloudTunnel', __.bind(this.configureCloudTunnel, this));
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
@@ -73,6 +75,24 @@ var CommandManager = BaseClass.extend({
 //		exec("sudo service inoho restart", foo);	
 		exec("sudo bash "+__rootPath+"/shellScripts/updateCron.sh > "+__rootPath+"/../logs/updateCron.log", foo);	
 		console.log('starting update now')
+	},
+	configureCloudTunnel : function () {
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			console.log(error, stdout, stderr);
+		}
+		exec("sudo bash "+__rootPath+"/shellScripts/createCloudAccount.sh > "+__rootPath+"/../logs/configureCloudTunnel.log", foo);	
+		console.log('starting cloud tunnel configuration now')
+	},
+	changeCloudPassword : function (email, pwd, clbk) {
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			console.log(error, stdout, stderr);
+			var rspJson = JSON.parse(stdout);
+			clbk && clbk(error||!rspJson.success, rspJson);
+		}
+		exec("sudo bash "+__rootPath+"/shellScripts/changeCloudPassword.sh "+email+" "+pwd, foo);	
+		console.log('starting changeCloudPassword bash')
 	},
 	restoreFactory : function (callback) {
 		var thisObj = this;
@@ -259,7 +279,17 @@ var CommandManager = BaseClass.extend({
 								__userConfig.set('email', '');__userConfig.set('password', '');
 								console.log("removed "+email+' from cloud');
 								createAccount(commandData.email, commandData.password, nwkKey)
-								__userConfig.save(function (err) {err && console.log(err)});
+								__userConfig.save(function (err) {
+									err && console.log(err)
+									var sshTunnelConfig = new (BasicConfigManager.extend({file : '/../configs/sshTunnelConfig.json'}))({"callback":function (err) {
+										if(err) sshTunnelConfig = null;
+										if (sshTunnelConfig) {
+											thisObj.changeCloudPassword(commandData.email, commandData.password)
+										}
+										else 
+											thisObj.configureCloudTunnel()
+									}});
+								});	
 							}
 						);
 					}
@@ -364,7 +394,8 @@ var CommandManager = BaseClass.extend({
 		device.setDimmer(switchId, duty)
 		
 	},
-	onToggleSwitchCommand	: function (commandData) {
+	onToggleSwitchCommand	: function (commandData, callback) {
+		callback && callback();
 		var devId = commandData.devId, switchId = commandData.switchId;
 		var device = deviceManager.getDevice(devId);
 		if(!device) {

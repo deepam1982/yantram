@@ -36,7 +36,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 		conf.id = id+''; // id has to be string
 		conf.rank || (conf.rank = (__.indexOf(keys, id+'')+1));
 		conf.count = count;
-		conf.disabledCtls = 0; 
+		conf.disabledCtls = 0;
 		__.each(conf.controls, function (ctl) {
 			var cnt = __.keys(ctl).length;
 			var curtainId = parseInt(ctl.switchID) - parseInt(__remoteDevInfoConf.get(ctl.devId+'.loads.normal'));
@@ -44,9 +44,16 @@ var GroupConfigManager = BasicConfigManager.extend({
 			__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
 				ctl[key] = val;
 			});
-			if (cnt == __.keys(ctl).length) return conf.controls = __.without(conf.controls, ctl);
+			if (ctl.devId == 'ipCamaras') {
+				var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
+				var ipCamCnf = ipCamaraConfig.get(ctl.switchID+'');
+				__.extend(ctl, {"type":"ipCam", "name":ipCamCnf.name, "icon":ipCamCnf.icon ||"ipCam", "groupId":conf.id});
+			}
+			if (cnt == __.keys(ctl).length) 
+				return conf.controls = __.without(conf.controls, ctl);
+
 			var config = deviceManager.getConfig(ctl.devId);
-			ctl.disabled = (!config)?true:((!config.reachable)?true:false);
+			ctl.disabled = (ctl.devId == 'ipCamaras')?false:((!config)?true:((!config.reachable)?true:false));
 			(ctl.disabled && conf.disabledCtls++);
 			ctl.state = false;
 			if(config){

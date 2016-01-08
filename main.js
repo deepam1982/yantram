@@ -96,6 +96,7 @@ var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConf
 __systemConfig = new SystemConfigMngr({'callback':function(err){
         var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
         var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
+        var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
@@ -133,9 +134,17 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 //               var auth = require(__rootPath+"/classes/auth/jwt");
 //             }
 //             catch(err){console.log("Error while starting auth server -----", err);}
-            server.listen(80);
+            server.listen(__systemConfig.get('port') || 80);
+            if(!__systemConfig.get('port')) {
+              var createPortProxy = require(__rootPath+"/classes/utils/portProxy");
+              createPortProxy(8080, 80)
+            }
 
             app.set('view engine', 'ejs');
+            app.use(function(req, res, next) {
+              req.url =  req.url.replace(/^\/static\/[0-9a-f]{7}(.*)/, "/static$1");
+              next();
+            });
             app.use(favicon(__rootPath + '/static/images/favicon.ico'));
             //app.use('/favicon', express.static(__rootPath + '/static/images', {maxAge:86400}));
             app.use('/static/images', express.static(__rootPath + '/static/images', {maxAge:86400}));
@@ -287,6 +296,10 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             var ajaxRoutes = require(__rootPath + '/routes/ajax');
             websiteRoutes(app, socComMngr);
             ajaxRoutes(app, socComMngr);
+            if(__systemConfig.get('ipCamaraSupported')){
+              var cameraRoutes = require(__rootPath + '/routes/cam');
+              cameraRoutes(app, socComMngr)
+            }
 
 
 

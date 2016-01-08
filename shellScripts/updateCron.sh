@@ -47,8 +47,25 @@ fi
 git --work-tree=$DIR1 --git-dir=$DIR1/.git fetch origin
 git --work-tree=$DIR1 --git-dir=$DIR1/.git reset --hard origin/$BRANCH
 
-echo "softupgrade done, restarting home controller"
-#step 4 restart homeController
+echo "softupgrade done, updating revId"
+#step 4 update revId
+currentRev=`git --work-tree=$DIR1 --git-dir=$DIR1/.git rev-parse origin/$BRANCH`
+revId=`echo $currentRev | cut -c1-7`
+
+jsonFile=$DIR0/configs/systemConfig.json
+jsonFile_bkp=$DIR0/configs/_systemConfig_bkp_bkp.json
+touch $jsonFile
+cp $jsonFile $jsonFile_bkp
+node > ${jsonFile} <<EOF
+try{var data = require('${jsonFile_bkp}');}
+catch(err){data={};}
+data.revId='${revId}';
+console.log(JSON.stringify(data, null, 4));
+EOF
+rm $jsonFile_bkp
+
+echo "revId updated, restarting home controller"
+#step 5 restart homeController
 
 sudo at -M now + 1 minute <<< 'sudo service inoho start'
 sudo /etc/init.d/inoho stop
