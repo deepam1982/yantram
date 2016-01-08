@@ -62,7 +62,6 @@ var showBurgerMenu = function () {
 	if(servedFromCloud) {
 		$('.nwkStng, .cldStng, .cnfrMdl, .chkUpdt').hide();
 	}else {
-		$('.logout').hide();
 		setInterval(function () {if(Date.now()-pingTimeStamp < 8000)return; location.reload();}, 1000);
 	}
 };

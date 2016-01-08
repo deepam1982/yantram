@@ -16,22 +16,12 @@ module.exports = function(app, cmdMngr) {
 		});
 
 	});
-
+	
 };
 
 
 
 
-	// app.get('/headers', function (req,res) {
-	// 	// if(!req.headers['authorization']){
-	// 	// 	res.writeHead(401, {'WWW-Authenticate': 'Basic realm="Inoho Test App"', 'Content-Type': 'text/plain'});
-	// 	// 	res.end();
-	// 	// 	return;
-	// 	// }
-	// 	res.write(req.headers);
-	// 	res.write(req.query);
-	// 	res.end()
-	// });
 
 
 //var MjpegProxy = require('mjpeg-proxy').MjpegProxy;

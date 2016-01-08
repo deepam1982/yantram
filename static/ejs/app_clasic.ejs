@@ -2,6 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
+		<title>Inoho</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="/static/<$=revId$>/fontawesome/css/font-awesome.min.css">
 	<style>
@@ -435,12 +436,18 @@
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
 			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
+			<$ if(!cloudRequest) { $>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
+			<$ } $>
 			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
+			<$ if(!cloudRequest) { $>
 			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>
+			<$ } $>
 			<br/><br/><br/>
 			<div class='options chkUpdt' jsVarNm='checkUpdatePage'>Check Updates</div>
-			<div class='options logout' ><a href='logout' style='text-decoration:none;color:inherit'>Logout</a></div>
+			<$ if(cloudRequest) { $>
+			<div class='options logout' ><a href='/logout' style='text-decoration:none;color:inherit'>Logout</a></div>
+			<$ } $>
 		</div>
 	</script>
 	<script type="text/template" id="ipCamaraFeedViewer">
