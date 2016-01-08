@@ -231,7 +231,7 @@ var CommandManager = BaseClass.extend({
 			__userConfig.set('password', commandData.password);
 		}
 		var thisObj = this;
-		var createAccount = function (newEmail, newPassword, nwkKey) {
+		var createAccount = function (newEmail, newPassword, nwkKey, next) {
 			console.log('recieved request to create account on cloud email-'+newEmail+' password-'+newPassword);
 			checkInternet(function (err){
 				if(!err) {
@@ -250,6 +250,7 @@ var CommandManager = BaseClass.extend({
 								if(err) return console.log(err);
 								console.log('Cloud configuration success');
 								callback({'success':true});
+								next && next();
 								thisObj.cloudSocket && thisObj.cloudSocket.socket.disconnect();
 							});
 						}
@@ -278,9 +279,7 @@ var CommandManager = BaseClass.extend({
 								if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
 								__userConfig.set('email', '');__userConfig.set('password', '');
 								console.log("removed "+email+' from cloud');
-								createAccount(commandData.email, commandData.password, nwkKey)
-								__userConfig.save(function (err) {
-									err && console.log(err)
+								createAccount(commandData.email, commandData.password, nwkKey, function (){
 									var sshTunnelConfig = new (BasicConfigManager.extend({file : '/../configs/sshTunnelConfig.json'}))({"callback":function (err) {
 										if(err) sshTunnelConfig = null;
 										if (sshTunnelConfig) {
@@ -289,7 +288,8 @@ var CommandManager = BaseClass.extend({
 										else 
 											thisObj.configureCloudTunnel()
 									}});
-								});	
+								});
+								__userConfig.save(function (err) {err && console.log(err)});	
 							}
 						);
 					}
