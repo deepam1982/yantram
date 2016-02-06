@@ -13,7 +13,7 @@
 		    /*You just need this if you are only concerned with android and not desktop browsers.*/
 		    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 		}    
-		input[type="text"], textarea, [contenteditable]
+		input[type="password"], input[type="text"], textarea, [contenteditable]
 		{ -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;}
 
 		body{
@@ -739,9 +739,12 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
-					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
-				<%}%>	
-				<br/><br/>
+					<div style='width:50px;float:left;'>
+					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>
+					</div>
+				<%}%>
+				<div style="clear:both;"></div>	
+				<br/>
 			<%}%>
 			&nbsp;&nbsp;<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
 			<br/><br/>
