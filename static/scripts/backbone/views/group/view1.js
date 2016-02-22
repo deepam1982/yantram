@@ -74,10 +74,45 @@ DeviceGroupView = BaseView.extend({
 	//TODO arr should be collection and not simple array.
 });
 
+ChoseGroupIconPannel = BasicDialog.extend({
+	templateSelector:"#choseGroupIconPannel",
+	icons:['1living','2living','3living','4tv','5tv','6music','7dining','8dining','9dining','10bar','11bar','12kitchen','13kitchen', '14bedroom', '15bedroom', '16bedroom', '17bedroom', '18bunkbed', '18splitbed', '19dressing', '20wadrobe','21wadrobe','22washroom','23bathroom','24bathroom','25washing', '26balcony','27balcony','28garden','29outdoor','30outdoor','31swimming','32snooker','33tenis','34gym','35garage','36conferance','37desk','38desk','39study','41pooja','42stairs','40door'],
+	_getJsonToRenderTemplate : function () {return {'icons':this.icons, 'curIcon':this.iconName || '40door'}},
+	events: {
+		"tap .cross" : "onSelectionDone",
+		"tap .roomIconCont" : "onRoomIconChange"
+	},
+	show : function (iconName,onDoneCakbk) {
+		this.iconName = iconName;
+		this.onDoneCakbk = onDoneCakbk;
+		return BasicDialog.prototype.show.apply(this, arguments);
+	},
+	onRoomIconChange : function (event) {
+		var rmIcnCnt = $(event.target).closest('.roomIconCont'), iconName = rmIcnCnt.attr('iconName');
+		this.$el.find('.roomIconCont .tick:visible').hide();
+		rmIcnCnt.find('.tick').show();
+	},
+	onSelectionDone : function () {
+		var newIconName = $(this.$el.find('.roomIconCont .tick:visible')[0]).closest('.roomIconCont').attr('iconName');
+		this.hide();
+		this.onDoneCakbk && this.onDoneCakbk(newIconName);
+	}
+})
+
 EditGroupPannel = BaseView.extend({
 	name : "EditGroupPannel",
 	templateSelector:"#editGroupTemplate",
+	subViews : [{'viewClassName':'ChoseGroupIconPannel', 'reference':'choseIconDialog', 'parentSelector':'.groupIconPannelCont', 'model':null, 'supressRender':true}],
 	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'deviceCollection'}],
+	events: {
+		"tap .editGroupIcon" : "editGroupIcon"
+	},
+	editGroupIcon : function () {
+		this.choseIconDialog.show(this.model.get('icon'),_.bind(function(newIconName){
+			this.model.set('icon', newIconName, {silent: true});
+			this.$el.find('.roomIcon').css('background-image','url("static/images/rooms/'+newIconName+'.png")')
+		},this));
+	},
 	render : function () {
 		deviceCollection.each(function (dev) {
 			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
@@ -90,6 +125,10 @@ EditGroupPannel = BaseView.extend({
 	},
 	erase : function () {
 		if(!this.rendered) return;
+		this.saveGroupInfo()
+		return BaseView.prototype.erase.apply(this, arguments);
+	},
+	saveGroupInfo : function () {
 		var groupInfo = this.model.toJSON();
 		groupInfo.rank = this.$el.find('input[name=rank]:checked').val() || groupInfo.rank;
 		groupInfo.name=this.$el.find('.groupName').val() || groupInfo.name;
@@ -101,8 +140,7 @@ EditGroupPannel = BaseView.extend({
 		}, this);
 		groupInfo.controls = controls;
 		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
-		console.log(groupInfo);
-		return BaseView.prototype.erase.apply(this, arguments);
+		console.log(groupInfo);		
 	}
 });
 

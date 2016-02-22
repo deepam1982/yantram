@@ -67,6 +67,9 @@ var CC2530Controller = BaseCommunicator.extend({
 			case '0304'	: 	this.emit('msgRecieved', "STSWPT", msg, sourceMacAdd); break;
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
 			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break; //????
+			case '0404'	: 	this.sendQuery(sourceNwkAdd, {name:"0404"}); 
+							console.log("## sent link alive acknowledgment to",sourceMacAdd, sourceNwkAdd);
+							break; // Link alive acknowledgment.
 			default 	: 	console.log("Unknown message from zigbee module -", data); return;
 		}
 //		console.log(msgId);
@@ -138,6 +141,7 @@ var CC2530Controller = BaseCommunicator.extend({
 
 	sendQuery : function (devId, queryObj, callback) {
 		var nwkAdd = devId?this._getNwkAdd(devId):'';
+		if(!nwkAdd && devId && devId.length == 4) nwkAdd = devId;
 		var queryInHexStr = this._buildQuery(queryObj)
 		var cbk = function (err, results, queryInHxStr) {
 			// console.log( "$$$$$$$$$$$$$$$$$$$$$ sent query - "+queryInHxStr);
@@ -149,6 +153,7 @@ var CC2530Controller = BaseCommunicator.extend({
 			this._processQueryQ = __.throttle(__.bind(function(){
 //				console.log("Processing Query Q");
 				var qObj = this._queryQ.shift();
+//				console.log("--------->>> outgoing query -",qObj.query);
 				qObj && this._send(qObj.query, function (err, results) {qObj.callback(err, results, qObj.queryInHexStr)});
 				if(this._queryQ.length) this._processQueryQ();
 			}, this), 10); // this was earlier 50ms, but then I thought 10ms is fine.

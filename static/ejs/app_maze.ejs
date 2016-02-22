@@ -16,6 +16,9 @@
 		input[type="password"], input[type="text"], textarea, [contenteditable]
 		{ -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;}
 
+		html {
+			height: 100%;
+		}
 		html, body{
 			width:100%;
 			height: 100%;
@@ -57,7 +60,6 @@
 			padding:10px 10px 0 10px;
 		}
 		#appCont {
-			min-height:500px;
 			overflow: hidden;
 			position: relative;
 			/*padding:0 20px 20px 20px;*/
@@ -152,6 +154,25 @@
 			border-radius: 5px;
 			padding-bottom: 5px;
 		}
+		.border1pxradius5px, .border2pxradius5px, .border2pxradius3px, .circle{
+			border-style:solid;
+		}
+		.border1pxradius5px{
+			border-width:1px; 
+			border-radius: 5px;
+		}
+		.border2pxradius5px{
+			border-width:2px; 
+			border-radius: 5px;
+		}
+		.border2pxradius3px {
+			border-width:2px; 
+			border-radius: 3px;	
+		}
+		.circle{
+			border-radius: 500px;
+			border-width:2px;
+		}
 		.dialogCont .dialog {
 			border-radius: 5px;
 		}
@@ -237,6 +258,10 @@
 		.powerOffSpinner {
 			position:absolute;right:14px;top:-4px;font-size:40px;
 		}
+		.patchSpinner {
+			position:absolute;right:-7px;top:-8px;font-size:40px;
+		}
+
 
 		#experiment, #experiment1{
 			margin-left: 20px;
@@ -252,7 +277,7 @@
 		#ipCamaraFeedViewerCont .popupPannel .cross {
 			color:black;
 		}
-		.popupPannel .cross, .advancePannel .cross {
+		.dialog .cross, .popupPannel .cross, .advancePannel .cross {
 			position:absolute;
 			right:-10px;top:-12px;
 			cursor:pointer;
@@ -273,9 +298,27 @@
 			border-radius: 22px;
 			font-size: 38px;
 		}
-
+		.powerOffIcon {
+			position:absolute;
+			height:24px; width:24px;
+			line-height:24px;
+			right: 5px;
+			top: -5px;
+			border-radius: 12px;
+			font-size: 18px;
+			text-align: center;
+		}
+		.patchIcon {
+			position:absolute;
+			height:25px; width:25px;
+			line-height:24px;
+			right: -16px;
+			border-radius: 15px;
+			font-size: 18px;
+			text-align: center;
+		}
 		.dialogCont{padding:20px;}
-		.dialog{padding:20px;}
+		.dialog{padding:20px; position:relative;}
 		.dialog .msgDiv {text-align: left;}
 		.dialog .buttonDiv {margin-top: 10px;}
 		.dialog .buttonDiv span{float: right;margin-left: 20px;}
@@ -324,7 +367,8 @@
 		.schedularCont .edit,
 		.schedularCont .remove,
 		.schedularCont .enable,
-		.schedularCont .disable {
+		.schedularCont .disable,
+		.editGroupCont .edit{
 			padding:5px;
 			cursor: pointer;
 		}
@@ -342,6 +386,9 @@
 
 		.whiteBG{background-color: white;}
 		.whiteBorderColor{border-color:white;}
+		.blackBorderColor{border-color:black;}
+
+		.blackTextColor{color:black;}
 
 		.editTemplateCont {
 			/*margin-top:-20px;*/
@@ -376,7 +423,7 @@
 
 		.theamTable .tableBox {
 			float: left;
-			width: 50px;
+			width: 51px;
 			min-height:5px;
 			text-align: center;
 		}
@@ -497,7 +544,7 @@
 	</style>
 	</head>
 
-	<body class='unselectable trapTheam theamTextColor appColor_<$=appColor$> appTheme<$=appTheme$>'>
+	<body class='unselectable trapTheam theamTextColor appColor_<$=appColor$> appTheme<$=appTheme$>'  homeView='<$=homeView$>'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
 			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
 		</div>
@@ -510,7 +557,10 @@
 						<div style='padding:0 20px;'>
 							<a href='' style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
-								<img id='burgerImage' class='' style='width:25px;' src="/static/<$=revId$>/images/burgerIcon_<$=appColor$>.png"></img>
+								<i id='burgerImage' class='theamTextColor fa fa-bars'></i>
+							</div>
+							<div id='backImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; font-size:23px;cursor:pointer;'>
+								<i id='backImage' class='theamTextColor fa fa-arrow-left'></i>
 							</div>	
 						</div>	
 					</div>
@@ -788,6 +838,25 @@
 				<%}}%>
 				<div style='clear:both;'></div>
 			</div>
+			<br/><br/><br/>
+			<div class='helpText'>Sellect one of the following view for the home screen</div>
+			<br/>
+			<div class='theamTable helpText'>
+				<div class='tableBox'>List view</div>
+				<div class='tableBox'><i style='margin-top:-5px;' class='listViewSelection theamTextColor fa fa-2x fa-list'></i></div>
+				<div class='tableBox'>
+					<input type="radio" name="homeView" value='list' 
+						<% print(('<$=homeView$>'=='list')?'checked="checked"':'' )%>/>
+				</div>
+				<br/><br/><br/>
+				<div class='tableBox'>Grid view</div>
+				<div class='tableBox'><i style='margin-top:-5px;' class='gridViewSelection theamTextColor fa fa-2x fa-th'></i></div>
+				<div class='tableBox'>
+					<input type="radio" name="homeView" value='grid'
+						<% print(('<$=homeView$>'=='grid')?'checked="checked"':'' )%>/>
+				</div>
+				<div style='clear:both;'></div>
+			</div>			
 			<br/>
 			<span class='button theamBorderColor theamTextColor' id='applyTheamButton' style='float:right;'>Apply</span>
 		</div>
@@ -860,9 +929,12 @@
 			<%if(typeof count != 'undefined') {%>
 				<span style='margin-left:-60px;float:left;'>Rank</span>
 				<%for(var i=1 ;i<=count; i++) {%>
+					<div style='width:50px;float:left;'>
 					<input id='positionRadio<%=i%>' type="radio" name="rank" value="<%=i%>" <% if(parseInt(rank)==i)print("checked")%>/><label for='positionRadio<%=i%>'><%=i%></label>&nbsp;&nbsp;&nbsp;
+					</div>
 				<%}%>	
-				<br/><br/>
+				<div style="clear:both;"></div>
+				<br/>
 			<%}%>
 			<span style='font-size:11px;'>Tap icon to add or remove device from mood</span>
 			<br/><br/>
@@ -872,6 +944,31 @@
 				filter:alpha(opacity=30);'>
 			</div>
 		</div>	
+	</script>
+	<script type="text/template" id="groupProxyMainPageViewTemplate">
+		<div>
+			<div class='proxyCont'></div>
+			<div style="clear:both;"></div>	
+			<div class='groupViewCont'></div>
+		</div>
+	</script>
+	<script type="text/template" id="groupProxyViewTemplate">
+		<div class='groupProxyCont' groupId='<%=id%>' style='float:left; margin:<%=margin%>px; height:100px; width:<%=width%>px; text-align:center;cursor:pointer;position:relative;'>
+			<% var poweredOn = (typeof poweredCount != "undefined" && poweredCount)?true:false; if(poweredOn){%>
+				<div class='powerOffIcon theamBGColor'>
+					<i class='fa fa-power-off brightColor'></i>
+				</div>
+			<%}%>	
+			<% if(typeof groupMoods != "undefined" && groupMoods){ for(var i=0; i<Math.min(2,groupMoods.length); i++) {%>
+				<div class='patchIcon moodIcon brightBGColor' style='top:<% print(16+i*(6+24)) %>px;' moodId='<%=groupMoods[i].id%>'>
+					<span style='display:inline-block;width:24px; height:24px; background-image:url("static/<$=revId$>/images/moods/<%=groupMoods[i].icon%>.png"); background-size:20px 20px; background-position: center; background-repeat: no-repeat; '></span>
+				</div>
+			<%}}%>
+
+
+			<div class='proxyImgCont translucentBg45 <% print((poweredOn)?"brightBorderColor":"blackBorderColor")%> circle' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:70px 70px; background-repeat: no-repeat; background-position: center; height:86px; width:86px; padding:2px;'></div>
+			<span class='font12 brightColor' style="text-align:left;white-space:nowrap;"><%=name%></span>
+		</div>
 	</script>
 	<script type="text/template" id="groupTemplate">
 		<div class='groupView theamBorderColor'>
@@ -918,6 +1015,12 @@
 				<div style="clear:both;"></div>
 				<br/>
 			<%}%>
+			<br/>
+			<span style='margin-left:-60px;float:left;'>Icon</span>
+			<div  class='roomIcon' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:40px 45px; height:40px; width:40px;margin:-15px 15px 0 0;float:left;'></div>
+			<span class='edit theamTextColor editGroupIcon'><i class='fa fa-pencil-square-o font16'></i></span>
+			<div class='groupIconPannelCont'></div>
+			<br/>
 			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
 			<br/><br/>
 			<div style='position:relative'>
@@ -926,6 +1029,30 @@
 				filter:alpha(opacity=30);'>
 			</div>
 		</div>	
+	</script>
+	<script type="text/template" id="choseGroupIconPannel">
+		<div class='dialogCont'>
+			<div class='dialog whiteBG blackTextColor' style='max-height:500px;overflow:auto;'>
+				<div class='cross' style='top:5px;right:0px;z-index:5;'>
+					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+					<br/>
+					<b>Done</b>
+				</div>
+				
+				<span class='font14'>Chose one of following as group icon</span>
+				<br/><br/>
+				<%for(var i=0; i<icons.length; i++) {%>
+					<div class='roomIconCont' iconName='<%=icons[i]%>' style='z-index:5;height:40px; width:40px;margin:10px;float:left;position:relative;'>
+						<div class='tick theamBGColor' style='display:<%print((curIcon==icons[i])?"block":"none")%>;'></div>
+						<div style='background-image:url("static/<$=revId$>/images/rooms/<%=icons[i]%>.png"); background-size:40px 45px; height:40px; width:40px;'></div>
+					</div>	
+				<%}%>
+				<div style="clear:both;"></div>
+			</div>
+			<div class='theamBGColor maskTransparent' style='opacity:0.3;
+				filter:alpha(opacity=30);'>
+			</div>
+		</div>
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
 		<div class='basicSwitchTemplate' style=''>

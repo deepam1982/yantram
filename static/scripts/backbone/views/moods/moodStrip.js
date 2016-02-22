@@ -21,6 +21,17 @@ MoodStripView = BaseView.extend({
 			setTimeout(function (){$elm.find('.spinner').remove()}, 1000);
 			if(err)console.log(err)
 		});
-
+	},
+	showSelectiveMoodProxy : function (moodIds) {
+		_.each(this.moodProxyArray, function(view){
+			var $moodProxy = view.$el;
+			if(_.indexOf(moodIds,$moodProxy.find(".moodIcon").attr('moodId'))+1)$moodProxy.show();
+			else $moodProxy.hide();	
+		});
+	},
+	showAllMoodProxy : function() {
+		_.each(this.moodProxyArray, function(view){
+			var $moodProxy = view.$el.show();
+		});
 	}
 })

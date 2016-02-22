@@ -92,9 +92,11 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
 	.theamBGColor{background-color: "+color+";}\
+	.brightBGColor{background-color: "+brightColor+";}\
 	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
 	input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+inputColor+";}\
+	.brightBorderColor{border-color:"+brightColor+";}\
 	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
 	.translucentBg45 {background-color: rgba("+traprntColor+",0.45);}\
 	#groupTitleHeaderForTrapTheam{border-bottom-color:rgba("+traprntColor+",0.45);}\
@@ -243,7 +245,11 @@ mC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchCo
 gC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
 
 deviceCollection = dC;
-var mainPageView = new MainPageView({'collection':gC});
+if($('body').attr('homeView')=='list')
+	var mainPageView = new MainPageView({'collection':gC});
+else 
+	var mainPageView = new GroupProxyMainPageView({'collection':gC, 'moodCollection':mC});
+
 var moodStrip = mainPageView.moodStrip = new MoodStripView({'collection':mC, 'el':$('.moodWidgetArea')});
 $('#appCont').append(mainPageView.$el);
 mainPageView.render();
