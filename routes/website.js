@@ -11,7 +11,8 @@ module.exports = function(app) {
 			default		: var appFile = __rootPath + '/static/ejs/app_clasic.ejs';
 		}
 		var appColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
-		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 
+		var homeView = __userConfig.get('homeView') || 'list';
+		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
 			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true

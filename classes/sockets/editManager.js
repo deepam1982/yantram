@@ -118,7 +118,7 @@ var EditManager = BaseClass.extend({
 			if(!obj.id) obj.id = 1 + __.max(__.map(groupConfig.data, function (val, key){return parseInt(key)}));
 			obj.id = Math.max(obj.id, 1);
 			if(controls.length)
-				groupConfig.set(obj.id+"", {"name":obj.name, "controls":controls});
+				groupConfig.set(obj.id+"", {"name":obj.name, "controls":controls, "icon":obj.icon});
 			else {
 				groupConfig.emit('groupDeleteStart', obj.id);
 				groupConfig.data = __.omit(groupConfig.data, obj.id+"");

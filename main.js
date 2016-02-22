@@ -64,13 +64,17 @@ fs.exists('/sys/class/gpio/gpio13', function (exist) {
 __restartZigbeeModule = function (calback) {
   console.log(" ----------------- Restarting Zigbee Module ----------------- ");
   fs.writeFile('/sys/class/gpio/gpio13/value',0, function(err) {
-      if(err) return calback && calback(err);
+      if(err){ 
+        console.log(err);
+        return calback && calback(err);
+      }
       setTimeout(function () {
             fs.writeFile('/sys/class/gpio/gpio13/value',1, function(err) {
               if(err)console.log(err);
+              console.log(" ----------------- Restarted Zigbee Module ----------------- ");
               calback && setTimeout(__.bind(calback, null, err), 1500)
             });
-      }, 300);
+      }, 3000);
   });
 };
 //setTimeout(__restartZigbeeModule, 20000);
@@ -300,6 +304,9 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               var cameraRoutes = require(__rootPath + '/routes/cam');
               cameraRoutes(app, socComMngr)
             }
+
+            var apiV1 = require(__rootPath + '/routes/apiV1');
+            apiV1(app, socComMngr);
 
 
 

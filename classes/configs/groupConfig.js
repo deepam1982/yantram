@@ -37,6 +37,9 @@ var GroupConfigManager = BasicConfigManager.extend({
 		conf.rank || (conf.rank = (__.indexOf(keys, id+'')+1));
 		conf.count = count;
 		conf.disabledCtls = 0;
+		conf.poweredCount = 0;
+		conf.groupMoods = [];
+		__.each(moodConfig.getSingleGroupMoods(), function(mObj, indx){if(1+__.indexOf(mObj.groups, conf.id+''))conf.groupMoods.push(__.pick(mObj,'id','name','icon'));});
 		__.each(conf.controls, function (ctl) {
 			var cnt = __.keys(ctl).length;
 			var curtainId = parseInt(ctl.switchID) - parseInt(__remoteDevInfoConf.get(ctl.devId+'.loads.normal'));
@@ -66,6 +69,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 					ctl.state = (ctl.state)?'on':'off';
 				}
 			}
+			if(!(curtainId > -1) && ctl.state=='on') conf.poweredCount++;
 			var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);
 			ctl.autoOff = timers.autoOff[0];
 			if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
@@ -89,6 +93,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 		return conf;
 	},
 	getList : function () {
+		var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 		var data = [];
 		__.each(this.toJSON(), function (conf, id) {	
 			data.push(this._getGroupDetails(conf, id));

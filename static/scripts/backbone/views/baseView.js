@@ -35,6 +35,7 @@ var BaseView = Backbone.View.extend({
         }, this);
         _.each(this.subViewArrays, function (orignalParams) {
         	var params = _.extend({}, orignalParams);
+            _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);
             if(params.array && _.isString(params.array)) eval('params.arr='+params.array);
             params.parentView=this;
             var arr = params.arr; params.array=null; var newArr=[];

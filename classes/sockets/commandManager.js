@@ -213,7 +213,9 @@ var CommandManager = BaseClass.extend({
 		callback({'success':true, 'email':__userConfig.get('email')})
 	},
 	modifyThemeSettings : function (commandData, callback) {
-		__userConfig.set('appTheam', commandData.theam);__userConfig.set('appColor', commandData.color);
+		__userConfig.set('appTheam', commandData.theam);
+		__userConfig.set('appColor', commandData.color);
+		__userConfig.set('homeView', commandData.homeView);
 		__userConfig.save(function (err) {
 			if(err) return console.log(err);
 			console.log('App theam modification success');
@@ -414,11 +416,11 @@ var CommandManager = BaseClass.extend({
 	},
 	activateMood : function (commandData) {
 	    var moodData = moodConfig.get(commandData.id+"");
-	    if(!moodData || !moodData.controls || moodData.icon != commandData.icon)
+	    if(!moodData || !moodData.controls)
 	    	return console.log("invalid mood command from client");
 		eventLogger.addEvent("activateMood", {
 	        'moodId':commandData.id, 
-	        'moodIcon':commandData.icon,
+	        'moodIcon':moodData.icon,
 	        'remoteDevice':commandData.deviceType 
 	    });
 	    var conf = {};
