@@ -879,7 +879,7 @@
 			<%}%>
 			<br/>
 			<span style='margin-left:-60px;float:left;'>Icon</span>
-			<div class='' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:40px 45px; height:40px; width:40px;margin:-15px 15px 0 0;float:left;'></div>
+			<div class='roomIcon' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:40px 45px; height:40px; width:40px;margin:-15px 15px 0 0;float:left;'></div>
 			<span class='edit theamTextColor editGroupIcon'><i class='fa fa-pencil-square-o font16'></i></span>
 			<div class='groupIconPannelCont'></div>
 			<br/><br/>
@@ -889,7 +889,7 @@
 	</script>
 	<script type="text/template" id="choseGroupIconPannel">
 		<div class='dialogCont'>
-			<div class='dialog whiteBG'>
+			<div class='dialog whiteBG' style='max-height:500px;overflow:auto;'>
 				<div class='cross' style='top:5px;right:0px;'>
 					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
 					<br/>

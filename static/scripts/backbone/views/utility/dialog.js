@@ -59,8 +59,8 @@ BasicDialog = BaseView.extend({
 		this.bd = new Backdrop({'$parent':$('#mainCont')});
 		this.bd.render();
 		this.bd.pullItOver(this.$el);
-		var left = ($(window).width() - this.$el.width())/2;
-		var top = ($(window).height() - this.$el.height())/2;
+		var left = Math.max(0,($(window).width() - this.$el.width())/2);
+		var top = Math.max(0,($(window).height() - this.$el.height())/2);
 		this.$el.css('position','fixed').css('top',top+'px').css('left',left+'px');
 		$('body').css('overflow', 'hidden');		
 	},

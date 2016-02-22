@@ -110,8 +110,7 @@ EditGroupPannel = BaseView.extend({
 	editGroupIcon : function () {
 		this.choseIconDialog.show(this.model.get('icon'),_.bind(function(newIconName){
 			this.model.set('icon', newIconName, {silent: true});
- 			BaseView.prototype.erase.apply(this, arguments);
- 			this.render();
+			this.$el.find('.roomIcon').css('background-image','url("static/images/rooms/'+newIconName+'.png")')
 		},this));
 	},
 	render : function () {
