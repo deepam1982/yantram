@@ -130,7 +130,7 @@
 		}
 		.trapTheam .groupView {
 			margin: 0px 0px 20px;
-			overflow: hidden;
+			/*overflow: hidden;*/
 		}
 
 		#groupTitleHeaderForTrapTheam {
@@ -1032,13 +1032,15 @@
 	</script>
 	<script type="text/template" id="choseGroupIconPannel">
 		<div class='dialogCont'>
-			<div class='dialog whiteBG blackTextColor' style='max-height:500px;overflow:auto;'>
+			<div class='dialog whiteBG blackTextColor' style='max-height:500px;overflow:auto;padding:0px'>
+				<div style='position:relative;'>
+				<div  style='padding:5px'>
 				<div class='cross' style='top:5px;right:0px;z-index:5;'>
 					<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
 					<br/>
 					<b>Done</b>
 				</div>
-				
+				<br/>
 				<span class='font14'>Chose one of following as group icon</span>
 				<br/><br/>
 				<%for(var i=0; i<icons.length; i++) {%>
@@ -1048,9 +1050,11 @@
 					</div>	
 				<%}%>
 				<div style="clear:both;"></div>
-			</div>
-			<div class='theamBGColor maskTransparent' style='opacity:0.3;
-				filter:alpha(opacity=30);'>
+				</div>
+				<div class='theamBGColor maskTransparent' style='opacity:0.3;
+					filter:alpha(opacity=30);'>
+				</div>
+				</div>
 			</div>
 		</div>
 	</script>
