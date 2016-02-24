@@ -94,6 +94,16 @@ var CommandManager = BaseClass.extend({
 		exec("sudo bash "+__rootPath+"/shellScripts/changeCloudPassword.sh "+email+" "+pwd, foo);	
 		console.log('starting changeCloudPassword bash')
 	},
+	deleteCloudAccount : function (clbk) {
+		var exec = require('child_process').exec;
+		var foo = function(error, stdout, stderr) {
+			console.log(error, stdout, stderr);
+			var rspJson = JSON.parse(stdout);
+			clbk && clbk(error||!rspJson.success, rspJson);
+		}
+		exec("sudo bash "+__rootPath+"/shellScripts/deleteCloudAccount.sh", foo);	
+		console.log('starting deleteCloudAccount bash')
+	},
 	restoreFactory : function (callback) {
 		var thisObj = this;
 		console.log("--------- restoreFactory called ---------");
@@ -109,28 +119,31 @@ var CommandManager = BaseClass.extend({
 					// 404 check if user dosen't exist then fine go ahead with account creation.
 					if(!rspJson || rspJson.status != 'success' && rspJson.code != 404) return callback({'success':false, 'msg':rspJson.msg});
 					console.log("cloud account deletion successful!");
-					groupConfig.data='';
-					groupConfig.save(function (err) {
+					thisObj.deleteCloudAccount(function (err) {
 						if(err) return callback({'success':false, 'msg':err});
-						console.log("groupConfig reset");
-						moodConfig.data='';
-						moodConfig.save(function (err) {
+						groupConfig.data='';
+						groupConfig.save(function (err) {
 							if(err) return callback({'success':false, 'msg':err});
-							console.log("moodConfig reset");
-							timerConfig.data='';
-							timerConfig.save(function (err) {
+							console.log("groupConfig reset");
+							moodConfig.data='';
+							moodConfig.save(function (err) {
 								if(err) return callback({'success':false, 'msg':err});
-								console.log("timerConfig reset");
-								deviceInfoConfig.data='';
-								deviceInfoConfig.save(function (err) {
+								console.log("moodConfig reset");
+								timerConfig.data='';
+								timerConfig.save(function (err) {
 									if(err) return callback({'success':false, 'msg':err});
-									console.log("deviceInfoConfig reset");
-									__userConfig.data='';
-									__userConfig.save(function (err) {
+									console.log("timerConfig reset");
+									deviceInfoConfig.data='';
+									deviceInfoConfig.save(function (err) {
 										if(err) return callback({'success':false, 'msg':err});
-										console.log("__userConfig reset");
-										setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
-										return callback({'success':true});
+										console.log("deviceInfoConfig reset");
+										__userConfig.data='';
+										__userConfig.save(function (err) {
+											if(err) return callback({'success':false, 'msg':err});
+											console.log("__userConfig reset");
+											setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
+											return callback({'success':true});
+										});
 									});
 								});
 							});
