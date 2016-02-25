@@ -74,7 +74,7 @@ EditSwitchParams = BaseView.extend({
 		console.log(obj);
 		obj.scheduleId = this.schEditor.scheduleId;
 		this.model.setSwitchParam({'schedule':obj}, _.bind(function () {}, this));
-//		this.repaint();
+		this.repaint(); // repaint is required as one may click done without changing any thing.
 	},
 	_showHideAutoOff : function (state) {
 		if (state) {

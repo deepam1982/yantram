@@ -62,6 +62,7 @@
 		#appCont {
 			overflow: hidden;
 			position: relative;
+			padding-top:30px; 
 			/*padding:0 20px 20px 20px;*/
 		}
 		.slim #appCont {
@@ -401,6 +402,9 @@
 		.translucentBg45{
 			background-color:rgba(96,20,31,0.45);
 		}
+		.translucentBdr45{
+			border-color:rgba(96,20,31,0.45);
+		}
 
 		.translucentBg50{
 			background-color:rgba(0,0,0,0.5);
@@ -492,7 +496,7 @@
 		    cursor:pointer;
 		}
 		
-		input[type=password], input[type=text], input[type=radio], textarea {
+		select,input[type=password], input[type=text], input[type=radio], textarea {
 		  @include transition(all 0.30s ease-in-out);
 		  outline: none;
 		  padding: 3px 0px 3px 3px;
@@ -565,7 +569,7 @@
 						</div>	
 					</div>
 				</div>
-				<br/><br/><br/>
+				<br/>
 				<div id='appCont' class='appArea'></div>
 			</div>
 			
@@ -947,7 +951,7 @@
 	</script>
 	<script type="text/template" id="groupProxyMainPageViewTemplate">
 		<div>
-			<div class='proxyCont'></div>
+			<div class='proxyCont' style='margin-top:10px;'></div>
 			<div style="clear:both;"></div>	
 			<div class='groupViewCont'></div>
 		</div>
@@ -966,7 +970,7 @@
 			<%}}%>
 
 
-			<div class='proxyImgCont translucentBg45 <% print((poweredOn)?"brightBorderColor":"blackBorderColor")%> circle' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:70px 70px; background-repeat: no-repeat; background-position: center; height:86px; width:86px; padding:2px;'></div>
+			<div class='proxyImgCont translucentBg45 <% print((poweredOn)?"brightBorderColor":"translucentBdr45")%> circle' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:70px 70px; background-repeat: no-repeat; background-position: center; height:86px; width:86px; padding:2px;'></div>
 			<span class='font12 brightColor' style="text-align:left;white-space:nowrap;"><%=name%></span>
 		</div>
 	</script>
@@ -1021,8 +1025,8 @@
 			<span class='edit theamTextColor editGroupIcon'><i class='fa fa-pencil-square-o font16'></i></span>
 			<div class='groupIconPannelCont'></div>
 			<br/>
-			<span style='font-size:11px;'>Tap icon to add or remove device from group</span>
-			<br/><br/>
+			<div style='text-align:center;'><span style='font-size:11px;'>Tap icon to add or remove device from group</span></div>
+			<br/>
 			<div style='position:relative'>
 				<div class='deviceGroupCont'></div>
 				<div class='theamBGColor maskTransparent' style='opacity:0.3;
@@ -1085,7 +1089,7 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
-		<div class="titleCont theamBGColor brightColor">
+		<div class="titleCont translucentBg50 brightColor">
 			<span style="text-align:left;">Device Settings</span>
 			<br/><br/>
 			<span class='helpText' style='float:left; display:none;'>Long press icons to edit parameters</span>
@@ -1098,13 +1102,13 @@
 		<div class='editViewCont'></div>
 	</script>
 	<script type="text/template" id="editMoodPageTemplate">
-		<div class="titleCont theamBGColor brightColor" style="padding-bottom:10px;">
+		<div class="titleCont translucentBg50 brightColor">
 			<span style="text-align:left;">Mood Settings</span>
 			<br/><br/>
 			<span class='helpText' style=''></span>
-			<i class='editButton addMoodButton fa fa-plus-circle' style='float:right;display:block;margin:-28px 21px 0 0; font-size:22px;'></i>
+			<i class='editButton addMoodButton fa fa-plus-circle' style='float:right;display:block;margin:-38px 21px 0 0; font-size:22px;'></i>
 			<br/>
-			<span class='editButton addMoodButton brightColor' style='float:right;display:block;margin:-15px 5px 0 0;'>add mood</span>
+			<span class='editButton addMoodButton brightColor' style='float:right;display:block;margin:-25px 5px 0 0;'>add mood</span>
 			<div style='clear:both;'></div>
 		</div>	
 		<br/><br/>
@@ -1114,7 +1118,7 @@
 		<div style='padding:0px 10px 10px 70px;'>
 			<br/>
 			<span class='editColumn'>Name</span>
-			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
+			<div><input style='width:180px;margin:-3px 0px 0px 0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
 			<br/>
 			<span class='editColumn'>Icon</span>
 			<div class='iconCont'></div>
@@ -1124,7 +1128,7 @@
 		<div class='theamTextColor' style='padding:0px 10px 10px 70px;'>
 			<br/>
 			<span class='editColumn'>Name</span>
-			<div><input style='width:180px;margin:0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
+			<div><input style='width:180px;margin:-3px 0px 0px 0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
 			<br/>
 			<span class='editColumn'>Type</span>
 			<div class='typeRadioCont'>
@@ -1135,9 +1139,9 @@
 			</div>
 			<br/>
 			<span class='editColumn'>Auto-off</span>
-			<div class='autoOffRadioCont' style='margin-top:-2px;'>
-				<span class='autoOffTimeSelect' style='display:none;padding:0 5px;'>in&nbsp;&nbsp;
-					<select style=' font-size:12px;'>
+			<div class='autoOffRadioCont' style='margin-top:-7px;'>
+				<span class='autoOffTimeSelect' style='display:none;padding:0 5px;vertical-align:middle;'>in&nbsp;&nbsp;
+					<select style=' font-size:12px;vertical-align:middle;'>
 						<option value="5">5 minutes</option>
 						<option value="10">10 minutes</option>
 						<option value="15">15 minutes</option>
@@ -1153,15 +1157,16 @@
 						<option value="180">3 hours</option>
 					</select>
 				</span>
-				<span class='autoOffEnable'><input id='autoOffEnable' type="radio" name="autoOff" value="enabled" <% if(typeof autoOff != 'undefined' && autoOff.enabled)print("checked")%>/><label for='autoOffEnable'>Enable</label></span>
-				<span class='autoOffDisable'><input id='autoOffDisable' type="radio" name="autoOff" value="disabled" <% if(typeof autoOff == 'undefined' || !autoOff.enabled)print("checked")%>/><label for='autoOffDisable'>Disable</label></span>
+				<span class='autoOffEnable' style='vertical-align:-webkit-baseline-middle;'><input id='autoOffEnable' type="radio" name="autoOff" value="enabled" <% if(typeof autoOff != 'undefined' && autoOff.enabled)print("checked")%> style='vertical-align:text-top;'/><label for='autoOffEnable'>Enable</label></span>
+				<span class='autoOffDisable' style='vertical-align:-webkit-baseline-middle;'><input id='autoOffDisable' type="radio" name="autoOff" value="disabled" <% if(typeof autoOff == 'undefined' || !autoOff.enabled)print("checked")%> style='vertical-align:text-top;'/><label for='autoOffDisable'>Disable</label></span>
 			</div>
 			<br/>
 			<span class='editColumn'>Schedules</span>
 			<div class='schedularCont' style="margin-top:-10px;">
 				<div id='scheduleEditor' class='editSchedule' style='display:none;'></div>
 				<% if(typeof schedules != 'undefined')for(var i=0; i<schedules.length; i++){ var sch = schedules[i]; %>
-					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin:-5px 0 0px -3px; padding-top:5px;'>
+					<div class='scheduleCont font12' scheduleId='<%=i%>' style='margin:0px 0 0px 3px; padding-top:5px;'>
+						<div style='margin:0px 0px 0px -9px;'>
 						<span class="<% if(sch.enabled) print('brightColor')%> <% print((sch.enabled)?'disable':'enable') %>" style="font-weight:bold;padding:0px;">
 							<span class="<% print((sch.enabled)?'disable':'enable') %>" 
 								style="margin-right:<% print((sch.enabled)?'0':'2')%>px;">
@@ -1173,6 +1178,7 @@
 							<span class='edit'><i class='fa fa-pencil-square-o font14'></i></span>
 							<span class='remove'><i class='fa fa-trash-o font14'></i></span>
 						</span>
+						</div>
 						<div style='clear:both;'></div>		
 					</div>
 				<%}%>

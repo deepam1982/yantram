@@ -95,10 +95,13 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	.brightBGColor{background-color: "+brightColor+";}\
 	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
-	input[type=password], input[type=text], input[type=radio], textarea, .theamBorderColor{border-color:"+inputColor+";}\
+	input[type=radio], .theamBorderColor{border-color:"+inputColor+";}\
+	select, input[type=password], input[type=text], textarea \
+	{border-color:"+inputColor+((appTheam=="maze")?(";background-color:"+inputColor):"")+";}\
 	.brightBorderColor{border-color:"+brightColor+";}\
 	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
 	.translucentBg45 {background-color: rgba("+traprntColor+",0.45);}\
+	.translucentBdr45 {border-color: rgba("+traprntColor+",0.45);}\
 	#groupTitleHeaderForTrapTheam{border-bottom-color:rgba("+traprntColor+",0.45);}\
 	.brightColor {color:"+brightColor+";}\
 	</style>");
