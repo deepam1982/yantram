@@ -506,6 +506,10 @@
 		  	-moz-border-radius: 3px; 
     		-webkit-border-radius: 3px; 			
 		}
+		input[type=radio] {
+			border-width: 2px; 	
+			padding: 2px 0px 3px 2px;
+		}
 		 
 		input[type=password]:focus, input[type=text]:focus, textarea:focus {
 		  @include box-shadow(0 0 5px #EE972D);
@@ -971,7 +975,7 @@
 
 
 			<div class='proxyImgCont translucentBg45 <% print((poweredOn)?"brightBorderColor":"translucentBdr45")%> circle' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:70px 70px; background-repeat: no-repeat; background-position: center; height:86px; width:86px; padding:2px;'></div>
-			<span class='font12 brightColor' style="text-align:left;white-space:nowrap;"><%=name%></span>
+			<span class='font12 brightColor' style="text-align:left;white-space:nowrap;text-transform:uppercase;"><%=name%></span>
 		</div>
 	</script>
 	<script type="text/template" id="groupTemplate">
@@ -1069,7 +1073,7 @@
 					<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/<%print((state=="on")?"on":"off")%>/<$=appColor$>/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch font12 <%print((state=="on")?"brightColor":"theamTextColor")%>' style='text-transform: uppercase;white-space:nowrap;line-height:2;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
+				<span class='toggelSwitch font12 <%print((state=="on")?"brightColor":"theamTextColor")%>' style='text-transform: uppercase;white-space:nowrap;line-height:2;'><%print((name.length>10)?name.substring(0, 8)+'...':name)%></span>
 				<div style='position:absolute;right:0px; top:-14px; width:30px; height:30px; background-image:url("static/<$=revId$>/images/auto<%print((state=="on")?"Off":"On")%>Indicator_<$=appColor$>.png"); opacity: 0.5; background-size:30px 30px;<%print((autoToggleTime != 'undefined' && autoToggleTime)?"":"display:none;")%>'></div>
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
