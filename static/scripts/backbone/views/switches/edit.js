@@ -136,7 +136,7 @@ EditSwitchParams = BaseView.extend({
 });
 
 EditCurtainParams = EditSwitchParams.extend({
-	iconList : ['curtain']
+	iconList : ['curtain', 'curtain1', 'curtain2', 'curtain3', 'curtain4']
 });
 
 EditIpCamParams = EditSwitchParams.extend({

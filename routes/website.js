@@ -28,8 +28,20 @@ module.exports = function(app) {
 	app.get('/apptest', function (req, res) {
     	res.end(req.query.callback+'('+JSON.stringify({'success':true})+')');
 	});
+
+// for Apps to confirm this device is Inoho home controller
 	app.get('/inohocontroller', function (req, res) {
-    	res.end(JSON.stringify({'success':true}));
+		var appTheam = (__userConfig.get('appTheam') || 'Clasic').toLowerCase();
+		var themeColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
+		switch(themeColor) {
+			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D"; break;
+			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D"; break;
+			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3"; break;
+			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8"; break;
+		}
+
+
+    	res.end(JSON.stringify({'success':true, 'themeColor':color}));
 	});
 	app.get('/headers', function (req,res) {
 		// if(!req.headers['authorization']){

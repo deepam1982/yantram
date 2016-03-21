@@ -49,7 +49,7 @@ var CC2530Controller = BaseCommunicator.extend({
 		var msgId = data.substr(1,2);
 		var msgTypeCode = data.substr(3,4);
 		// if(msgTypeCode != '0302')
-		 	// console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
+		// 	 console.log( "$$$$$$$$$$$$$$$$$$$$$ response recieved  - "+data);
 		if(data.length < 8 && msgTypeCode == '0302') return; 	 
 		var clbk = this._pendingReqCallbackMap[msgTypeCode];
 		if(!clbk && msgTypeCode == '0302') msgTypeCode = '0302a'
@@ -97,7 +97,10 @@ var CC2530Controller = BaseCommunicator.extend({
 		}
 	},
 	_handleStateResponse : function (macAdd, nwkAdd, msg) {
-		var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
+		if(msg.length == 16) //msg 8Byte => --- D4_st D3_st D2_st D1_st D0_st Sen_st Sw_st
+			var state = this._invertBinaryNumber(msg.substr(14,2))+msg.substr(10,2)+msg.substr(8,2)+msg.substr(6,2)+msg.substr(4,2)+msg.substr(2,2)+msg.substr(12,2); 
+		else	//msg 4Byte => D1_st D0_st Sen_st Sw_st
+			var state = this._invertBinaryNumber(msg.substr(6,2))+msg.substr(2,2)+msg.substr(0,2)+msg.substr(4,2); 
 		this.emit('msgRecieved', "DVST", state, macAdd);
 		var listItem = __.findWhere(this.deviceList, {'macAdd':macAdd});
 		if (listItem) {__.extend(listItem, {'nwkAdd':nwkAdd, 'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});}

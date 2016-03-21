@@ -22,8 +22,8 @@ module.exports ={
 			this.isSensorActive.push(activityState & 1); activityState >>= 1;
 		}, this);
 	},
-	_getActiveSensorMsg : function (msg) {return "0"+msg.substr(7, 1);},
-	_getSensorStateMsg : function (msg) {return msg.substr(6, 1);},
+	_getActiveSensorMsg : function (msg) {return "0"+msg.substr((msg.length==16)?15:7, 1);},
+	_getSensorStateMsg : function (msg) {return msg.substr((msg.length==16)?14:6, 1);},
 	_setSensorState : function (msg) {
 		msg = parseInt(msg)
 		this.sensorState[0] = ((1<<0)&msg)?1:0;

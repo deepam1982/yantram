@@ -4,6 +4,7 @@ var BaseDevice = require(__rootPath+"/classes/devices/baseDevice");
 var SwBd01 = require(__rootPath+"/classes/devices/switchBoards/swBd01");
 var SwBd02 = require(__rootPath+"/classes/devices/switchBoards/swBd02");
 var CrtnCtrl01 = require(__rootPath+"/classes/devices/curtainControllers/crtnCtrl01");
+var DmBd05 = require(__rootPath+"/classes/devices/switchBoards/dmBd05");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
@@ -76,6 +77,7 @@ var DeviceManager = BaseClass.extend({
 			case "SWBD01"		 : var device = new SwBd01 (deviceId, this); break;
 			case "SWBD02"		 : var device = new SwBd02 (deviceId, this); break;
 			case "CNCR01"		 : var device = new CrtnCtrl01 (deviceId, this); break;
+			case "DMBD05"		 : var device = new DmBd05 (deviceId, this); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+type);
