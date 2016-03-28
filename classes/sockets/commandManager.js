@@ -38,6 +38,8 @@ var CommandManager = BaseClass.extend({
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
 			case 'toggleSwitch' : this.onToggleSwitchCommand(commandData); break;
+			case 'turnSwitchOn' : this.onSwitchCommand(commandData); break;
+			case 'turnSwitchOff' : this.onSwitchCommand(commandData); break;
 			case 'setDuty' 		: this.onSetDutyCommand(commandData); break;
 			case 'moveCurtain'	: this.onMoveCurtainCommand(commandData); break;
 		}
@@ -410,6 +412,9 @@ var CommandManager = BaseClass.extend({
 		
 	},
 	onToggleSwitchCommand	: function (commandData, callback) {
+		return this.onSwitchCommand(commandData, callback);
+	},
+	onSwitchCommand : function(commandData, callback) {
 		callback && callback();
 		var devId = commandData.devId, switchId = commandData.switchId;
 		var device = deviceManager.getDevice(devId);
@@ -417,15 +422,18 @@ var CommandManager = BaseClass.extend({
 			console.log('device not found');
 			return;
 		}
-		eventLogger.addEvent("toggleSwitch", {
+		eventLogger.addEvent(commandData.actionName, {
 	        'boardId':devId, 
 	        'pointId':devId+'-l'+switchId,
 	        'pointKey':switchId,
 	        'remoteDevice':commandData.deviceType, 
-	        'state':(commandData.state == 'off')?true:false // log new state
+//	        'state':(commandData.state == 'off')?true:false // log new state
 	    });
-		device.toggleSwitch(switchId);
-	
+	    switch(commandData.actionName) {
+			case 'toggleSwitch' : device.toggleSwitch(switchId); break;
+			case 'turnSwitchOn' : device.setSwitchState(switchId, true); break;
+			case 'turnSwitchOff': device.setSwitchState(switchId, false); break;
+		}
 	},
 	activateMood : function (commandData) {
 	    var moodData = moodConfig.get(commandData.id+"");
