@@ -83,7 +83,8 @@ var EditManager = BaseClass.extend({
 				moodConfig.data = __.omit(moodConfig.data, obj.id+"");
 			}
 
-			var rankObj=moodConfig.get(obj.id+""), rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
+			var rankObj=moodConfig.data[obj.id+""]//moodConfig.get(obj.id+"")
+			, rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
 			currentRank =(curObj)?curObj.rank:0, rankModified=(rank != currentRank);
 			
 			var dataArr = __.sortBy(__.values(moodConfig.data), 'rank');
@@ -124,7 +125,8 @@ var EditManager = BaseClass.extend({
 				groupConfig.data = __.omit(groupConfig.data, obj.id+"");
 			}
 
-			var rankObj=groupConfig.get(obj.id+""), rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
+			var rankObj=groupConfig.data[obj.id+""]//groupConfig.get(obj.id+"")
+			, rank = ((rankObj)?parseInt(obj.rank):Infinity) || 1, 
 			currentRank =(curObj)?curObj.rank:0, rankModified=(rank != currentRank);
 			
 			console.log(rank, currentRank, rankObj);

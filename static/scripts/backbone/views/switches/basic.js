@@ -61,7 +61,9 @@ IpCamaraFeedViewer = BaseView.extend(Popup).extend({
 		_.each(groupModel.get('controls'), function(ctrl, i){
 			if(ctrl.devId == camModel.get('devId') && ctrl.switchID == camModel.get('switchID'))
 				camIndex = i;
-		});		
+		});
+		var cameraName = camModel.get("name");
+		this.$el.find('.cameraName').html(cameraName);		
 		this.$el.find('.camFeedCont').html("<img style='width:100%' src='"+src+"'>")
 
 		this.grpView = new GroupView1({model:groupModel});
@@ -69,7 +71,7 @@ IpCamaraFeedViewer = BaseView.extend(Popup).extend({
 		this.grpView.render();
 		(camIndex+1) && this.grpView.switchViewArray[camIndex].$el.hide();
 
-		this.grpView.$el.find('.translucentBg50').removeClass('translucentBg50').addClass('theamBGColor');
+		//this.grpView.$el.find('.translucentBg50').removeClass('translucentBg50').addClass('theamBGColor');
 
 		this.showPopUp();
 	},

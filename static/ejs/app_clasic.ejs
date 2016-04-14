@@ -158,9 +158,9 @@
 			margin-top:1px;
 			cursor:pointer;
 			position:absolute;
-			right:-5px;
-			top:-8px;
-			padding:10px;
+			right:-10px;
+			top:-13px;
+			padding:15px;
 		}
 		.editButton {
 			display: none;
@@ -206,8 +206,11 @@
 		.switchToggleSpinner {
 			position:absolute;left:2px;top:5px;font-size:70px;
 		}
-		.powerOffSpinner, .patchSpinner {
+		.powerOffSpinner{
 			position:absolute;right:-8px;top:-10px;font-size:40px;
+		}
+		.patchSpinner {
+			position:absolute;right:2px;top:2px;font-size:40px;
 		}
 
 		#experiment, #experiment1{
@@ -215,8 +218,9 @@
 			font-size: 15px;
 			color:red;
 		}
-		.popupPannel{
-
+		#ipCamaraFeedViewerCont .popupPannel .cross,
+		#ipCamaraFeedViewerCont .popupPannel .cameraName {
+			color:black;
 		}
 		.dialog .cross, .popupPannel .cross, .advancePannel .cross {
 			position:absolute;
@@ -241,23 +245,31 @@
 		}
 		.powerOffIcon {
 			position:absolute;
+			right: -25px;
+			top: -22px;
+			height:24px; width:24px;
+			padding:10px;
+			}
+		.powerOffIcon .bgDiv{
 			height:24px; width:24px;
 			line-height:24px;
-			right: -15px;
-			top: -12px;
 			border-radius: 12px;
 			font-size: 18px;
 			text-align: center;
 		}
 		.patchIcon {
 			position:absolute;
+			right: -24px;
+			height:24px; width:24px;
+			padding:10px;
+		}
+		.patchIcon .bgDiv{
 			height:24px; width:24px;
 			line-height:24px;
-			right: -16px;
-			border-radius: 15px;
 			font-size: 18px;
 			text-align: center;
 			border:1px solid white;
+			border-radius: 15px;
 		}
 		.dialogCont{padding:20px;}
 		.dialog{padding:20px; position:relative;}
@@ -457,7 +469,6 @@
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
 			<div id='ipCamaraFeedViewerCont'></div>
 		</div>		
-		<img src="static/<$=revId$>/images/loading.gif" style="display:none;"/>
 	</body>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/iefix.js"></script>
 <!--	
@@ -495,12 +506,13 @@
 	</script>
 	<script type="text/template" id="ipCamaraFeedViewer">
 		<div class='popupPannel' style='padding:10px; display:none;'>
-			<div class='cross' style='top:5px;right:0px;'>
+			<div class='cross' style='top:-2px;right:0px;'>
 				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
 				<br/>
 				<b>Done</b>
 			</div>
 			<div class='theamBorderColor whiteBG'>
+				<div class='cameraName' style='margin:2px 0px 9px 0px;'></div>
 				<div class='camFeedCont' style='min-height:300px;'>
 				</div>
 				<dic class='camGroupCont'></div>
@@ -528,6 +540,8 @@
 				</div>
 				<div id="camMetaData" class="theamBorderColor" style='padding:20px; border-width:1px; border-style:solid;'>
 					<div style='padding-left:130px;' class='font12'>
+						<span style='margin:8px 0 0 -130px;float:left;' id='infoSpan'></span><div>&nbsp;</div>
+						</br>
 						<span style='margin:8px 0 0 -130px;float:left;'>Camera Name:</span><input id='cameraName' type='text' placeholder='eg. Lobby Camera'></input>
 						</br>
 						<span style='margin:8px 0 0 -130px;float:left;'>Static IP:</span><input id='camaraIp' type='text' placeholder='eg. 192.168.0.147'></input>
@@ -684,7 +698,7 @@
 			<span class='button theamBorderColor theamTextColor' id='modifyCloudAccountButton'>Confirm</span>
 			<span class='button theamBorderColor theamTextColor' id='skipCldSetButton' style='margin-left:30px;display:none;'>Skip</span>
 			<br/><br/>
-			
+			<div class="loader" style="text-align:center;display:none;"><i class="theamTextColor spinner fa fa-spinner fa-spin fa-5x"></i></div>
 		</div>
 	</script>
 	<script type="text/template" id="theamSettingTemplate">
@@ -821,15 +835,20 @@
 		</div>
 	</script>
 	<script type="text/template" id="groupProxyViewTemplate">
-		<div class='groupProxyCont' groupId='<%=id%>' style='float:left; margin:<%=margin%>px; height:100px; width:<%=width%>px; text-align:center;cursor:pointer;position:relative;'>
+		<% var vMargin = (typeof minMargin != "undefined")?Math.min(minMargin, margin):margin %>
+		<div class='groupProxyCont' groupId='<%=id%>' style='float:left; margin:<%=vMargin%>px <%=margin%>px; height:100px; width:<%=width%>px; text-align:center;cursor:pointer;position:relative;'>
 			<% var poweredOn = (typeof poweredCount != "undefined" && poweredCount)?true:false; if(poweredOn){%>
-				<div class='powerOffIcon theamBGColor'>
-					<i class='fa fa-power-off' style='color:white;'></i>
+				<div class='powerOffIcon'>
+					<div class='bgDiv theamBGColor'>
+						<i class='fa fa-power-off' style='color:white;'></i>
+					</div>
 				</div>
 			<%}%>	
 			<% if(typeof groupMoods != "undefined" && groupMoods){ for(var i=0; i<Math.min(3,groupMoods.length); i++) {%>
-				<div class='patchIcon moodIcon theamBGColor' style='top:<% print(16+i*(6+24)) %>px;' moodId='<%=groupMoods[i].id%>'>
+				<div class='patchIcon moodIcon' style='top:<% print(7+i*(6+24)) %>px;' moodId='<%=groupMoods[i].id%>'>
+				<div class='bgDiv theamBGColor'>
 					<span style='display:inline-block;width:24px; height:24px; background-image:url("static/<$=revId$>/images/moods/<%=groupMoods[i].icon%>.png"); background-size:20px 20px; background-position: center; background-repeat: no-repeat; '></span>
+				</div>
 				</div>
 			<%}}%>
 
@@ -842,7 +861,7 @@
 		<div class='groupView theamBorderColor'>
 			<div class="roomTitleCont theamBGColor" style='position:relative;'>
 				<span style="text-align:left;"><%=name%></span>
-				<i class='powerButton fa fa-power-off'></i>
+				<div class='powerButton'><i class='fa fa-power-off'></i></div>
 				<i class='editButton deleteGroup fa fa-trash-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
 				<i class='editButton editGroup fa fa-pencil-square-o' style='float:right; padding:7px 0 7px 20px;font-size:20px;'></i>
 				<div style='clear:both;'></div>

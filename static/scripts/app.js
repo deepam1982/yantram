@@ -71,7 +71,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 		if(typeof appTheam == 'undefined') appTheam = 'Clasic';
 		appTheam = appTheam.toLowerCase();
 		themeColor = themeColor.toLowerCase();
-		switch(themeColor) {
+		switch(themeColor) { // if you modify color here modify it in website.js as well as it sends the color to android or Iphone app.
 			case "orange" : var color = (appTheam=='maze')?"#CE771D":"#EE972D", brightColor = (appTheam=='maze')?'#F3CBCB':"#EE972D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#E7CDB0':color; break;
 			case "red"	  : var color = (appTheam=='maze')?"#832A28":"#9E171D", brightColor = (appTheam=='maze')?'#F3CBCB':"#9E171D", traprntColor = "96,20,31", inputColor=(appTheam=='maze')?'#A58F8F':color; break;
 			case "blue"   : var color = (appTheam=='maze')?'#42487B':"#5EA5F3", brightColor = (appTheam=='maze')?'#93CBEB':"#5EA5F3", traprntColor = "26,20,50", inputColor=(appTheam=='maze')?'#758FAF':color; break;
@@ -93,7 +93,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
 	.theamBGColor{background-color: "+color+";}\
 	.brightBGColor{background-color: "+brightColor+";}\
-	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop .basicSwitchTemplate {background-color: "+color+";}\
+	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop > .basicSwitchTemplate {background-color: "+color+";}\
 	.theamTextColor{color:"+inputColor+";}\
 	input[type=radio], .theamBorderColor{border-color:"+inputColor+";}\
 	select, input[type=password], input[type=text], textarea \
@@ -287,3 +287,4 @@ $('#appCont').append(homeControllerDownPage.$el);
 
 var ipCamaraFeedViewer = new IpCamaraFeedViewer({'el':$("#ipCamaraFeedViewerCont")});
 ipCamaraFeedViewer.render();
+

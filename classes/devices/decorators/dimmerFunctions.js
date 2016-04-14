@@ -2,16 +2,25 @@ var __ = require("underscore");
 module.exports ={
 	_getDimmerStateMsg : function (msg) {return msg.substr(2);},
 	_recordDeviceStatus : function (msg) {
-		var oldDm0St = this.dimmerState[0];
-		var oldDm1St = this.dimmerState[1]; 
+		var oldDmStArr = [];
+		for (var i=0; i<this.dimmerState.length;i++) {
+			oldDmStArr[i] = this.dimmerState[i];
+		}
 		this._setDimmerState(this._getDimmerStateMsg(msg));	
 		this._super(msg);
-		if (Math.abs(oldDm0St-this.dimmerState[0])>10 || Math.abs(oldDm1St != this.dimmerState[1])>10) 
-			this.emit('stateChanged', 'dimmer');
+		var dmStatCng = false;
+		for (var i=0; i<this.dimmerState.length;i++) {
+			if(Math.abs(oldDmStArr[i]-this.dimmerState[i])>10){
+				dmStatCng = true;
+				break;
+			}
+		}
+		if (dmStatCng) this.emit('stateChanged', 'dimmer');
 	},
 	_setDimmerState : function (msg) {
-		this.dimmerState[0] = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);
-		this.dimmerState[1] = this._hexCharToInt(msg[2])*0x10 + this._hexCharToInt(msg[3]);
+		for (var i=0; i<this.dimmerState.length;i++) {
+			this.dimmerState[i] = this._hexCharToInt(msg[2*i])*0x10 + this._hexCharToInt(msg[(2*i)+1]);
+		}
 	},
 	setDimmer : function(dimmerNo, value, donotRetry) {
 		if (dimmerNo > this.dimmerState.length) return;

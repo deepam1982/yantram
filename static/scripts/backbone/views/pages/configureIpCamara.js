@@ -9,14 +9,21 @@ ConfigureIpCamaraView = BaseView.extend({
 	render : function () {
 		this.options.socket.emit("getIpCamaraData", _.bind(function (res) {
 			if(!res.success) return alert(res.msg);
-			this._populateCamList(res.data);
+			this.camData = res.data;
+			this._populateCamList(this.camData);
+			this.changeFormData();
 		}, this));
 		return BaseView.prototype.render.apply(this, arguments);
 	},
 	changeFormData : function (event) {
 		this.$el.find('.errorMsg').html("");
-		var obj = JSON.parse($(event.target).closest('.camTab').attr("camObj") || "{}");
-		this.toggleCamList();
+		var camObjStr = (event)?$(event.target).closest('.camTab').attr("camObj"):"";
+		var camCnt=_.keys(this.camData).length;
+		if(!camObjStr && camCnt) 
+			camObjStr='{"info":"Add new camera to system, to edit existng '+camCnt+' camera'+((camCnt>1)?'s':'')+' use above dropdown."}';
+		var obj = JSON.parse(camObjStr);
+		if(event) this.toggleCamList();
+		this.$el.find('#camMetaData #infoSpan').html(obj.info || "Use following fields to edit "+obj.name+"'s parameters.");
 		this.$el.find('#camMetaData #cameraId').val(obj.id);
 		this.$el.find('#camMetaData #cameraName').val(obj.name);
 		this.$el.find('#camMetaData #camaraIp').val(obj.ip);
@@ -54,8 +61,10 @@ ConfigureIpCamaraView = BaseView.extend({
 		this.options.socket.emit("editIpCamaraData", obj, _.bind(function (res) {
 			console.log(res);
 			if(!res.success) return this.$el.find('.errorMsg').html(res.msg);
-			this.$el.find('.errorMsg').html("Ip camera parameters saved.");
-			setTimeout(_.bind(function() {this.$el.find('.errorMsg').html("");}, this), 3000)
+			this.$el.find('.errorMsg').html("Parameters saved, restarting now, would take 10 to 15 seconds.");
+			this.$el.find('#submitCamData').hide();
+			this.options.socket.emit('restartHomeController');
+			//setTimeout(_.bind(function() {this.$el.find('.errorMsg').html("");}, this), 3000)
 		}, this));
 	}
 

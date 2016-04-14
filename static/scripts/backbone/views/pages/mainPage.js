@@ -16,9 +16,10 @@ GroupProxyView = BaseView.extend({
 	name : "GroupProxyView",
 	proxyWidth:90,
 	proxyMargin:15,
+	proxyMinMargin:15,
 	templateSelector:"#groupProxyViewTemplate",
 	_getJsonToRenderTemplate : function () {
-		return _.extend(this.model.toJSON(),{'width':this.proxyWidth, 'margin':this.proxyMargin});
+		return _.extend(this.model.toJSON(),{'width':this.proxyWidth, 'margin':this.proxyMargin, 'minMargin':this.proxyMinMargin});
 	},
 	events: {
 		"tap .powerOffIcon"	: "powerOff",
@@ -53,15 +54,18 @@ GroupProxyMainPageView = MainPageView.extend({
 	},
 	render : function () {
 		$(".appArea").css('padding',0);
-		MainPageView.prototype.render.apply(this, arguments);
 		this.$el.css('width','100%');
 		var wth = this.$el.width()
 		, pWth = GroupProxyView.prototype.proxyWidth
-		, pMar = GroupProxyView.prototype.proxyMargin
+		, pMar = GroupProxyView.prototype.proxyMinMargin
+		, proxysInARow = Math.floor(wth/(pWth+2*pMar))
+		, extraMrgin = wth - (proxysInARow*(pWth+2*pMar))
 		;
-		var proxysInARow = Math.floor(wth/(pWth+2*pMar));
-		var padding = Math.floor((wth - (proxysInARow*(pWth+2*pMar)))/2)
-		this.$el.find('.proxyCont').css('padding-left',padding).css('padding-right',padding);
+		extraMrgin = Math.floor((extraMrgin-2*pMar)/(2*(proxysInARow+1)));
+		GroupProxyView.prototype.proxyMargin = extraMrgin + pMar;
+		MainPageView.prototype.render.apply(this, arguments);
+		this.$el.css('width','100%');
+		this.$el.find('.proxyCont').css('padding-left',pMar+extraMrgin).css('padding-right',pMar+extraMrgin);
 		return this;
 	},
 	erase : function () {
