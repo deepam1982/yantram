@@ -97,7 +97,7 @@ var BaseCommunicator = BaseClass.extend({
 			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds/2)) && !dev.unreachable) recheckList.push(dev);
 		}, this)
 		__.each(recheckList, function (dev, i) {
-			console.log("########### rechecking connectivity of",dev.macAdd)
+			console.log("########### rechecking connectivity of",dev.macAdd, "last seen", parseInt((Date.now()/1000)-dev.lastSeenAt)+"sec ago");
 			setTimeout(__.bind(function(dInfo){
 				this._send("\x2B0302"+dInfo.nwkAdd+"\x0D", function () { });
 			},this, dev), i*100);

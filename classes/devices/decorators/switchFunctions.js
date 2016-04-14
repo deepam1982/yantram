@@ -64,9 +64,9 @@ module.exports ={
 					else callback && callback()
 				}, this));
 				this.retryTimeout = setTimeout(__.bind(function () {
-					if(retryCount < 5 && this._binStateToInt(this.switchState)^swst)
+					if(retryCount < 10 && this._binStateToInt(this.switchState)^swst)
 						this._setSwitch(swst, callback, retryCount+1);
-				}, this), 200); // if this interval is long (should be 100) it will create problem when user rapidly toggels the switch.	
+				}, this), (retryCount < 5)?200:1000); // if this interval is long (should be 100) it will create problem when user rapidly toggels the switch.	
 		}, this));		// and if the interval is short (should be 200) it will resend query when response is on the way.
 	},
 	stopPendingSwitchCommands : function () {

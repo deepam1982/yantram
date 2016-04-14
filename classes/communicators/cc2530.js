@@ -14,7 +14,7 @@ var CC2530Controller = BaseCommunicator.extend({
 	},
 	_broadcast : function () {
 		this._send("\x2B0302FFFF\x0D", function () { // "\x2B0302FFFF"
-//			console.log('##### Sent broadcast')
+	//		console.log('##### Sent broadcast')
 		});
 		setTimeout(__.bind(this.checkBroadCastRsp, this), 2000);
 		this._super()
@@ -24,9 +24,11 @@ var CC2530Controller = BaseCommunicator.extend({
 			return setTimeout(__.bind(this.checkBroadCastRsp, this), 1000);
 		__.each(this.deviceList, __.bind(function (devInfo) {
 			if(devInfo.lastSeenAt+3 < (new Date().getTime() / 1000)){
-				this._send("\x2B0302"+devInfo.nwkAdd+"\x0D", function () { });
+				this._queryQ.push({'query':"\x2B"+"0302"+devInfo.nwkAdd+"\x0D", 'callback':function () {}, 'queryInHexStr':"0302"});
+//				this._send("\x2B0302"+devInfo.nwkAdd+"\x0D", function () { });
 			}
 		}, this));
+		this._processQueryQ();
 	},
 	_hexCharToInt: function(str) {
 		var intt = str.charCodeAt(0);
@@ -69,6 +71,7 @@ var CC2530Controller = BaseCommunicator.extend({
 			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break; //????
 			case '0404'	: 	this.sendQuery(sourceNwkAdd, {name:"0404"}); 
 							console.log("## sent link alive acknowledgment to",sourceMacAdd, sourceNwkAdd);
+							this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd);
 							break; // Link alive acknowledgment.
 			default 	: 	console.log("Unknown message from zigbee module -", data); return;
 		}
@@ -121,12 +124,17 @@ var CC2530Controller = BaseCommunicator.extend({
 				listItem.unreachable = false;
 				this.emit("deviceReachable", listItem.macAdd);
 			}
-			if(listItem.lastMsg != msg) this._handleStateResponse(macAdd, nwkAdd, msg);
-			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastMsg':msg, 'lastSeenAt':(new Date().getTime() / 1000)});
+			if(msg && listItem.lastMsg != msg) {
+				this._handleStateResponse(macAdd, nwkAdd, msg);
+				__.extend(listItem, {'lastMsg':msg});
+			}
+			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+
 		}
 		else {
 			this.emit('msgRecieved', "newdevice", nwkAdd, macAdd, __.bind(function () {
 				this.deviceList.push({'macAdd':macAdd, 'deviceId':macAdd, 'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+				if(msg) this._handleStateResponse(macAdd, nwkAdd, msg); //since broadcast and state query is same.
 			}, this));
 		}
 	},
@@ -141,7 +149,17 @@ var CC2530Controller = BaseCommunicator.extend({
 		}
 		return qry;
 	},
-
+	_processQueryQ : function() {
+		if(this.___processQueryQ) return this.___processQueryQ();
+		this.___processQueryQ = __.throttle(__.bind(function(){
+//				console.log("Processing Query Q");
+			var qObj = this._queryQ.shift();
+//				console.log("--------->>> outgoing query -",qObj.query);
+			qObj && this._send(qObj.query, function (err, results) {qObj.callback(err, results, qObj.queryInHexStr)});
+			if(this._queryQ.length) this._processQueryQ();
+		}, this), 80) // this was earlier 50ms, but then I thought 10ms is fine.
+		this.___processQueryQ();
+	}, 
 	sendQuery : function (devId, queryObj, callback) {
 		var nwkAdd = devId?this._getNwkAdd(devId):'';
 		if(!nwkAdd && devId && devId.length == 4) nwkAdd = devId;
@@ -152,14 +170,6 @@ var CC2530Controller = BaseCommunicator.extend({
 		}
 		this._queryQ.push({'query':"\x2B"+queryInHexStr+nwkAdd+"\x0D", 'callback':cbk, 'queryInHexStr':queryInHexStr});
 //		console.log("Qurey pushed to Query Q");
-		if(!this._processQueryQ)
-			this._processQueryQ = __.throttle(__.bind(function(){
-//				console.log("Processing Query Q");
-				var qObj = this._queryQ.shift();
-//				console.log("--------->>> outgoing query -",qObj.query);
-				qObj && this._send(qObj.query, function (err, results) {qObj.callback(err, results, qObj.queryInHexStr)});
-				if(this._queryQ.length) this._processQueryQ();
-			}, this), 10); // this was earlier 50ms, but then I thought 10ms is fine.
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 		if(queryInHexStr == "0302")
