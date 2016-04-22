@@ -101,6 +101,7 @@ var LircdConf = function () {
           case constants.STATE_REMOTE:
             if (_this.isEndRemote(line)) {
               result.remotes.push(currentRemote);
+              currentRemote = {};
               _this.state = constants.STATE_START;
             } else if (_this.isBeginCodes(line)) {
               currentRemote.codes = {};
@@ -171,8 +172,8 @@ var LircdConf = function () {
             remote['MS']=[[0,1],[0,1]];
           }
           else if(remote.flags.indexOf('SHIFT_ENC') != -1) {
-          //  remote['MS']=[['S','M'],['S','M']];
-            remote['MS']=[[1,0],[1,0]];
+          //  remote['MS']=[['M','S'],['S','M']];
+            remote['MS']=[[0,1],[1,0]];
           }
           else if(remote.flags.indexOf('RC5') != -1) {
           //  remote['MS']=[['M','S'],['S','M']];
@@ -209,14 +210,16 @@ var LircdConf = function () {
       if(remote.codes && !remote.codes[keyName]) return [];
       var zeroOne = [remote.zero.split(" ").map(Number),remote.one.split(" ").map(Number)]
       ,   MS = remote.MS
-      ,   rawArr = [], pendingMark=0, pendingSpace=0;
+      ,   rawArr = [], pendingMark=0, pendingSpace=0
+      ,   ieRC6 = (remote.flags.indexOf('RC6') != -1)
+      ;
       var insertMarkIntoRawArr = function(mark) {
             pendingSpace && rawArr.push(pendingSpace) && (pendingSpace=0);
-            pendingMark = mark;
+            pendingMark += mark;
       }
       var insertSpaceIntoRawArr = function(space) {
             pendingMark && rawArr.push(pendingMark) && (pendingMark=0);
-            pendingSpace = space;
+            pendingSpace += space;
       }
       var insertMarkSpaceIntoRawArr = function(mark,space){
           insertMarkIntoRawArr(mark); insertSpaceIntoRawArr(space);
@@ -224,19 +227,32 @@ var LircdConf = function () {
       var insertSpaceMarkIntoRawArr = function(space,mark){
           insertSpaceIntoRawArr(space); insertMarkIntoRawArr(mark); 
       }
-
+      var dataBitIndx=0;
       var insertDataIntoRawArr = function (data, noBits) {
+//        console.log("insertDataIntoRawArr", data.toString(2), noBits)
         var invData=0
         for(var i=0; i<noBits; i++){
           invData<<=1;invData|=( data &1);data>>=1;
         }
+//        console.log(invData.toString(2))
+//        console.log(rawArr.toString())
         for(var i=0; i<noBits; i++){
           var bitVal = invData & 1; invData >>= 1;
           var ms = MS[bitVal], zo = zeroOne[bitVal];
-          if(ms[0] == 0) //MARK SPACE case
-            insertMarkSpaceIntoRawArr(+zo[ms[0]],+zo[ms[1]]);
-          else   //SPACE MARK case
-            insertSpaceMarkIntoRawArr(+zo[ms[0]], +zo[ms[1]]);
+          if(ieRC6 && dataBitIndx == 4){
+            if(ms[0] == 0) //MARK SPACE case
+              insertMarkSpaceIntoRawArr(2*(+zo[ms[0]]),2*(+zo[ms[1]]));
+            else   //SPACE MARK case
+              insertSpaceMarkIntoRawArr(2*(+zo[ms[0]]),2*(+zo[ms[1]]));
+          } 
+          else {
+            if(ms[0] == 0) //MARK SPACE case
+              insertMarkSpaceIntoRawArr(+zo[ms[0]],+zo[ms[1]]);
+            else   //SPACE MARK case
+              insertSpaceMarkIntoRawArr(+zo[ms[0]], +zo[ms[1]]);
+          }
+          dataBitIndx++;
+//          console.log(bitVal, rawArr.toString(), " PM-"+pendingMark+" PS-"+pendingSpace)
         }
       }
       if(remote.header) {

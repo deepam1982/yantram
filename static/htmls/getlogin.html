@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<title>Login page</title>
+	</head>
+	<body>
+		<form id="myform" method="POST" action="/dologin">
+			<input type="text" name="httpd_username" value="" />
+			<input type="password" name="httpd_password" value="" />
+			<input type="submit" name="login" value="Login" />
+		</form>
+	</body>
+	<script>
+		function eraseCookieFromAllPaths(name) {
+		    // This function will attempt to remove a cookie from all paths.
+		    var pathBits = location.pathname.split('/');
+		    var pathCurrent = ' path=';
+
+		    // do a simple pathless delete first.
+		    document.cookie = name + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT;';
+
+		    for (var i = 0; i < pathBits.length; i++) {
+		        pathCurrent += ((pathCurrent.substr(-1) != '/') ? '/' : '') + pathBits[i];
+		        document.cookie = name + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT;' + pathCurrent + ';';
+		    }
+		}
+		eraseCookieFromAllPaths('asid');
+		function getParameterByName(name) {
+		    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+		        results = regex.exec(location.search);
+		    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+		}
+		document.getElementsByName("httpd_username")[0].value=getParameterByName('email');
+		document.getElementsByName("httpd_password")[0].value=getParameterByName('password'); 
+		document.getElementById("myform").submit();
+	</script>
+</html>

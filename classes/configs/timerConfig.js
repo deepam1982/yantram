@@ -52,6 +52,10 @@ var TimerConfigManager = BasicConfigManager.extend({
 		}, this));
 
 	},
+	getSchedule : function (devId, loadId, scheduleId) { //scheduleId is schedule index
+		var filter = {"devId":devId, "loadId":loadId};
+		return (JSON.parse(JSON.stringify(__.where(this.data.schedules, filter))))[scheduleId];
+	},
 	getTimers : function (devId, loadId) {
 		var retObj = {};
 		var filter = __.extend({'devId':devId}, (typeof loadId == 'number')?{'loadId':loadId}:null);
