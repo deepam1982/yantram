@@ -13,4 +13,4 @@ var SwBd02 = SwBd01.extend({
 
 });
 
-module.exports = SwBd01;
+module.exports = SwBd02;
