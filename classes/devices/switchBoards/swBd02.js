@@ -6,9 +6,9 @@ var SwBd02 = SwBd01.extend({
 	numberOfSwitches : 5,
 	numberOfDimmers : 1,
 	numberOfSensors : 2,
-	_setDimmerState : function (msg) {
-		this.dimmerState[0] = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);
-	}
+	// _setDimmerState : function (msg) {
+	// 	this.dimmerState[0] = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);
+	// }
 
 
 });

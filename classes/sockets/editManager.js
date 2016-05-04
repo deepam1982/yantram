@@ -105,10 +105,11 @@ var EditManager = BaseClass.extend({
 			return callback && callback({'success':false, 'msg':'invalid parameters'});
 		var invalidParams = false, controls=[], id=0;
 		__.each(obj.controls, function (ctrl) {
+			var devConf = deviceInfoConfig.get(ctrl.devId);
 			if(ctrl.devId && ctrl.devId == "ipCamaras") {
 				if(typeof ctrl.switchID == "undefined") return invalidParams = true;
 			}
-			else if(!ctrl.devId || typeof ctrl.switchID == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchID))
+			else if(!ctrl.devId || typeof ctrl.switchID == "undefined" || !devConf || ((devConf.loads.normal || 0) + (devConf.loads.curtain || 0))  < parseInt(ctrl.switchID))
 				return invalidParams = true;
 			controls.push({"id":++id, "devId":ctrl.devId, "switchID":ctrl.switchID})
 		}, this);
