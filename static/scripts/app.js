@@ -51,7 +51,7 @@ var configurationWorkFlow = function (pageName) {
 		try {window[pageObjName].forIntalonFlow();}catch(err){}
 		window[pageObjName].onDone = function () {
 			$('.hideWhileConfigureFlow').show();
-			ioSocket.emit("checkConfigurations")
+			ioSockets[primeIp].emit("checkConfigurations")
 		};
 	}
 	else 
@@ -78,11 +78,6 @@ var setAppTheamColor = function (appTheme, themeColor) {
 			case "green"  : var color = (appTheam=='maze')?'#406E38':"#69C1A8", brightColor = (appTheam=='maze')?'#E3DBCB':"#69C1A8", traprntColor = "56,72,50", inputColor=(appTheam=='maze')?'#95AF8F':color; break;
 		}
 
-		color=(servedFromCloud)?"#69C1A8":color;
-		inputColor=(servedFromCloud)?"#69C1A8":inputColor;
-
-		
-//		inputColor=(servedFromCloud)?"#69C1A8":(appTheam == "Maze")?"#A58F8F":"#EE972D;";
 		var $sheet = $("<style>\
 	hr {\
 		border-top-color: "+color+";\
@@ -107,22 +102,24 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	</style>");
 		$('body').append($sheet);	
 }
-var servedFromCloud = false;
+var servedFromCloud = false, useSockets=servedFromCloud||true;
+
 //setAppTheamColor();
-var ioSocket, pingTimeStamp = Date.now();
+var primeIndx=0;
+var ioSockets=[], pingTimeStamp = Date.now();
 hashChanged = function (hash) {
 	if(!window.location.hash) return;
 	var removeHash = false;
 	switch(window.location.hash) {
-		case '#updatenow'				: 	ioSocket.emit('updateNow');removeHash=true;break;
-		case '#restorenetwork'			: 	ioSocket.emit('restoreNetwork');removeHash=true;break;
-		case '#restartinoho'			: 	ioSocket.emit('restartHomeController');removeHash=true;break;
-		case '#configurecloudtunnel'	: 	ioSocket.emit('configureCloudTunnel');removeHash=true;break;
-		case '#restartzigbee'			: 	ioSocket.emit('restartZigbee');removeHash=true;break;
-		case '#startcloudlogs'			: 	ioSocket.emit('startCloudLogs');removeHash=true;break;
-		case '#stopcloudlogs'			: 	ioSocket.emit('stopCloudLogs');removeHash=true;break;
+		case '#updatenow'				: 	ioSockets[primeIndx].emit('updateNow');removeHash=true;break;
+		case '#restorenetwork'			: 	ioSockets[primeIndx].emit('restoreNetwork');removeHash=true;break;
+		case '#restartinoho'			: 	ioSockets[primeIndx].emit('restartHomeController');removeHash=true;break;
+		case '#configurecloudtunnel'	: 	ioSockets[primeIndx].emit('configureCloudTunnel');removeHash=true;break;
+		case '#restartzigbee'			: 	ioSockets[primeIndx].emit('restartZigbee');removeHash=true;break;
+		case '#startcloudlogs'			: 	ioSockets[primeIndx].emit('startCloudLogs');removeHash=true;break;
+		case '#stopcloudlogs'			: 	ioSockets[primeIndx].emit('stopCloudLogs');removeHash=true;break;
 		case '#restorefactorysetting'	: 	if(confirm("Are you sure you wanna restore factory setting?")){
-												ioSocket.emit('restoreFactory', function (rsp) {
+												ioSockets[primeIndx].emit('restoreFactory', function (rsp) {
 													if(!rsp.success) alert(rsp.msg);
 												});
 											};removeHash=true;break;
@@ -135,39 +132,39 @@ hashChanged = function (hash) {
 	}
 	if(removeHash)window.location.hash = '';
 };
-var connectSocket = function (callback) {
-	ioSocket = io.connect((servedFromCloud)?'/client':'/' //, {transports: ['websocket']}
-		);
-	if(callback) ioSocket.on('connect', callback);
-	ioSocket.on('connect', showBurgerMenu);
-	ioSocket.on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
-	ioSocket.on('roomConfigUpdated', function (config) {
+var connectSocket = function (ip, idx, callback) {
+	ioSockets[idx] = io.connect('/', {path: '/ip/'+ip+'/socket.io'});
+	console.log(idx, ip, ioSockets[idx].id);
+	ioSockets[idx].on('connect', function(){console.log(idx, ip, ioSockets[idx].id);if(callback)callback();});
+	ioSockets[idx].on('connect', showBurgerMenu);
+	ioSockets[idx].on('log', function(data) {console.log('Recieved from server to log', data, new Date() - d)});
+	ioSockets[idx].on('roomConfigUpdated', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
-		gC.set(config, {merge: true, remove: false});
+		gCs[idx].set(config, {merge: true, remove: false});
 	});
-	ioSocket.on('deleteGroup', function (groupId) {
+	ioSockets[idx].on('deleteGroup', function (groupId) {
 		if(!groupId) return;
-		gC.remove(gC.get(groupId));
+		gCs[idx].remove(gCs[idx].get(groupId));
 	});
-	ioSocket.on('onDeviceUpdate', function (config) {
+	ioSockets[idx].on('onDeviceUpdate', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
-		dC.set(config, {merge: true, remove: false});
+		dCs[idx].set(config, {merge: true, remove: false});
 	});
-	ioSocket.on('moodConfigUpdate', function (config) {
+	ioSockets[idx].on('moodConfigUpdate', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
-		mC.set(config, {merge: true, remove: false});
+		mCs[idx].set(config, {merge: true, remove: false});
 	});
-	ioSocket.on('deleteMood', function (moodId) {
+	ioSockets[idx].on('deleteMood', function (moodId) {
 		if(!moodId) return;
-		mC.remove(mC.get(moodId));
+		mCs[idx].remove(mCs[idx].get(moodId));
 	});
-	ioSocket.on('noHomeControllerPresent', function () {
+	ioSockets[idx].on('noHomeControllerPresent', function () {
 		sideMenu.switchPage('homeControllerDownPage');
 		$('#appLoadingVeil').hide();
 	});
-	ioSocket.on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
-	ioSocket.on('switchPage', configurationWorkFlow);
-	ioSocket.on('homeControllerLocalIpAddress', function (add) {
+	ioSockets[idx].on('sudoHeartbeat', function () {pingTimeStamp = Date.now();});
+	ioSockets[idx].on('switchPage', configurationWorkFlow);
+	ioSockets[idx].on('homeControllerLocalIpAddress', function (add) {
 		var arr = window.location.href.split("/");
 		if(arr[2] == add) return;
 		$.ajax({crossDomain: true,dataType: "jsonp",
@@ -177,11 +174,12 @@ var connectSocket = function (callback) {
 	});
 };
 var setTheme = function () {
-	ioSocket.emit('getThemeSettings', {}, function (rsp) {
+	ioSockets[primeIndx].emit('getThemeSettings', {}, function (rsp) {
 		setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
 	});
 }
-connectSocket(setTheme);
+_.each(localIpArr, function(ip, indx){connectSocket(ip, indx, (indx == primeIndx)?setTheme:null);})
+
 var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
 sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
 sideMenu.render();
@@ -205,37 +203,46 @@ Backbone.ajax = function (obj) {
 	obj.headers = {"Content-Encoding": "gzip"};
     obj.dataType = 'text';
 	if(!obj.useSocket) return backboneAjax.apply(this, arguments);
-	ioSocket.emit(obj.url, obj.data, obj.success);
+	obj.socket.emit(obj.url, obj.data, obj.success);
 }
-var RoomCollection = Backbone.Collection.extend({
+var CustomCollection = Backbone.Collection.extend({
+	initialize: function() {
+		Backbone.Collection.prototype.initialize.apply(this, arguments);
+		this.on('add', function (model) {
+			model.ioSocket = model.collection.ioSocket;
+		}, this);
+		return this;
+	}
+})
+var RoomCollection = CustomCollection.extend({
 	url: '/group/list',
-	model:RoomModel
+	model:RoomModel,
+	initialize: function() {
+		CustomCollection.prototype.initialize.apply(this, arguments);
+		this.on('add', function (roomModel) {
+			dCs[primeIndx].each(function (model, idx){model.set('name', 'Module-'+(idx+1));});
+		}, this);
+		return this;
+	},
+	comparator:function (model) {return parseInt(model.get('rank'));}
 });
-var DeviceCollection = Backbone.Collection.extend({
+var DeviceCollection = CustomCollection.extend({
 	url: '/device/list'
 });
-var MoodCollection = Backbone.Collection.extend({
+var MoodCollection = CustomCollection.extend({
 	url: '/mood/list',
-	model:BaseModel
+	model:BaseModel,
+	initialize: function() {
+		CustomCollection.prototype.initialize.apply(this, arguments);
+		this.on("add", function(roomModel){
+			roomModel.on('change', function (model, data) {console.log("change called on "+model.get('name'));console.log(model);});
+			(gCs[primeIndx].models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
+		});
+		return this;
+	},
+	comparator:function (model) {return parseInt(model.get('rank'));}
 });
-var gC = new RoomCollection();
-var dC = new DeviceCollection();
-var mC = new MoodCollection();
-gC.comparator = function (model) {return parseInt(model.get('rank'));};
-mC.comparator = function (model) {return parseInt(model.get('rank'));};
 
-dC.on('add', function () {dC.each(function (model, idx){model.set('name', 'Module-'+(idx+1));});});
-
-gC.on("add", function(roomModel){
-	roomModel.on('change', function (model, data) {
-		console.log("change called on "+model.get('name'));
-		console.log(model);
-	});
-	(gC.models.length<5 || fixMoodStrip) && (fixMoodStrip=true) && clearTimeout(hideMoodStripTimer);
-})
-//		gC.on("sort", function () {console.log(gC.pluck('name'));});
-//		mC.on("add", function(model){console.log(model);})
-// gc should follow dc and mc ... others wise page takes longer to load.
 var fetchCount = 0;
 var fetchComplete = function () {
 	if(++fetchCount == 3)setTimeout(function () {
@@ -243,41 +250,53 @@ var fetchComplete = function () {
 		console.log('Veil lifted at:', new Date()-d);
 	}, 200);
 };
-dC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
-mC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
-gC.fetch({update:true, remove: false, useSocket:servedFromCloud, success:fetchComplete});
 
-deviceCollection = dC;
+var gCs=[], dCs=[], mCs=[];
+_.each(localIpArr, function(ip, idx){
+
+	(gCs[idx] = new RoomCollection()).ioSocket=ioSockets[idx];
+	(dCs[idx] = new DeviceCollection()).ioSocket=ioSockets[idx];
+	(mCs[idx] = new MoodCollection()).ioSocket=ioSockets[idx];
+
+	dCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+	mCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+	gCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+
+})
+
+
 if($('body').attr('homeView')=='list')
-	var mainPageView = new MainPageView({'collection':gC});
+	var mainPageView = new MainPageView({'collections':gCs});
 else 
-	var mainPageView = new GroupProxyMainPageView({'collection':gC, 'moodCollection':mC});
+	var mainPageView = new GroupProxyMainPageView({'collections':gCs, 'moodCollections':mCs});
 
-var moodStrip = mainPageView.moodStrip = new MoodStripView({'collection':mC, 'el':$('.moodWidgetArea')});
+var moodStrip = mainPageView.moodStrip = new MoodStripView({'collections':mCs, 'el':$('.moodWidgetArea')});
 $('#appCont').append(mainPageView.$el);
 mainPageView.render();
+
+
 sideMenu.currentPage = mainPageView;
-var editPageView = new EditPageView({'collection':gC});
+var editPageView = new EditPageView({'collections':gCs, 'deviceCollections':dCs});
 $('#appCont').append(editPageView.$el);
 // editPageView.render();
 // sideMenu.currentPage = editPageView;
-var editMoodView = new EditMoodPageView({'collection':mC});
+var editMoodView = new EditMoodPageView({'collections':mCs, 'deviceCollections':dCs, 'groupCollections':gCs});
 $('#appCont').append(editMoodView.$el);
-var configureModulePage = new ConfigureNewModuleView({socket:ioSocket});
+var configureModulePage = new ConfigureNewModuleView({socket:ioSockets[primeIndx], gC:gCs[primeIndx]});
 $('#appCont').append(configureModulePage.$el);
-var cloudSettingPage = new CloudSettingPageView({socket:ioSocket});
+var cloudSettingPage = new CloudSettingPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(cloudSettingPage.$el);
-var themeSettingPage = new ThemeSettingPageView({socket:ioSocket});
+var themeSettingPage = new ThemeSettingPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(themeSettingPage.$el);
-var networkSettingPage = new NetworkSettingPageView({socket:ioSocket});
+var networkSettingPage = new NetworkSettingPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(networkSettingPage.$el);
-var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSocket});
+var welcomeScreenPage = new WelcomeScreenPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(welcomeScreenPage.$el);
-var checkUpdatePage = new CheckUpdatePageView({socket:ioSocket});
+var checkUpdatePage = new CheckUpdatePageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(checkUpdatePage.$el);
-var fileReaderPage = new FileReaderPageView({socket:ioSocket});
+var fileReaderPage = new FileReaderPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(fileReaderPage.$el);
-var commandPosterPage = new CommandPosterPageView({socket:ioSocket});
+var commandPosterPage = new CommandPosterPageView({socket:ioSockets[primeIndx]});
 $('#appCont').append(commandPosterPage.$el);
 var HomeControllerDownPageView = BaseView.extend({
 	templateSelector:"#homeControllerDownTemplate"

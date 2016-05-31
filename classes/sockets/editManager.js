@@ -6,12 +6,14 @@ var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
+var sendGetRequest = require(__rootPath+"/classes/utils/checkInternet").sendGetRequest
 
 var EditManager = BaseClass.extend({
 	init : function (obj) {
 		__.bindAll(this, "onLocalConnection");
-		this.localIo = obj.localIo;
-		this.localIo.sockets.on('connection', this.onLocalConnection);
+//		this.localIo = obj.localIo;
+//		this.localIo.sockets.on('connection', this.onLocalConnection);
+		obj.sockets.on('connection', this.onLocalConnection);
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;
@@ -26,6 +28,46 @@ var EditManager = BaseClass.extend({
 		socket.on('modifyMood', __.bind(this.modifyMood, this));
 		socket.on('editIpCamaraData', __.bind(this.editIpCamaraData, this));
 		socket.on('getIpCamaraData', __.bind(this.getIpCamaraData, this));
+		socket.on('updateIpOctet', __.bind(this.updateIpOctet, this));
+		socket.on('updateClusterIps', __.bind(this.updateClusterIps, this));
+	},
+	updateClusterIps : function (obj, callback) {
+		if(!obj || !obj.ipArr || !__.isArray(obj.ipArr))
+			callback({'success':false, 'msg':'invalid ipArray'});
+		var onValidationDone = function(err) {
+			if(err) return callback({'success':false, 'msg':err});
+			__systemConfig.set('clusterIps', obj.ipArr);
+			__systemConfig.save(function (err) {
+				if(err) console.log(err);
+				callback({'success':(err)?false:true, 'msg':err});
+			});
+		};
+		var count=0
+		for(var i=0; i<obj.ipArr.length; i++){
+			sendGetRequest(obj.ipArr[i], '/inohocontroller', function(err, rsp){
+				console.log(err, rsp);
+				if (count < 0) return;
+				if(err || !(rsp=JSON.parse(rsp)) || !rsp.success) {
+					count = -1;
+					return onValidationDone("one or more IPs are not reachable")
+				}
+				if (!--count) return onValidationDone(null);
+			});
+			count++;
+		}
+		if(!count) onValidationDone();
+	},
+	updateIpOctet : function (obj, callback) {
+
+		if(!obj || !obj.ipOctet || (obj.ipOctet=parseInt(obj.ipOctet)) < 1 || obj.ipOctet > 254)
+			callback({'success':false, 'msg':'invalid ipOctate'});
+		__systemConfig.set('ipOctate', obj.ipOctet);
+		__systemConfig.save(function (err) {
+			if(err) console.log(err);
+			var exec = require('child_process').exec;
+			exec("sudo service checkIpAlias.sh");	
+		});
+		callback({'success':true});
 	},
 	getIpCamaraData : function (callback) {
 		callback({'success':true, 'data':ipCamaraConfig.data});		

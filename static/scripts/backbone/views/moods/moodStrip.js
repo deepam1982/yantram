@@ -1,19 +1,13 @@
 MoodProxy = BaseView.extend({
 	name : "MoodProxy",
 	tagName : 'span',
-	templateSelector:"#moodProxyTemplate"
-});
-
-MoodStripView = BaseView.extend({
-	name : "MoodStrip",
-	templateSelector:"#moodStripTemplate",
-	subViewArrays : [{'viewClassName':'MoodProxy', 'reference':'moodProxyArray', 'parentSelector':'.moodProxyCont', 'array':'this.collection'}],
+	templateSelector:"#moodProxyTemplate",
 	events : {
 		"tap .moodIcon" : 'applyMood'
 	},
 	applyMood : function (event) {
 		var $elm = $(event.target).closest('.moodIcon');
-		var moodModel = this.collection.get($elm.attr('moodId'));
+		var moodModel = this.model;
 		console.log(moodModel);
 //		$elm.append('<img src="static/images/loading.gif" style="position:absolute;left:-9px;top:-2px;width:60px;"/>')
 		$elm.append('<i class="spinner fa fa-spinner fa-spin" style="position:absolute;left:-6px;top:-2px;font-size:50px;color:white;"></i>')
@@ -22,16 +16,42 @@ MoodStripView = BaseView.extend({
 			if(err)console.log(err)
 		});
 	},
-	showSelectiveMoodProxy : function (moodIds) {
-		_.each(this.moodProxyArray, function(view){
-			var $moodProxy = view.$el;
-			if(_.indexOf(moodIds,$moodProxy.find(".moodIcon").attr('moodId'))+1)$moodProxy.show();
-			else $moodProxy.hide();	
-		});
+	
+});
+
+MoodStripView = BaseView.extend({
+	name : "MoodStrip",
+	templateSelector:"#moodStripTemplate",
+	subViewArrays : [{'viewClassName':'MoodProxy', 'reference':'moodProxyArray', 'parentSelector':'.moodProxyCont', 'array':'this.collection'}],
+	initialize: function(opt) {
+		var oriPrams = this.subViewArrays[0], i=0;
+		this.subViewArrays = [];
+		_.each(opt.collections, function(col){
+			var clonPrams = _.extend({}, oriPrams);
+			clonPrams.array = 'this.options.collections['+(i++)+']';
+			clonPrams.reference +=('_'+i);
+			this.subViewArrays.push(clonPrams);
+			col.on('add', function(){
+				var count=0;_.each(this.options.collections, function(ccol){count+=ccol.length;});
+				this.$el.find('.moodProxyCont').width(55*count);
+			}, this);
+		}, this)
+		return BaseView.prototype.initialize.apply(this, arguments);
+	},
+	showSelectiveMoodProxy : function (moods) {
+		var cids = []; _.each(moods, function(m){cids.push(m.cid);});
+		for(var i=1; i<=this.options.collections.length;i++){
+			_.each(this['moodProxyArray_'+i], function(view){
+				view.$el.hide();
+				if(1+_.indexOf(cids, view.model.cid)) view.$el.show();
+			});
+		}
 	},
 	showAllMoodProxy : function() {
-		_.each(this.moodProxyArray, function(view){
-			var $moodProxy = view.$el.show();
-		});
+		for(var i=1; i<=this.options.collections.length;i++){
+			_.each(this['moodProxyArray_'+i], function(view){
+				var $moodProxy = view.$el.show();
+			});
+		}	
 	}
 })

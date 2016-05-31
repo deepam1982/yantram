@@ -2,7 +2,7 @@ EditMoodPannel = BaseView.extend({
 	name : "EditMoodPannel",
 	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
 	templateSelector:"#editMoodTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'gC','createOnRender':true}],
+	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'this.options.gC','createOnRender':true}],
 		events : {
 		"tap .moodIcon" : 'changeMoodIcon'
 	},
@@ -25,7 +25,7 @@ EditMoodPannel = BaseView.extend({
 		moodInfo.name=this.$el.find('.moodName').val() || moodInfo.name;
 		moodInfo.name=moodInfo.name.charAt(0).toUpperCase() + moodInfo.name.slice(1);
 		var controls = [], id=0;
-		gC.each(function (grp) {
+		this.options.gC.each(function (grp) {
 			_.each(grp.get('controls'), function (sw, key) {
 				sw.selected && controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
 			}, this);
@@ -35,7 +35,7 @@ EditMoodPannel = BaseView.extend({
 	},
 	_saveMood : function () {
 		if(this.avoidSaving) return;
-		ioSocket.emit("modifyMood", this._getMoodInfo(), function (err){if(err)console.log(err)});
+		this.model.ioSocket.emit("modifyMood", this._getMoodInfo(), function (err){if(err)console.log(err)});
 	},
 	render : function () {
 		var hash = {};
@@ -44,7 +44,7 @@ EditMoodPannel = BaseView.extend({
 			hash[obj.devId][obj.switchId]= (obj.state=='on'||obj.state==true)?true:false;
 		}, this);
 
-		gC.each(function (grp) {
+		this.options.gC.each(function (grp) {
 			_.each(grp.get('controls'), function (sw, key) {
 				sw.task='moodSelection';sw.selected=false;
 				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){

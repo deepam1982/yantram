@@ -50,6 +50,7 @@ ConfigureSwitchboardModuleView = BaseView.extend({
 					this.groupViewArr = [];
 					setTimeout(_.bind(function () {
 						this.$el.find('.loader').hide();
+						var gC = this.options.parentView.options.gC;
 						for (var i=0; i<groupIds.length; i++) {
 							var grpMdl = gC.get(groupIds[i]);
 							grpMdl.on('change', this._onConfigurationConfirmation, this);
@@ -100,7 +101,8 @@ ConfigureNewModuleView = BaseView.extend({
 		"tap .optionTab" : "switchView"
 	},
 	subViews : [{'viewClassName':'ConfigureSwitchboardModuleView', 'reference':'cnfgrSMView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':false},
-				{'viewClassName':'ConfigureIpCamaraView', 'reference':'cnfgrIPCamView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':true}],
+				{'viewClassName':'ConfigureIpCamaraView', 'reference':'cnfgrIPCamView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':true},
+				{'viewClassName':'ConfigureClusterView', 'reference':'cnfgrClusterView', 'parentSelector':'.configurationAppCont', 'eval':['socket=this.options.socket'], 'supressRender':true}],
 	toggleList : function() {
 		var $list = this.$el.find('.dropDownOptions');
 		if($list.is(':visible')) $list.hide();

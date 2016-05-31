@@ -5,7 +5,7 @@ var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var eventLogger = require(__rootPath+"/classes/eventLogger/logger");
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
-var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
+var checkInternet = require(__rootPath+"/classes/utils/checkInternet").checkInternet;
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
@@ -14,8 +14,9 @@ var CommandManager = BaseClass.extend({
 	init : function (obj) {
 		__.bindAll(this, "onLocalConnection", "onToggleSwitchCommand", 
 			"onSetDutyCommand", "onModifyNetworkSecurityKey");
-		this.localIo = obj.localIo;
-		this.localIo.sockets.on('connection', this.onLocalConnection);
+//		this.localIo = obj.localIo;
+//		this.localIo.sockets.on('connection', this.onLocalConnection);
+		obj.sockets.on('connection', this.onLocalConnection);
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;
@@ -56,7 +57,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
 		socket.on('restoreFactory', __.bind(this.restoreFactory, this));
-
+		socket.on('testSocket', function(){console.log("Test Success!!!!")});
 		console.log('Added Command Listners!!')
 	},
 	setLogOnCloud : function (flag) {

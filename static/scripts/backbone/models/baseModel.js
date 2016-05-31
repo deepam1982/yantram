@@ -10,17 +10,19 @@ BaseModel = Backbone.Model.extend({
 		return ;
 	},
 	sendActionRequest	:   function (actionName, data, success, error) {
+		var ioSocket = this.ioSocket;
 		if (!ioSocket || !(ioSocket.connected || ioSocket.socket && ioSocket.socket.connected)) {
 			if (error) error("Socket not connected");
 			console.log(actionName + " cannot be perfomed, socket not connected.");
 			return;
 		}
+		data.actionName=actionName;
 		data.deviceType = ( screen.width <= 480 )?'Mobile':'Laptop';
-		ioSocket.emit(actionName, data);
+		ioSocket.emit(actionName, data, function() {console.log("callback for",actionName)});
 		if (success) success();
 	},
 	sendActionRequestByAjax	:	function ($actionName, data, success, error) {
-		if(servedFromCloud) return this.sendActionRequest.apply(this, arguments);
+		if(useSockets) return this.sendActionRequest.apply(this, arguments);
 		if(!data) data = {};
 //		data.respondWithModel=true;
 		data.actionName=$actionName;

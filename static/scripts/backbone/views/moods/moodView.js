@@ -2,7 +2,7 @@
 MoodView = BaseView.extend(Popup).extend({
 	name : "MoodView",
 	templateSelector:"#moodViewTemplate",
-	subViews : [{'viewClassName':'EditMoodPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'supressRender':true}],
+	subViews : [{'viewClassName':'EditMoodPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'eval':['gC=this.options.groupCollection'], 'supressRender':true}],
 	events: _.extend(Popup.events, {
  		"tap .editMood" : "showPopUp",
  		"tap .deleteMood" : "deleteMood"
@@ -44,10 +44,10 @@ MoodView = BaseView.extend(Popup).extend({
 		var moodJson = (this.model)?this.model.toJSON():{};
 		moodJson.groups = [];
 		var groups = _.groupBy(moodJson.controls, function (ctl) {
-			var info = deviceCollection.get(ctl.devId).get('loadInfo')[ctl.switchId];
+			var info = this.options.deviceCollection.get(ctl.devId).get('loadInfo')[ctl.switchId];
 			ctl.name = info.name; ctl.icon=info.icon;
 			return (ctl.groupInfo)?ctl.groupInfo.id:9999;
-		});
+		}, this);
 		_.each(groups, function (ctls, gpId){
 			moodJson.groups.push({'name':(ctls[0].groupInfo)?ctls[0].groupInfo.name:'No Group', 'controls':ctls});
 		});

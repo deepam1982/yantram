@@ -52,8 +52,9 @@ CloudSettingPageView = BaseView.extend({
 	},
 	modify : function (cloudEmail, cloudPwd) {
 		this.$el.hide();
-		this.$el.find('.loader').show();
-		this.$el.parent().append(this.$el.find('.loader'));
+		var $loader = this.$el.find('.loader');
+		$loader.show();
+		this.$el.parent().append($loader);
 		this.options.socket.emit("modifyCloudSettings", {"email":cloudEmail, "password":cloudPwd}, _.bind(function (rsp) {
 			$loader.remove();
 			this.$el.show();

@@ -12,10 +12,22 @@ module.exports = function(app) {
 		}
 		var appColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
 		var homeView = __userConfig.get('homeView') || 'list';
+		var hcId = __userConfig.get('zigbeeNetworkName');
+		var ip = __piIpAddr.split('.');
+		ip.pop();
+		var ipMask = ip.join('.');
+		//JSON.stringify(
+		var clusterIpArr = __systemConfig.get('clusterIps');
+		clusterIpArr = (clusterIpArr)?[__piIpAddr].concat(clusterIpArr):[__piIpAddr];
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
+			'clusteringSupported':__systemConfig.get('clusteringSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
-			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true
+			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true,
+			'hcId':hcId, 
+			'ipMask':ipMask,
+			'ipOctate':__systemConfig.get('ipOctate')||'123',
+			'clusterIpArr':clusterIpArr
 		});
 		// try {res.sendFile(appFile);}
 		// catch(err) {res.sendfile(appFile);}

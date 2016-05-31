@@ -11,8 +11,9 @@ var zlib = require('zlib');
 var RequestManager = BaseClass.extend({
 	init : function (obj) {
 		__.bindAll(this, "setEventListners");
-		this.localIo = obj.localIo;
-		this.localIo.sockets.on('connection', this.setEventListners);
+//		this.localIo = obj.localIo;
+//		this.localIo.sockets.on('connection', this.setEventListners);
+		obj.sockets.on('connection', this.setEventListners);
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;

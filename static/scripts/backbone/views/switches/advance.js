@@ -165,7 +165,7 @@ AdvanceFanSwitch = AdvanceSwitch.extend({
 	},
 	render	:	function () {
  		AdvanceSwitch.prototype.render.apply(this, arguments);
- 		var minSpeed = (this.model.get('icon').indexOf('fan') == -1) ? 0 : 30;
+ 		var minSpeed = (this.model.get('icon').indexOf('fan') == -1) ? 10 : 30;
  		this.$slider = $('<input type="range" class="inside fanSlider" min="'+minSpeed+'" max="95" value="50" showemptylabels="false" style="margin:30px 0 0 10px;"/>');
  		this.$el.find('.advancePannel').append(this.$slider);
  		this.$slider.width(Math.max(120,this.$el.parent().width() - 2*this.$el.find('.toggelSwitch').width() - 20));

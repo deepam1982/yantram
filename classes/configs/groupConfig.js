@@ -34,6 +34,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 		var keys = __.keys(this.data);
 		var count = keys.length;
 		conf.id = id+''; // id has to be string
+		conf.hcId = __userConfig.get('zigbeeNetworkName');
 		conf.rank || (conf.rank = (__.indexOf(keys, id+'')+1));
 		conf.count = count;
 		conf.disabledCtls = 0;
@@ -99,6 +100,14 @@ var GroupConfigManager = BasicConfigManager.extend({
 			data.push(this._getGroupDetails(conf, id));
 		}, this);
 		return data;
+	},
+	publishGroupConfig : function (groupIds) {
+		(!groupIds || !groupIds.length) && (groupIds = __.keys(this.data));
+		__.each(groupIds, function (id, i) {
+			__.defer(__.bind(function (idd) {
+				this.emit("publishGroupConfig", this.getGroupDetails(idd))
+			}, this), id);
+		}, this);
 	}
 })
 if (typeof groupConfig == 'undefined') groupConfig = new GroupConfigManager();

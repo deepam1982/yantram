@@ -95,6 +95,8 @@ fs.exists('/sys/class/gpio/gpio18', function (exist) {
   });
 });
 
+var findIpAddress = require(__rootPath+"/classes/utils/checkInternet").findIpAddress;
+__piIpAddr = findIpAddress();
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
 var SystemConfigMngr = BasicConfigManager.extend({file : '/../configs/systemConfig.json'});
 __systemConfig = new SystemConfigMngr({'callback':function(err){
@@ -105,6 +107,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
         __userConfig = new UsrCnfMngr({'callback':function (err) {
+          var SocketManager = require(__rootPath + '/classes/sockets/socketManager')
 
           if(__userConfig.get('logOnCloud') === true) console.log = logOnCloud;
 
@@ -122,7 +125,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             //var expressDevice = require('express-device');
             var app = express()
               , server = require('http').createServer(app)
-              , io = require('socket.io').listen(server);
+              , io = require('socket.io').listen(server)
+              , sm = new SocketManager({'io':io});//, 'nameSpace':'/'+__userConfig.get('zigbeeNetworkName')});
 /*            io.set("transports", [
                 'websocket'
               , 'flashsocket'
@@ -159,44 +163,9 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               res.send(500, 'Something broke!');
             });
 
-
-            var checkConfigurations = function (socket){
-//              socket.emit('switchPage', 'welcomeScreen');
-//              return;
-              if(!__userConfig.get('zigbeeNetworkName') || !__userConfig.get('zigbeeNetworkKey'))
-                socket.emit('switchPage', 'welcomeScreen'); //socket.emit('switchPage', 'networkSetting');
-              else if(!__userConfig.get('email') || !__userConfig.get('password'))
-                socket.emit('switchPage', 'cloudSetting');
-              else if(!__.keys(__remoteDevInfoConf.data).length)
-                socket.emit('switchPage', 'configureModule');
-              else
-                socket.emit('switchPage', 'mainPage');
-            }
-            io.sockets.on('connection', function (socket) {
-              console.log('Socket connection established!!');
-              // socket.emit('showBurgerMenu'); // not required any more
-              socket.on('checkConfigurations', __.bind(checkConfigurations,null, socket));
-              if(__systemConfig.get('communicator') != 'tarang') 
-                checkConfigurations(socket);
-            });
-            setInterval(function () {io.sockets.emit('sudoHeartbeat')}, 1000);
-
-
-            var SocketCommandManager = require(__rootPath + '/classes/sockets/commandManager')
-            var socComMngr = new SocketCommandManager({'localIo':io});
-
-            var SocketRequestManager = require(__rootPath + '/classes/sockets/requestManager')
-            var socReqMngr = new SocketRequestManager({'localIo':io});
-
-            var SocketEditManager = require(__rootPath + '/classes/sockets/editManager')
-            var socEdtMngr = new SocketEditManager({'localIo':io});
-            
-            var FileReader = require(__rootPath + '/classes/sockets/fileReader')
-            var fileReader = new FileReader({'localIo':io});
-
             var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
             var restoreStateAttempts = 0;
-            var checkInternet = require(__rootPath+"/classes/utils/checkInternet");
+            var checkInternet = require(__rootPath+"/classes/utils/checkInternet").checkInternet;
             var restoreState = function () {
               checkInternet(function(err) {
                 if (err) return(++restoreStateAttempts && setTimeout(restoreState, ((restoreStateAttempts < 8)?30:120)*1000));
@@ -211,29 +180,18 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }
             restoreState();
             //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
-            var theCloudSocket = null
-            var publishGroupConfig = function (groupIds) {
-              (!groupIds || !groupIds.length) && (groupIds = __.keys(groupConfig.data));
-              __.each(groupIds, function (id, i) {
-                __.defer(function (idd) {
-                  var conf = groupConfig.getGroupDetails(idd);
-                  io.sockets.emit('roomConfigUpdated', conf);
-                  __.defer(function (conff) {theCloudSocket && theCloudSocket.emit('roomConfigUpdated', conff);}, conf);
-                }, id);
-              });
-            };
 
-            groupConfig.on('groupDeleteStart', function (groupId) {
-              io.sockets.emit('deleteGroup', groupId);
-              theCloudSocket && theCloudSocket.emit('deleteGroup', groupId);
-            });
-            
+            sm.initilizeSubManagers();
+            var socComMngr = sm.socComMngr;
+            sm.subscribeConfigEvents();
+            sm.initCloudSocket();
+
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType, switchIds) {
               if(nodeType != 'sensor') {
                 console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
                 var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
                 console.log(groupIds);
-                publishGroupConfig(groupIds);
+                groupConfig.publishGroupConfig(groupIds);
               }
               if(nodeType == 'load'){
                 __deviceStateConf.data = deviceManager.getDeviceStateMap();
@@ -260,29 +218,6 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               });
               
             })
-
-            moodConfig.on('moodDeleteStart', function (moodId) {
-              io.sockets.emit('deleteMood', moodId);
-              theCloudSocket && theCloudSocket.emit('deleteMood', moodId);
-            });
-
-            moodConfig.on('moodConfigChanged', function (moodId) {
-              var list=moodId?[moodConfig.getMoodDetails(moodId)]:moodConfig.getList()
-              __.each(list, function (info) {
-                io.sockets.emit('moodConfigUpdate', info);
-              });
-//              io.sockets.emit('moodConfigUpdate', moodConfig.getList());
-            });  
-
-            require(__rootPath + '/classes/sockets/initClientSocket')(function (err, cloudSocket) {
-              theCloudSocket = cloudSocket;
-              publishGroupConfig();
-              socComMngr.setCloudSocket(cloudSocket);
-              socReqMngr.setCloudSocket(cloudSocket);
-              fileReader.setCloudSocket(cloudSocket);
-              socEdtMngr.setCloudSocket(cloudSocket);
-            })
-              
 
             var coordinator = require(__rootPath+"/classes/coordinator");
             // coordinates between sensors, virtual devices, timers etc.

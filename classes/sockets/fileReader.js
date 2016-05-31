@@ -3,8 +3,9 @@ var fs = require('fs');
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var FileReader = BaseClass.extend({
 	init : function (obj) {
-		this.localIo = obj.localIo;
-		this.localIo.sockets.on('connection', __.bind(this.onLocalConnection, this));
+//		this.localIo = obj.localIo;
+//		this.localIo.sockets.on('connection', __.bind(this.onLocalConnection, this));
+		obj.sockets.on('connection', __.bind(this.onLocalConnection, this));
 	},
 	setCloudSocket	: 	function (cloudSocket) {
 		this.cloudSocket = cloudSocket;

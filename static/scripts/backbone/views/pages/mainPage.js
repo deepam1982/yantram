@@ -2,6 +2,26 @@
 MainPageView = BaseView.extend({
 	name : 'MainPageView',
 	subViewArrays : [{'viewClassName':'GroupView1', 'reference':'roomViewArray', 'parentSelector':'', 'array':'this.collection'}],
+	_getJsonToRenderTemplate : function () {return {'clusterCount':this.options.collections.length, 'currentCluster':this.currentCluster||1}},
+	initialize: function(opt) {
+		var oriPrams = JSON.parse(JSON.stringify(this.subViewArrays[0])), i=0;
+		this.subViewArrays = [];
+		_.each(opt.collections, function(col){
+			var clonPrams = JSON.parse(JSON.stringify(oriPrams));
+			_.each(clonPrams.eval, function(val, idx, eval){
+				if(val == 'deviceCollection') eval[idx] = val+'=this.options.deviceCollections['+i+']';
+				if(val == 'moodCollection') eval[idx] = val+'=this.options.moodCollections['+i+']';
+				if(val == 'groupCollection') eval[idx] = val+'=this.options.groupCollections['+i+']';
+			}, this);
+			clonPrams.array = 'this.options.collections['+(i++)+']';
+			clonPrams.reference +=('_'+i);
+			if(clonPrams.parentSelectorPrefix)
+				clonPrams.parentSelector = clonPrams.parentSelectorPrefix + ('_'+i);
+			this.subViewArrays.push(clonPrams);
+		}, this)
+		console.log(this.subViewArrays);
+		return BaseView.prototype.initialize.apply(this, arguments);
+	},
 	render : function () {
 		this.moodStrip && $('#moodWigitCont').show() && this.moodStrip.render();
 		return BaseView.prototype.render.apply(this, arguments);
@@ -23,7 +43,11 @@ GroupProxyView = BaseView.extend({
 	},
 	events: {
 		"tap .powerOffIcon"	: "powerOff",
-		"tap .moodIcon"	: "applyMood" 
+		"tap .moodIcon"	: "applyMood",
+		"tap .groupProxyCont" : "onProxyTap"
+	},
+	onProxyTap : function () {
+		this.options.parentView.switchToGroupview(this.model, this.options.moodCollection);
 	},
 	powerOff : function(event) {
 		event.stopPropagation();
@@ -46,11 +70,11 @@ GroupProxyView = BaseView.extend({
 
 GroupProxyMainPageView = MainPageView.extend({
 	name : 'GroupProxyMainPageView',
-	subViewArrays : [{'viewClassName':'GroupProxyView', 'reference':'groupProxyArray', 'parentSelector':'.proxyCont', 'array':'this.collection', 'eval':['moodCollection=this.options.moodCollection']}],
+	subViewArrays : [{'viewClassName':'GroupProxyView', 'reference':'groupProxyArray', 'parentSelectorPrefix':'.proxyCont', 'array':'this.collection', 'eval':['moodCollection']}],
 	templateSelector:"#groupProxyMainPageViewTemplate",
 	initialize: function(obj) {
 		$('#backImageCont').on('tap', _.bind(this.backClicked, this));
-		return BaseView.prototype.initialize.apply(this, arguments);
+		return MainPageView.prototype.initialize.apply(this, arguments);
 	},
 	render : function () {
 		$(".appArea").css('padding',0);
@@ -72,9 +96,6 @@ GroupProxyMainPageView = MainPageView.extend({
 		$(".appArea").css('padding', '');
 		return MainPageView.prototype.erase.apply(this, arguments);
 	},
-	events: {
-		"tap .groupProxyCont" : "switchToGroupview"
-	},
 	backClicked : function() {
 		if(!this.rendered) return;
 		this.moodStrip.showAllMoodProxy()
@@ -85,10 +106,8 @@ GroupProxyMainPageView = MainPageView.extend({
 		$('#burgerImageCont').show();
 
 	},
-	switchToGroupview : function (event) {
-		var $gropProxy = $(event.target).closest('.groupProxyCont');
-		var groupId = $gropProxy.attr('groupId');
-		var grpMdl = this.collection.get(groupId)
+	switchToGroupview : function (grpMdl, moodCollection) {
+		console.log("onProxyTap");	
 		this.grpView = new GroupView1({model:grpMdl});
 		this.$el.find('.groupViewCont').prepend(this.grpView.$el);
 		this.$el.find('.proxyCont').hide();
@@ -96,7 +115,9 @@ GroupProxyMainPageView = MainPageView.extend({
 		this.grpView.render();
 		$('#burgerImageCont').hide();
 		$('#backImageCont').show();
-		this.moodStrip.showSelectiveMoodProxy(_.pluck(grpMdl.get('groupMoods'),'id'))
+		var moodModels=[];
+		_.each(_.pluck(grpMdl.get('groupMoods'),'id'), function(id){moodModels.push(moodCollection.get(id))});
+		this.moodStrip.showSelectiveMoodProxy(moodModels)
 
 	}
 })

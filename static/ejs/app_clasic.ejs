@@ -96,6 +96,19 @@
 			border-bottom-right-radius: 0px;
 			border-bottom-left-radius: 0px;
 		}
+		.clusterNameCont {
+			padding: 4px 12px 0px;
+			margin: 0px 0px 0px 10px;
+			border-radius: 4px 4px 0 0;
+			font-size: 12px;
+			cursor: pointer;
+			color: black;
+		}
+		.clusterNameCont.curCluster{
+			border-width: 4px;
+			border-style: solid;
+			border-bottom-width: 0px;
+		}
 
 		.moodGroupCont {
 			padding:15px 0 0 55px;
@@ -466,7 +479,7 @@
 			</div>
 			<div id='sideMenuCont' class='theamBGColor' style='position:absolute; top:0px; bottom:0px; right:0px; width:38%; border-left:2px solid white;  z-index:99; display:none'></div>
 			<div style='clear:both;'></div>	
-			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer'></div>
+			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer' style='overflow-x: auto; text-align:center;'></div>
 			<div id='ipCamaraFeedViewerCont'></div>
 		</div>		
 	</body>
@@ -502,6 +515,29 @@
 			<$ if(cloudRequest) { $>
 			<div class='options logout' ><a href='/logout' style='text-decoration:none;color:inherit'>Logout</a></div>
 			<$ } $>
+		</div>
+	</script>
+	<script type="text/template" id="configureClusterTemplate">
+		<div style='padding:20px;' class='translucentBg50'>
+			<div style='padding-left:160px;' class='font12'>
+				<span><span style='margin:8px 0 0 -160px;float:left;'>Cluster 1 Static IP Address:</span><$=ipMask$>.&nbsp;<input id='ipOctet' type='text' placeholder='123' style='width:25px;' value='<$=ipOctate$>' orig-value='<$=ipOctate$>'></input></span>
+				<% for(var i=0; i<ipArr.length; i++) {%>
+					<span <% if(i+1 == ipArr.length)print("style='display:none;' id='dummyClstrStng'");%> class='clstrStng'>
+						</br></br>
+						<span style='margin:8px 0 0 -160px;float:left;'>Cluster <%print(i+2)%> Static IP Address:</span><input type='text' placeholder='<$=ipMask$>.125' style='width:86px;' value='<%=localIpArr[i+1]%>' orig-value='<%=localIpArr[i+1]%>'></input><span class='remove' style='float:right;margin:10px 10px 0 0;'><i class='fa fa-trash-o font14'></i></span>
+					</span>
+				<% } %>	
+				</br></br>
+				<span class='addClstrBtnCont theamTextColor' style='margin:0 0 0 -160px;float:left;' id='addCluster'>
+					<span class='addMoreCluster'><i class='fa fa-sign-in font18 rotateRight'></i></span>
+					<span class='font12 addMoreCluster'>&nbsp;&nbsp;add more cluster</span>
+				</span>
+				<span class='theamTextColor' style='margin:0 0 0 -160px;float:left; display:none;' id='addClusterError'>
+					<span class='addMoreCluster'><i class='fa fa-exclamation-triangle font18'></i></span>&nbsp;&nbsp;
+					<span class='font12 errorMsg'></span>
+				</span>
+				<div style='clear:both'></div>
+			</div>
 		</div>
 	</script>
 	<script type="text/template" id="ipCamaraFeedViewer">
@@ -563,7 +599,7 @@
 		</div>
 	</script>
 	<script type="text/template" id="addNewModuleTemplate">
-		<$ if(ipCamaraSupported) { $>
+		<$ if(ipCamaraSupported || clusteringSupported) { $>
 			<div class='font14 theamBGColor brightColor' style='width:250px;padding:8px; position:relative;'>
 					<div class='showMore' style='color:white;'>
 						<span class='currentOpt'>Configure switchboard module</span><i class='font18 fa fa-arrow-right fa-chevron-circle-down' style='float:right; color:white;'/>
@@ -571,7 +607,12 @@
 					<div class='dropDownOptions font14 theamBGColor brightColor' style='width:100%; display:none; top:30px; left:0px; position:absolute;'>
 						<hr/>
 						<div class='optionTab' viewName='cnfgrSMView'>Configure switchboard module</div>
+						<$ if(ipCamaraSupported) { $>
 						<div class='optionTab' viewName='cnfgrIPCamView'>Configure IP camera</div>
+						<$ } $>	
+						<$ if(clusteringSupported) { $>
+						<div class='optionTab' viewName='cnfgrClusterView'>Configure Clusters</div>
+						<$ } $>	
 					</div>	
 			</div>
 		<$ } $>	
@@ -748,13 +789,13 @@
 		</div>
 	</script>
 	<script type="text/template" id="moodProxyTemplate">
-		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block;margin:0px 5px; width:40px;text-align:center;color:black;position:relative;cursor:pointer;'>
+		<div class='font10 moodIcon' moodId='<%=id%>' moodIconName='<%=icon%>' style='display:inline-block; margin:0px 5px; width:40px; min-height:60px; text-align:center; color:black; position:relative; cursor:pointer;'>
 			<div style='display:inline-block;width:40px; height:40px; background-image:url("static/<$=revId$>/images/moods/<%=icon%>.png"); background-size:40px 40px;'></div>
 			<span><%=name%></span>
 		</div>
 	</script>
 	<script type="text/template" id="moodStripTemplate">
-		<div class="moodProxyCont" style='padding:0px 15px; text-align:center;'></div>
+		<div class="moodProxyCont" style='padding:0px 15px; height:60px; margin:auto;'></div>
 	</script>
 	<script type="text/template" id="moodViewTemplate">
 		<div class='popupPannel theamBorderColor' style='display:none; width:100%;position:relative;'>
@@ -829,7 +870,12 @@
 	</script>
 	<script type="text/template" id="groupProxyMainPageViewTemplate">
 		<div>
-			<div class='proxyCont'></div>
+			<div class='proxyCont'>
+			<% if(typeof clusterCount == 'undefined') var clusterCount=1, currentCluster=1;
+				for(var i=1; i<=clusterCount; i++) {%>
+				<span class='proxyCont_<%=i%>' style='margin-top:10px;'></span>
+			<%}%>
+			</div>
 			<div style="clear:both;"></div>	
 			<div class='groupViewCont'></div>
 		</div>
@@ -957,24 +1003,44 @@
 		</div>
 	</script>
 	<script type="text/template" id="editPageTemplate">
+		<div class='clusterTabs'>
+			<% if(typeof clusterCount == 'undefined') var clusterCount=1, currentCluster=1;
+				if(clusterCount > 1) for(var i=1; i<=clusterCount; i++) {%>
+				<span class="clusterNameCont theamBGColor <% if(i==currentCluster)print('curCluster brightBorderColor')%>" clusterNo='<%=i%>'>Cluster-<%=i%></span>
+			<%}%>	
+		</div>
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
-		<br/><br/>
+		<br/>
+		<span class='theamTextColor' style='<%if(clusterCount == 1)print("display:none;")%>'>Cluster-<%=currentCluster%></span>
+		<br/>
 		<i class='editButton addGroupButton theamTextColor fa fa-object-group' style='float:right;display:block;margin:-28px 25px 0 0; font-size:22px;'></i>
 		<br/>
 		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px 2px 0 0;'>create group</span>
 		<span class='helpText' style='float:left;margin-top:-5px;'>Long press icons to edit parameters</span>
 		<br/>
-		<div class='editViewCont'></div>
+		<% for(var i=1; i<=clusterCount; i++) {%>
+			<div class='editViewCont editViewCont_<%=i%>'></div>
+		<%}%>
 	</script>
 	<script type="text/tonlyemplate" id="editMoodPageTemplate">
+		<div class='clusterTabs'>
+			<% if(typeof clusterCount == 'undefined') var clusterCount=1, currentCluster=1;
+				if(clusterCount > 1) for(var i=1; i<=clusterCount; i++) {%>
+				<span class="clusterNameCont theamBGColor <% if(i==currentCluster)print('curCluster brightBorderColor')%>" clusterNo='<%=i%>'>Cluster-<%=i%></span>
+			<%}%>	
+		</div>
 		<div class="titleCont theamBGColor"><span style="text-align:left;">Mood Settings</span></div>
-		<br/><br/>
+		<br/>
+		<span class='theamTextColor' style='<%if(clusterCount == 1)print("display:none;")%>'>Cluster-<%=currentCluster%></span>
+		<br/>
 		<i class='editButton addMoodButton theamTextColor fa fa-plus-circle' style='float:right;display:block; margin:-32px 18px 0 0; font-size:22px;'></i>
 		<br/>
 		<span class='editButton addMoodButton theamTextColor' style='float:right;display:block;margin:-20px 2px 0 0;'>add mood</span>
 		<span class='helpText' style=''></span>
 		<div style='clear:both;'></div>
-		<div class='moodViewCont'></div>
+		<% for(var i=1; i<=clusterCount; i++) {%>
+			<div class='moodViewCont moodViewCont_<%=i%>' style='padding:0px;'></div>
+		<%}%>
 	</script>
 	<script type="text/template" id="editIpCameraTemplate">
 		<div style='padding:0px 10px 10px 70px;'>
@@ -1141,6 +1207,11 @@
 			</div>
 		</div>
 	</script>
+	<script>
+		hcId = "<$=hcId$>"
+		var localIpArr =[];
+		<$ for(var i=0; i<clusterIpArr.length; i++) { $>localIpArr.push('<$=clusterIpArr[i]$>');<$}$>
+	</script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/jsxcompressor.min.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/utility/dialog.js"></script>
@@ -1154,6 +1225,7 @@
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureClusterView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureNewModule.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureIpCamara.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/md5.min.js"></script>

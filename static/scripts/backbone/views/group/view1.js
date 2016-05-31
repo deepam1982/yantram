@@ -14,7 +14,9 @@ GroupView1 = BaseView.extend({
 	subViewArrays : [{'viewClassName':'SwitchViewFactory', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'recreateOnRepaint':false}],
 	initialize: function(obj) {
 		var ColClass = Backbone.Collection.extend({model:SwitchModel});
-		this.switchCollection = new ColClass(obj.model.get("controls"));
+		this.switchCollection = new ColClass();
+		this.switchCollection.on("add", function (swModel) {swModel.ioSocket=this.model.collection.ioSocket;}, this);
+		this.switchCollection.set(this.model.get("controls"), {merge: true});
 		this.model.on('change', _.bind(function (model) {
 			//var changedProps = _.keys(model.changed);
 			//if(changedProps.length == 1 && changedProps[0] == "controls") this.avoidRepaint = true;
@@ -103,7 +105,7 @@ EditGroupPannel = BaseView.extend({
 	name : "EditGroupPannel",
 	templateSelector:"#editGroupTemplate",
 	subViews : [{'viewClassName':'ChoseGroupIconPannel', 'reference':'choseIconDialog', 'parentSelector':'.groupIconPannelCont', 'model':null, 'supressRender':true}],
-	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'deviceCollection'}],
+	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'this.options.deviceCollection'}],
 	events: {
 		"tap .editGroupIcon" : "editGroupIcon"
 	},
@@ -114,11 +116,11 @@ EditGroupPannel = BaseView.extend({
 		},this));
 	},
 	render : function () {
-		deviceCollection.each(function (dev) {
+		this.options.deviceCollection.each(function (dev) {
 			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
 		}, this);
 		_.each(this.model.get('controls'), function (obj) {
-			deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;
+			this.options.deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;
 		}, this);
 		BaseView.prototype.render.apply(this, arguments);
 		return this;
@@ -133,20 +135,21 @@ EditGroupPannel = BaseView.extend({
 		groupInfo.rank = this.$el.find('input[name=rank]:checked').val() || groupInfo.rank;
 		groupInfo.name=this.$el.find('.groupName').val() || groupInfo.name;
 		var controls = [], id=0;
-		deviceCollection.each(function (dev) {
+		this.options.deviceCollection.each(function (dev) {
 			_.each(dev.get('loadInfo'), function (sw, key) {
 				sw.selected && controls.push({"id":++id, "devId":dev.id, "switchID":parseInt(key)});
 			}, this);
 		}, this);
 		groupInfo.controls = controls;
-		ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+		if(groupInfo.name && controls.length)
+		this.model.ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
 		console.log(groupInfo);		
 	}
 });
 
 GroupEditView = GroupView1.extend(AdvancePannel).extend({
 	name : "GroupEditView",
-	subViews : [{'viewClassName':'EditGroupPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'supressRender':true}],
+	subViews : [{'viewClassName':'EditGroupPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'eval':['deviceCollection=this.options.deviceCollection'],'supressRender':true}],
 	subViewArrays : [{'viewClassName':'EditableSwitch', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection'}],
 	render	:	function () {
  		GroupView1.prototype.render.apply(this, arguments);
@@ -163,7 +166,7 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  			var groupInfo = this.model.toJSON();
 //			groupInfo.rank = groupInfo.id;
 			groupInfo.controls = [];
-			ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
+			this.model.ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
  		}, this));
  	},
  	showAdvancePannel : function () {

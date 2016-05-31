@@ -52,11 +52,11 @@ IpCamaraFeedViewer = BaseView.extend(Popup).extend({
 	events: {
 		"tap .popupPannel > .cross" : "hidePopUp"
 	},
-	showFeed : function (camModel) {
+	showFeed : function (camModel, groupModel) {
 		this.hidePopUp();
 		var switchId = camModel.get("switchID"), devId = camModel.get("devId"), groupId = camModel.get("groupId");
 		var src = '/cam/'+switchId;
-		var groupModel = gC.get(groupId);
+//		var groupModel = gC.get(groupId);
 		var camIndex = -1;
 		_.each(groupModel.get('controls'), function(ctrl, i){
 			if(ctrl.devId == camModel.get('devId') && ctrl.switchID == camModel.get('switchID'))
@@ -90,7 +90,7 @@ IpCamaraSwitch = BasicSwitch.extend(Popup).extend({
 		"tap .toggelSwitch" : "showCameraFeed"
 	},
 	showCameraFeed : function () {
-		ipCamaraFeedViewer.showFeed(this.model);
+		ipCamaraFeedViewer.showFeed(this.model, this.options.parentView.model);
 	}
 })
 
