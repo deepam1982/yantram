@@ -51,7 +51,7 @@ var configurationWorkFlow = function (pageName) {
 		try {window[pageObjName].forIntalonFlow();}catch(err){}
 		window[pageObjName].onDone = function () {
 			$('.hideWhileConfigureFlow').show();
-			ioSockets[primeIp].emit("checkConfigurations")
+			ioSockets[primeIndx].emit("checkConfigurations")
 		};
 	}
 	else 
@@ -133,7 +133,10 @@ hashChanged = function (hash) {
 	if(removeHash)window.location.hash = '';
 };
 var connectSocket = function (ip, idx, callback) {
-	ioSockets[idx] = io.connect('/', {path: '/ip/'+ip+'/socket.io'});
+	if(idx == primeIndx)
+		ioSockets[idx] = io.connect('/');
+	else 
+		ioSockets[idx] = io.connect('/', {path: '/ip/'+ip+'/socket.io'});
 	console.log(idx, ip, ioSockets[idx].id);
 	ioSockets[idx].on('connect', function(){console.log(idx, ip, ioSockets[idx].id);if(callback)callback();});
 	ioSockets[idx].on('connect', showBurgerMenu);
