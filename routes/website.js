@@ -1,5 +1,6 @@
 var express = require('express');
 var ejs = require('ejs');
+var findIpAddress = require(__rootPath+"/classes/utils/checkInternet").findIpAddress;
 ejs.delimiter = '$';
 // var RoomController = require(__rootPath+"/controllers/roomController");
 module.exports = function(app) {
@@ -13,12 +14,14 @@ module.exports = function(app) {
 		var appColor = (__userConfig.get('appColor') || 'orange').toLowerCase();
 		var homeView = __userConfig.get('homeView') || 'list';
 		var hcId = __userConfig.get('zigbeeNetworkName');
-		var ip = __piIpAddr.split('.');
+		if(!__piIpAddr) __piIpAddr = findIpAddress();
+		var piIpAddr = __piIpAddr || '192.168.1.123'
+		var ip = piIpAddr.split('.');
 		ip.pop();
 		var ipMask = ip.join('.');
 		//JSON.stringify(
 		var clusterIpArr = __systemConfig.get('clusterIps');
-		clusterIpArr = (clusterIpArr)?[__piIpAddr].concat(clusterIpArr):[__piIpAddr];
+		clusterIpArr = (clusterIpArr)?[piIpAddr].concat(clusterIpArr):[piIpAddr];
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
 			'clusteringSupported':__systemConfig.get('clusteringSupported'), 

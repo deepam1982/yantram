@@ -34,9 +34,9 @@ MainPageView = BaseView.extend({
 
 GroupProxyView = BaseView.extend({
 	name : "GroupProxyView",
-	proxyWidth:90,
-	proxyMargin:15,
-	proxyMinMargin:15,
+	proxyWidth:94,
+	proxyMargin:13,
+	proxyMinMargin:13,
 	templateSelector:"#groupProxyViewTemplate",
 	_getJsonToRenderTemplate : function () {
 		return _.extend(this.model.toJSON(),{'width':this.proxyWidth, 'margin':this.proxyMargin, 'minMargin':this.proxyMinMargin});

@@ -900,7 +900,7 @@
 
 
 			<div class='proxyImgCont <% print((poweredOn)?"theamBorderColor":"blackBorderColor")%> border2pxradius3px' style='background-image:url("static/<$=revId$>/images/rooms/<% print((typeof icon != "undefined")?icon:"40door")%>.png"); background-size:86px 86px; background-repeat: no-repeat; background-position: center; height:86px; width:86px; padding:2px;'></div>
-			<span class='font12' style="text-align:left;white-space:nowrap;"><%=name%></span>
+			<div class='font12' style="text-align:center;white-space:nowrap; overflow:hidden; margin-top:5px;"><%=name%></div>
 		</div>
 	</script>
 	<script type="text/template" id="groupTemplate">
@@ -981,7 +981,7 @@
 					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/transparent/<%=icon%>.png' />
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
-				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name)%></span>
+				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name||'&nbsp;')%></span>
 				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/<$=revId$>/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
 				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/<$=revId$>/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
 
