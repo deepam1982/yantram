@@ -160,7 +160,7 @@ EditParamFactory = function (options) {
 }
 
 EditableSwitch = AdvanceSwitch.extend({
-	subViews : [{'viewClassName':'EditParamFactory', 'reference':'editView', 'parentSelector':'.advancePannel', 'model':'this.model', 'supressRender':true}],
+	subViews : [{'viewClassName':'EditParamFactory', 'reference':'editView', 'parentSelector':'.advancePannel', 'model':'this.model', 'supressRender':true, 'recreateOnRepaint':true}],
 	toggelSwitch : function (event) {
 		if(this.model.get('type') != "curtain")
 			return AdvanceSwitch.prototype.toggelSwitch.apply(this, arguments);
