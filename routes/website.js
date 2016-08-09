@@ -24,6 +24,7 @@ module.exports = function(app) {
 		clusterIpArr = (clusterIpArr)?[piIpAddr].concat(clusterIpArr):[piIpAddr];
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
+			'iRSupported':__systemConfig.get('iRSupported'),
 			'clusteringSupported':__systemConfig.get('clusteringSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
 			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true,
@@ -59,6 +60,18 @@ module.exports = function(app) {
     	res.end(JSON.stringify({'success':true, 'themeColor':color}));
 	});
 	app.get('/headers', function (req,res) {
+		// if(!req.headers['authorization']){
+		// 	res.writeHead(401, {'WWW-Authenticate': 'Basic realm="Inoho Test App"', 'Content-Type': 'text/plain'});
+		// 	res.end();
+		// 	return;
+		// }
+		res.send(req.headers);
+		// res.write(req.headers);
+		// res.write(req.query);
+		// res.end()
+	});
+	app.get('/testlog', function (req,res) {
+		console.log(' ################# recieved get request testlog #############');
 		// if(!req.headers['authorization']){
 		// 	res.writeHead(401, {'WWW-Authenticate': 'Basic realm="Inoho Test App"', 'Content-Type': 'text/plain'});
 		// 	res.end();

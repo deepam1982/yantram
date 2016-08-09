@@ -1,0 +1,30 @@
+{
+	"name" : "Airtel DTH",
+	"lirc" : "airtel",
+	"codes" 	: {
+		"power" 	: 	"KEY_POWER",
+		"mute"		: 	"KEY_MUTE",
+		"volUp"		:	"KEY_VOL_UP",
+		"volDwn"	:	"KEY_VOL_DWN",
+		"chnlUp"	:	"KEY_CHNL_UP",
+		"chnlDwn"	:	"KEY_CHNL_DWN",
+		"navUp"		:	"KEY_UP",
+		"navRight"	:	"KEY_RIGHT",
+		"navDwn"	:	"KEY_DOWN",
+		"navLeft"	:	"KEY_LEFT",
+		"navOk"		:	"KEY_OK",
+		"key_0"		:	"KEY_0",
+		"key_1"		:	"KEY_1",
+		"key_2"		:	"KEY_2",
+		"key_3"		:	"KEY_3",
+		"key_4"		:	"KEY_4",
+		"key_5"		:	"KEY_5",
+		"key_6"		:	"KEY_6",
+		"key_7"		:	"KEY_7",
+		"key_8"		:	"KEY_8",
+		"key_9"		:	"KEY_9",
+		"AV"		:	"",
+		"dots"		:	"KEY_BACK",
+		"BtnUp"		:	"KEY_PRESS_END"
+	}
+}

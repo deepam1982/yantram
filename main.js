@@ -104,6 +104,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
         var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
         var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
+        var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
         __userConfig = new UsrCnfMngr({'callback':function (err) {
@@ -164,6 +165,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             });
 
             var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
+            deviceManager.wifiCommunicator.setServer(app);
             var restoreStateAttempts = 0;
             var checkInternet = require(__rootPath+"/classes/utils/checkInternet").checkInternet;
             var restoreState = function () {

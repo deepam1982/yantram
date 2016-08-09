@@ -37,7 +37,7 @@ MoodView = BaseView.extend(Popup).extend({
 	 		var moodInfo = this.model.toJSON();
 			moodInfo.rank = moodInfo.id;
 			moodInfo.controls = [];
-			ioSocket.emit("modifyMood", moodInfo, function (err){if(err)console.log(err)});
+			this.model.ioSocket.emit("modifyMood", moodInfo, function (err){if(err)console.log(err)});
  		}, this)); 		
  	},
 	_getJsonToRenderTemplate : function () {

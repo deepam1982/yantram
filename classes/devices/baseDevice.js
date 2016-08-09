@@ -24,6 +24,7 @@ var BaseDevice = BaseClass.extend({
 		this.switchState = [];
 		this.dimmerState = [];
 		this.sensorState = [];
+		this.sensorLastOnTime = [];
 		this.curtainControlState = [];
 		this.curtainControl
 		this.isSensorActive = [];
@@ -183,7 +184,7 @@ var BaseDevice = BaseClass.extend({
 		}, this);
 		var sensorState = {}
 		__(this.numberOfSensors).times(function (i) {
-			sensorState[i+""] = {"state":this.sensorState[i], "Active":this.isSensorActive[i]};
+			sensorState[i+""] = {"state":this.sensorState[i], "Active":this.isSensorActive[i], "epoch":this.sensorLastOnTime[i]};
 		}, this);
 		var retObj = {reachable : this.reachable};
 		retObj[this.id+""] = {"switch":switchState, "dimmer":dimmerState, "sensor":sensorState, "curtain":curtainControlState};

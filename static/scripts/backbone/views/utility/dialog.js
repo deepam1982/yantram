@@ -20,8 +20,10 @@ Backdrop = BaseView.extend({
 		match = (match)?(match[1]+'px'):'auto';
 		$elm.attr('cssWidth', match);
 		$elm.css('width', $elm.width());
+		$elm.css('max-height', $(window).height());
 		$elm.css('z-index', this.options.zIndex+1);
 		$elm.css('position', 'absolute');
+		$elm.css('overflow', 'auto');
 		$elm.addClass('onBackdrop');
 		this.elmArr.push($elm);
 	},

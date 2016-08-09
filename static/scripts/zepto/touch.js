@@ -123,7 +123,7 @@
             // delay by one tick so we can cancel the 'tap' event if 'scroll' fires
             // ('tap' fires before 'scroll')
             tapTimeout = setTimeout(function() {
-              try{
+              // try{
               // trigger universal 'tap' with the option to cancelTouch()
               // (cancelTouch cancels processing of single vs double taps for faster 'tap' response)
               var event = $.Event('tap')
@@ -144,7 +144,7 @@
                   touch = {}
                 }, 250)
               }
-              }catch(err){console.log("caught error in touch.js", err)}
+              // }catch(err){console.log("caught error in touch.js", err)}
             }, 0)
           } else {
             touch = {}

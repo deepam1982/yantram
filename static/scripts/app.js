@@ -86,6 +86,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	.whiteBG{background-color: white;}\
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
+	.theamColor{color: "+color+";}\
 	.theamBGColor{background-color: "+color+";}\
 	.brightBGColor{background-color: "+brightColor+";}\
 	.appThemeMaze #ipCamaraFeedViewerCont .popupPannel, .appThemeMaze .onBackdrop > .basicSwitchTemplate {background-color: "+color+";}\
@@ -127,6 +128,7 @@ hashChanged = function (hash) {
 		case '#shownetworksettings'		:	sideMenu.switchPage('networkSettingPage');break;
 		case '#showfilereader'			:	sideMenu.switchPage('fileReaderPage');break;
 		case '#showcommandposter'		:	sideMenu.switchPage('commandPosterPage');break;
+		case '#showirsettings'			:	sideMenu.switchPage('iRSettingPage');break;
 
 
 	}
@@ -144,6 +146,7 @@ var connectSocket = function (ip, idx, callback) {
 	ioSockets[idx].on('roomConfigUpdated', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
 		gCs[idx].set(config, {merge: true, remove: false});
+		console.log(config);
 	});
 	ioSockets[idx].on('deleteGroup', function (groupId) {
 		if(!groupId) return;
@@ -152,6 +155,7 @@ var connectSocket = function (ip, idx, callback) {
 	ioSockets[idx].on('onDeviceUpdate', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
 		dCs[idx].set(config, {merge: true, remove: false});
+		console.log(config);
 	});
 	ioSockets[idx].on('moodConfigUpdate', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
@@ -283,6 +287,9 @@ var editPageView = new EditPageView({'collections':gCs, 'deviceCollections':dCs}
 $('#appCont').append(editPageView.$el);
 // editPageView.render();
 // sideMenu.currentPage = editPageView;
+var iRSettingPage = new IRSettingPage({'deviceCollection':dCs[0], socket:ioSockets[primeIndx]});
+$('#appCont').append(iRSettingPage.$el);
+
 var editMoodView = new EditMoodPageView({'collections':mCs, 'deviceCollections':dCs, 'groupCollections':gCs});
 $('#appCont').append(editMoodView.$el);
 var configureModulePage = new ConfigureNewModuleView({socket:ioSockets[primeIndx], gC:gCs[primeIndx]});

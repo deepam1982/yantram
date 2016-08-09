@@ -6,6 +6,8 @@ var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
+var irBlasterConfig = require(__rootPath+"/classes/configs/irBlasterConfig");
+var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
 var sendGetRequest = require(__rootPath+"/classes/utils/checkInternet").sendGetRequest
 
 var EditManager = BaseClass.extend({
@@ -71,6 +73,32 @@ var EditManager = BaseClass.extend({
 	},
 	getIpCamaraData : function (callback) {
 		callback({'success':true, 'data':ipCamaraConfig.data});		
+	},
+	modifyIrRemoteParam : function (obj, callback) {
+		var curObj=irRemoteConfig.get(obj.switchId+"")
+		, params=__.pick(obj.params, __.keys(curObj));
+
+		var lircManager = require(__rootPath+"/classes/lirc/lircFileManager");
+		if(!lircManager.isEditable(curObj.lirc)) return callback && callback({'success':false, 'msg':'not editable!'});
+		
+		__.extend(curObj, params);
+		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket	
+		__.defer(function (){
+			irRemoteConfig.set(obj.switchId+"", curObj);
+			irRemoteConfig.save(function (err) {if(err) console.log(err);});
+			deviceManager.emit('deviceStateChanged', obj.devId, null, 'irRemoteParam', obj.switchId);
+		}, this);
+	},
+	modifyIrBlasterParam : function (obj, callback) {
+		var curObj=irBlasterConfig.get(obj.switchId+"")
+		, params=__.pick(obj.params, __.keys(curObj));
+		__.extend(curObj, params);
+		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket	
+		__.defer(function (){
+			irBlasterConfig.set(obj.switchId+"", curObj);
+			irBlasterConfig.save(function (err) {if(err) console.log(err);});
+			deviceManager.emit('deviceStateChanged', obj.devId, null, 'switchParams');
+		}, this);
 	},
 	modifyIpCamaraParam : function (obj, callback) {
 		var curObj=ipCamaraConfig.get(obj.switchId+"")
@@ -151,9 +179,15 @@ var EditManager = BaseClass.extend({
 			if(ctrl.devId && ctrl.devId == "ipCamaras") {
 				if(typeof ctrl.switchID == "undefined") return invalidParams = true;
 			}
+			else if(ctrl.devId && ctrl.devId == "irBlasters") {
+			//	ctrl.devId = "irRemotes"; ctrl.irBlasterId = ctrl.switchID; ctrl.switchID=0;
+				if(typeof ctrl.switchID == "undefined") return invalidParams = true;
+			}
 			else if(!ctrl.devId || typeof ctrl.switchID == "undefined" || !devConf || ((devConf.loads.normal || 0) + (devConf.loads.curtain || 0))  < parseInt(ctrl.switchID))
 				return invalidParams = true;
-			controls.push({"id":++id, "devId":ctrl.devId, "switchID":ctrl.switchID})
+			var pushItem = {"id":++id, "devId":ctrl.devId, "switchID":ctrl.switchID};
+		//	if (ctrl.devId == "irRemotes") pushItem["irBlasterId"] = ctrl.irBlasterId;
+			controls.push(pushItem);
 		}, this);
 		if(invalidParams) return callback && callback({'success':false, 'msg':'invalid parameters1'});
 		callback && callback({'success':true}); // dont hold the calback to wait for save ... it will block the socket
@@ -188,6 +222,8 @@ var EditManager = BaseClass.extend({
 	allowedSwitchParams : ["type", "icon", "devId", "name"], // why devId ???
 	modifySwitchParam : function (obj, callback) {
 		if(obj.devId == 'ipCamaras') return this.modifyIpCamaraParam(obj, callback);
+		if(obj.devId == 'irBlasters') return this.modifyIrBlasterParam(obj, callback);
+		if(obj.devId == 'irRemotes') return this.modifyIrRemoteParam(obj, callback);
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
 		if(obj.params.autoOff) { //TODO this piece of code should not be along with deviceInfoConfig

@@ -25,18 +25,22 @@ var BaseView = Backbone.View.extend({
         this._attachModelEvents();
         this._attachCollectionEvents();
         _.each(this.subViews, function (orignalParams) {
-            var params = _.extend({}, orignalParams);
-            _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);
-            if(params.model && _.isString(params.model)) eval('params.model='+params.model);
-            if(params.collection && _.isString(params.collection)) eval('params.collection='+params.collection);
-            params.parentView=this;
-            if(params.viewClassName)
-                this[params.reference] = new window[params.viewClassName](_.omit(params,'events'));
+            this._createSubView(orignalParams);
         }, this);
         _.each(this.subViewArrays, function(orignalParams){
             !orignalParams.createOnRender && this._createSubViewArray(orignalParams)
         }, this);
 	},
+    _createSubView : function (orignalParams) {
+        var params = _.extend({}, orignalParams);
+        _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);
+        if(params.model && _.isString(params.model)) eval('params.model='+params.model);
+        if(params.collection && _.isString(params.collection)) eval('params.collection='+params.collection);
+        params.parentView=this;
+        if(params.viewClassName)
+            this[params.reference] = new window[params.viewClassName](_.omit(params,'events'));
+        return this[params.reference];
+    },
     _createSubViewArray : function (orignalParams) {
             var params = _.extend({}, orignalParams);
             _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);
@@ -140,6 +144,7 @@ var BaseView = Backbone.View.extend({
         _.each(this.subViews, function (params) { 
             if(!params) return;
             var ref = this[params.reference];
+            if(!ref) ref = this._createSubView(params);
             var $parent = (params.parentSelector)?this.$el.find(params.parentSelector):null;
             if (!$parent || !$parent.length) $parent=this.$el; 
             $parent.append(ref.$el);
@@ -178,7 +183,7 @@ var BaseView = Backbone.View.extend({
         }, this);
         _.each(this.subViews, function (params) {
             if(!params) return;
-            this[params.reference].removeView();
+            this[params.reference] && this[params.reference].removeView();
         }, this);
         this.remove();
     },
@@ -210,6 +215,10 @@ var BaseView = Backbone.View.extend({
             var events = params.events,viewObj=this[params.reference];
             if (events) for(var eventName in events){viewObj.off(eventName, this[events[eventName]], this)}
             viewObj.rendered && viewObj.erase();
+            if(params.recreateOnRepaint) {
+                viewObj.removeView();
+                this[params.reference] = null;
+            }
         }, this);
     	this.$el.html("");
         this.rendered = false;

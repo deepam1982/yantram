@@ -1,4 +1,4 @@
- var parsers = require("serialport").parsers;
+var parsers = require("serialport").parsers;
 var SerialPort = require("serialport").SerialPort;
 
 var BaseClass = require(__rootPath+"/classes/baseClass");
