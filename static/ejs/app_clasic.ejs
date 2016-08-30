@@ -1284,7 +1284,8 @@
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
-				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />
+				<img style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />
+				<div class="toggelSwitch" style="width:45px;height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);"></div>
 				<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
 			</div>
 		</div>

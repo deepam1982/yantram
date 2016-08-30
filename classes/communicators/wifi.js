@@ -53,6 +53,7 @@ var WifiCommunicator = BaseClass.extend({
 		console.log("Started wifi scan!!");
 	},
 	_onNewDeviceFound : function (macId, ip) {
+		console.log("New Device found on wifiScan", macId, ip)
 		this._macIdNwkIdMap[macId] = {};
 		var config = irBlasterConfig.get(macId);
 		if (config) {

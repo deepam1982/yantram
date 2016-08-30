@@ -56,7 +56,7 @@ SwitchProxy = BaseView.extend({
 	name : "SwitchProxy",
 	templateSelector:"#switchProxyTemplate",
 	events: {
- 		"tap .iconPartition" : "onToggelSwitch"
+ 		"tap .toggelSwitch" : "onToggelSwitch"
  	},
  	onToggelSwitch : function (event) {
  		if(this.model.task == 'moodSelection') {
