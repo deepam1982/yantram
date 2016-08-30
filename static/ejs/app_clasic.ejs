@@ -28,7 +28,7 @@
 			background-color: rgb(215,211,182);
 			font-family: "Arial, Helvetica Neue", Helvetica, sans-serif;
 			color:gray;
-			font-weight: lighter;
+			font-weight: normal;
 		}
 		#mainCont{
 			min-height:100%;
@@ -126,6 +126,16 @@
 		}
 		.groupView {
 			margin: 10px 0px 0px;
+		}
+		.remoteEditProxyView {
+			border-width: 1px;
+			border-style: solid;
+			padding: 10px;
+			border-radius: 5px;
+			margin-bottom: 15px;
+		}
+		.remoteEditProxyView .fa{
+			color:black; float:right; margin:30px 20px 0 0; padding:10px; font-size:20px; cursor:pointer;
 		}
 		.onBackdrop .groupView {
 			margin: 0px 0px 0px;
@@ -255,6 +265,16 @@
 			border-radius: 22px;
 			font-size: 39px;
 			text-align: center;
+		}
+		.remoteCountIndicator {
+			position:absolute;
+			height:40px; width:25px;
+			line-height:41px;
+			right: 5px;
+			bottom: 10px;
+			border-radius: 5px;
+			font-size: 22px;
+			text-align: left;
 		}
 		.powerOffIcon {
 			position:absolute;
@@ -465,7 +485,7 @@
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin-bottom:18px;">
-						<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor">ho</span></a>
+						<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor logoDiv">ho</span></a>
 						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 							<i id='burgerImage' class='theamTextColor fa fa-bars'></i>
 						</div>
@@ -481,6 +501,8 @@
 			<div style='clear:both;'></div>	
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor whiteBorderColor footer' style='overflow-x: auto; text-align:center;'></div>
 			<div id='ipCamaraFeedViewerCont'></div>
+			<div id='remoteViewerCont'></div>
+			<div id='remoteEditorCont'></div>
 		</div>		
 	</body>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/iefix.js"></script>
@@ -500,7 +522,10 @@
 			<i class='fa fa-arrow-right hideMe' style='position:absolute;top:22px;right:22px;font-size:20px;cursor:pointer;padding:10px'></i>
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
-			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Device Settings</div>
+			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Group Settings</div>
+			<$ if(typeof iRSupported != 'undefined' && iRSupported) { $>
+				<div class='options iRStng hideWhileConfigureFlow' jsVarNm='iRSettingPage'>IR Settings</div>
+			<$ } $>	
 			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<$ if(!cloudRequest) { $>
@@ -538,6 +563,29 @@
 				</span>
 				<div style='clear:both'></div>
 			</div>
+		</div>
+	</script>
+	<script type="text/template" id="remoteViewer">
+		<div class='popupPannel' style='padding:10px; display:none;'>
+			<div class='cross' style='top:-2px;right:0px;'>
+				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+				<br/>
+				<b>Done</b>
+			</div>
+			<div class='theamBorderColor whiteBG'>
+				<div class='recoderMeta' style='display:none;color:black; padding-left:60px;font-size:12px;'>
+					<span style='margin:10px 0 0 -60px;float:left;'>Name:</span><div><input id='remoteName' type='text' placeholder='eg. LG TV'></input></div>
+					<br/>
+					<span style='margin:10px 0 0 -60px;float:left;'>Hardware:</span><div class='blstrIconListCont'></div>
+					<div style='clear:both'></div>
+					<span style='margin:10px 0 0 -60px;float:left;'>Remotes:</span><div class='iconListCont'></div>
+					<div style='clear:both'></div>
+					<div style='text-align:center;font-size:11px;margin:10px 0 3px -60px;'>Long press to edit IR code</div>
+				</div>
+				<div class='remoteCont' style='padding:5px 0px;float:left;width:100%;'></div>
+			</div>
+			<div style='clear:both'></div>
+			<class='iRrecorderCont'></div>
 		</div>
 	</script>
 	<script type="text/template" id="ipCamaraFeedViewer">
@@ -1009,7 +1057,7 @@
 				<span class="clusterNameCont theamBGColor <% if(i==currentCluster)print('curCluster brightBorderColor')%>" clusterNo='<%=i%>'>Cluster-<%=i%></span>
 			<%}%>	
 		</div>
-		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Group Settings</span></div>
 		<br/>
 		<span class='theamTextColor' style='<%if(clusterCount == 1)print("display:none;")%>'>Cluster-<%=currentCluster%></span>
 		<br/>
@@ -1021,6 +1069,66 @@
 		<% for(var i=1; i<=clusterCount; i++) {%>
 			<div class='editViewCont editViewCont_<%=i%>'></div>
 		<%}%>
+	</script>
+	<script type="text/template" id="iRSettingTemplate">
+		<div class="titleCont theamBGColor"><span style="text-align:left;">IR Settings</span></div>
+		<br/><br/>
+		<i class='editButton addRemoteButton theamTextColor fa fa-plus-square' style='float:right;display:block;margin:-28px 25px 0 0; font-size:22px;'></i>
+		<br/>
+		<span class='editButton addGroupButton theamTextColor' style='float:right;display:block;margin:-15px 2px 0 0;'>Add IR Remote</span>
+		<br/>
+		<div class='irRemProxyCont'></div>
+	</script>
+	<script  type="text/template" id="recordIRInterface">
+		<style>#codeMetaData .metaSpan{margin-left:-70px;float:left;}</style>
+		<div class='recordIRInterfaceCont'>				
+			<div id="codeMetaData" class="dialog whiteBG" style='max-height:500px;overflow:auto;'>
+				<div class='cross' style='top:5px;right:0px;'>
+					<span class='done'><i class='fa fa-thumbs-o-up' style='font-size:20px;'></i><br/><b>Done</b></span>
+					<span class='cancle' style='display:none;'><i class='fa fa-thumbs-o-down' style='font-size:20px;'></i><br/><b>Cancle</b></span>
+				</div>
+				<div style='padding-left:70px;' class='font12'>
+					<span class='metaSpan'>H.ware:</span><div class='blstrIconListCont'></div>
+					<div style='clear:both;'></div></br>
+					<span class='metaSpan'>Name:</span><div id='name'>&nbsp;</div></br>
+					<span class='metaSpan'>Encoding:</span><div id='encoding'>&nbsp;</div></br>
+					<span class='metaSpan'>Bits:</span><div id='bits'>&nbsp;</div></br>
+					<span class='metaSpan'>Code:</span><div id='code'>&nbsp;</div></br>
+					<span class='metaSpan'>Length:</span><div id='length'>&nbsp;</div></br>
+				</div></br>
+				<div id='saveCaptured' style='float:left;width:75px; text-align:center; display:none;'>
+					<i class='addGroupButton theamTextColor fa fa-thumbs-o-up' style='padding:0px; font-size:22px;'></i><br/>
+					<span class='addGroupButton theamTextColor' style='padding:0px; font-size:12px;'>save</span>
+				</div>
+				<div id='startIrCapture' style='float:right;width:75px; text-align:center;'>
+					<i class='addGroupButton theamTextColor fa fa-assistive-listening-systems' style='padding:0px; font-size:22px;'></i><br/>
+					<span class='addGroupButton theamTextColor' style='padding:0px; font-size:12px;'>start receiver</span>
+				</div>
+				<div id='stopIrCapture' style='float:right;width:75px;display:none; text-align:center;'>
+					<i class='addGroupButton theamTextColor fa fa-stop-circle' style='padding:0px; font-size:22px;'></i><br/>
+					<span class='addGroupButton theamTextColor' style='padding:0px; font-size:12px;'>stop receiver</span>
+				</div>
+				<div id='playCaptured' style='float:right;width:75px; text-align:center; display:none;'>
+					<i class='addGroupButton theamTextColor fa fa-feed' style='padding:0px; font-size:22px;'></i><br/>
+					<span class='addGroupButton theamTextColor' style='padding:0px; font-size:12px;'>play code</span>
+				</div>
+				</br></br>
+			</div>		
+		</div>
+	</script>
+	<script type="text/template" id="irRemoteEditProxyTemplate">
+		<div class="remoteEditProxyView theamBorderColor">
+			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
+				<div style='width:74px;height:74px;position:relative;'>
+					<img style="width:76px;height:76px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/transparent/<%=icon%>.png' />
+					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
+				</div>	
+				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name||'&nbsp;')%></span>
+			</div>
+			<i class='deleteIrRemote fa fa-trash-o'></i>
+			<i class='editIrRemote fa fa-pencil-square-o'></i>
+			<div style='clear:both;'></div>
+		</div>
 	</script>
 	<script type="text/tonlyemplate" id="editMoodPageTemplate">
 		<div class='clusterTabs'>
@@ -1050,6 +1158,7 @@
 			<br/>
 			<span class='editColumn'>Icon</span>
 			<div class='iconCont'></div>
+			<div style='clear:both;'></div>
 		</div>
 	</script>
 	<script type="text/template" id="editSwitchTemplate">
@@ -1160,6 +1269,14 @@
 			<div style='width:45px; height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
 		</div>	
 	</script>
+	<script type="text/template" id="multiSelectIconTemplate">
+		<div style="width:45px; height:60px; float:left;position:relative;">
+			<div class='tick theamBGColor' style='display:none;'></div>
+			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>', remId='<%=id%>'/>
+			<div style="width:45px; text-align:center;" class='font10'><%=name%></div>
+			<div style='width:45px; height:60px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
+		</div>	
+	</script>
 	<script type="text/template" id="switchProxyTemplate">
 		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
 			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected)?"":"display:none;"); print((typeof task != "undefined" &&  task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
@@ -1167,7 +1284,8 @@
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
-				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />
+				<img style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />
+				<div class="toggelSwitch" style="width:45px;height:45px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);"></div>
 				<span style='font-size:10px; font-weight:400;color:black;'><%=name%></span>
 			</div>
 		</div>
@@ -1208,7 +1326,8 @@
 		</div>
 	</script>
 	<script>
-		hcId = "<$=hcId$>"
+		revId = "<$=revId$>";
+		hcId = "<$=hcId$>";
 		var localIpArr =[];
 		<$ for(var i=0; i<clusterIpArr.length; i++) { $>localIpArr.push('<$=clusterIpArr[i]$>');<$}$>
 	</script>
@@ -1216,6 +1335,7 @@
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/baseView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/utility/dialog.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/basic.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/remote.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/advance.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/edit.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/group/view1.js"></script>
@@ -1224,6 +1344,7 @@
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/irSetting.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureClusterView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureNewModule.js"></script>

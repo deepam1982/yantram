@@ -1,0 +1,63 @@
+
+
+begin remote
+
+  name  Airtel
+  bits           32
+  flags RCMM|CONST_LENGTH
+  eps            18
+  aeps          100
+
+  header        470   215
+  three         220   720
+  two           220   550
+  one           220   384
+  zero          220   220
+  ptrail        220
+  gap          99817
+#  toggle_bit_mask 0x8000
+
+#  header        417   278
+#  three         167   778
+#  two           167   611
+#  one           167   444
+#  zero          167   278
+#  ptrail        167
+#  gap          99817
+#  toggle_bit_mask 0x8000
+
+      begin codes
+          KEY_0                    0x26002700
+          KEY_1                    0x26002701
+          KEY_2                    0x26002702
+          KEY_3                    0x26002703
+          KEY_4                    0x26002704
+          KEY_5                    0x26002705
+          KEY_6                    0x26002706
+          KEY_7                    0x26002707
+          KEY_8                    0x26002708
+          KEY_9                    0x26002709
+
+          KEY_POWER                0x2600270C
+
+          KEY_VOLUMEUP             0x26002710
+          KEY_VOLUMEDOWN           0x26002711
+
+          KEY_CHANNELUP            0x26002720
+          KEY_CHANNELDOWN          0x26002721
+
+          KEY_UP                   0x26002758
+          KEY_DOWN                 0x26002759
+          KEY_LEFT                 0x2600275A
+          KEY_RIGHT                0x2600275B
+          KEY_OK                   0x2600275C
+
+          KEY_BACK                 0x26002783
+
+          KEY_YELLOW               0x260027C0
+          KEY_BLUE                 0x260027C1
+          KEY_PRESS_END            0x2600A7FF
+
+      end codes
+
+end remote

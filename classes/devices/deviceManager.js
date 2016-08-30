@@ -6,18 +6,25 @@ var SwBd02 = require(__rootPath+"/classes/devices/switchBoards/swBd02");
 var CrtnCtrl01 = require(__rootPath+"/classes/devices/curtainControllers/crtnCtrl01");
 var DmBd05 = require(__rootPath+"/classes/devices/switchBoards/dmBd05");
 var DmBd03 = require(__rootPath+"/classes/devices/switchBoards/dmBd03");
+var IRBLR1 = require(__rootPath+"/classes/devices/irBlasters/baseIrBlaster");
+var IRWIFI01 = require(__rootPath+"/classes/devices/irBlasters/irWifi01");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
 	_deviceMap : {},
 	_virtualNodes : {},
-	init : function (communicator) {
+	init : function (communicator, wifiCommunicator) {
 		this.communicator = communicator;
 		this.communicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
 		this.communicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
 		this.communicator.on('deviceReachable', __.bind(this._updateDeviceRechability, this, true));
 		this.communicator.on('deviceUnreachable', __.bind(this._updateDeviceRechability, this, false));
 		__.each(this.communicator.getDeviceIds(), __.bind(this._onNewDeviceFound, this));
+		this.wifiCommunicator = wifiCommunicator;
+		this.wifiCommunicator.on('newDeviceFound', __.bind(this._onNewDeviceFound, this));
+		this.wifiCommunicator.on('msgRecieved', __.bind(this._onMsgRecieved, this));
+		this.wifiCommunicator.on('deviceReachable', __.bind(this._updateDeviceRechability, this, true));
+		this.wifiCommunicator.on('deviceUnreachable', __.bind(this._updateDeviceRechability, this, false));
 	},
 	_updateDeviceRechability : function  (reachable, deviceId) {
 		console.log("_updateDeviceRechability", reachable);
@@ -43,9 +50,11 @@ var DeviceManager = BaseClass.extend({
 		return stateMap;
 	},
 	_registrationCheck : {},
-	_onNewDeviceFound : function (deviceId, count) {
+	_onNewDeviceFound : function (deviceId, type, count) {
+		console.log("deviceManager _onNewDeviceFound");
 		if(this._deviceMap[deviceId] || typeof this._deviceMap[deviceId] != 'undefined' && !count) return;
 	//	this._deviceMap[deviceId]=false;
+		if(type) return this._registerNewDevice(type, deviceId);
 		this.sendQuery(deviceId, {name:"GTDVTP"}); //Get Device Type
 	},
 	sendQuery : function (deviceId, queryObj, callback) {
@@ -80,6 +89,8 @@ var DeviceManager = BaseClass.extend({
 			case "CNCR01"		 : var device = new CrtnCtrl01 (deviceId, this); break;
 			case "DMBD05"		 : var device = new DmBd05 (deviceId, this); break;
 			case "DMBD03"		 : var device = new DmBd03 (deviceId, this); break;
+			case "IRBLR1"		 : var device = new IRBLR1 (deviceId, this.wifiCommunicator); break;
+			case "IRWIFI01"		 : var device = new IRWIFI01 (deviceId, this.wifiCommunicator); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
 		console.log("#### Registered Device:" +deviceId+" of type:"+device.type);
@@ -97,7 +108,7 @@ var DeviceManager = BaseClass.extend({
 		// device.getConfig();
 		// this.emit('newDeviceFound', deviceId);
 	},
-	getConfig : function (deviceId) {
+	getConfig : function (deviceId, type) {	
 		if (this._deviceMap[deviceId])
 			return this._deviceMap[deviceId].getConfig();
 	},
@@ -115,6 +126,7 @@ var DeviceManager = BaseClass.extend({
 
 var TarangController = require(__rootPath+'/classes/communicators/tarang');
 var Cc2530Controller = require(__rootPath+'/classes/communicators/cc2530');
+var WifiCommunicator = require(__rootPath+'/classes/communicators/wifi');
 
 if(__systemConfig.get('communicator') == 'tarang'){
 	var communicator = new TarangController;
@@ -124,7 +136,7 @@ else {
 	var communicator = new Cc2530Controller;
 	console.log('communicator is cc2530', __systemConfig.get('communicator'));
 }
-
+ var wifiCommunicator = new WifiCommunicator;
 if(typeof deviceManager == 'undefined') 
-	deviceManager = new DeviceManager(communicator);
+	deviceManager = new DeviceManager(communicator, wifiCommunicator);
 module.exports = deviceManager;

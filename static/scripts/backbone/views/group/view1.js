@@ -1,10 +1,15 @@
 SwitchViewFactory = function (options) {
+	var retObj;
 	switch (options.model.get('type')) {
 		case 'dimmer'	: return new AdvanceFanSwitch(options);
 		case 'curtain'	: return new AdvanceCurtainSwitch(options);
 		case 'ipCam'	: return new IpCamaraSwitch(options);
-		default		: return new BasicSwitch(options);
+		case 'irRem'	: return new AdvanceRemoteSwitch(options);
+		case 'normal'	: return new BasicSwitch(options);
+		default		: retObj = new BasicSwitch(options);
 	}
+	retObj.render = function(){return this}
+	return retObj;
 }
 
 GroupView1 = BaseView.extend({
@@ -51,7 +56,7 @@ SwitchProxy = BaseView.extend({
 	name : "SwitchProxy",
 	templateSelector:"#switchProxyTemplate",
 	events: {
- 		"tap .iconPartition" : "onToggelSwitch"
+ 		"tap .toggelSwitch" : "onToggelSwitch"
  	},
  	onToggelSwitch : function (event) {
  		if(this.model.task == 'moodSelection') {
@@ -116,13 +121,16 @@ EditGroupPannel = BaseView.extend({
 		},this));
 	},
 	render : function () {
-		this.options.deviceCollection.each(function (dev) {
+		var irRemIndx = -1;
+		this.options.deviceCollection.each(function (dev, indx) {
+			if(dev.get("id") == "irRemotes") irRemIndx = indx;
 			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
 		}, this);
 		_.each(this.model.get('controls'), function (obj) {
 			this.options.deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;
 		}, this);
 		BaseView.prototype.render.apply(this, arguments);
+		if(irRemIndx != -1) this.deviceGroupView[irRemIndx].$el.hide();
 		return this;
 	},
 	erase : function () {
@@ -136,8 +144,9 @@ EditGroupPannel = BaseView.extend({
 		groupInfo.name=this.$el.find('.groupName').val() || groupInfo.name;
 		var controls = [], id=0;
 		this.options.deviceCollection.each(function (dev) {
+			if(dev.get('id') == "irRemotes") return;
 			_.each(dev.get('loadInfo'), function (sw, key) {
-				sw.selected && controls.push({"id":++id, "devId":dev.id, "switchID":parseInt(key)});
+				sw.selected && controls.push({"id":++id, "devId":dev.id, "switchID":(dev.id=="irBlasters")?key:parseInt(key)});
 			}, this);
 		}, this);
 		groupInfo.controls = controls;
@@ -150,7 +159,7 @@ EditGroupPannel = BaseView.extend({
 GroupEditView = GroupView1.extend(AdvancePannel).extend({
 	name : "GroupEditView",
 	subViews : [{'viewClassName':'EditGroupPannel', 'reference':'editPannel', 'parentSelector':'.editTemplateCont', 'model':'this.model', 'eval':['deviceCollection=this.options.deviceCollection'],'supressRender':true}],
-	subViewArrays : [{'viewClassName':'EditableSwitch', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection'}],
+	subViewArrays : [{'viewClassName':'EditableSwitch', 'reference':'switchViewArray', 'parentSelector':'.switchCont', 'array':'this.switchCollection', 'eval':['deviceCollection=this.options.deviceCollection']}],
 	render	:	function () {
  		GroupView1.prototype.render.apply(this, arguments);
  		AdvancePannel.render.apply(this, arguments);

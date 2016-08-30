@@ -24,6 +24,7 @@ var CommandManager = BaseClass.extend({
 	},
 	setCommonEventListners : function (socket) {
 		socket.on('toggleSwitch', this.onToggleSwitchCommand);
+		socket.on('sendIRCode', this.sendIRCode);
 		socket.on('setDuty', this.onSetDutyCommand);
 		socket.on('moveCurtain', this.onMoveCurtainCommand);
 		socket.on('groupOff', __.bind(this.groupOff, this));
@@ -58,6 +59,11 @@ var CommandManager = BaseClass.extend({
 		socket.on('checkUpdates', __.bind(this.checkUpdates, this));
 		socket.on('restoreFactory', __.bind(this.restoreFactory, this));
 		socket.on('testSocket', function(){console.log("Test Success!!!!")});
+		socket.on('runIrProcess', __.bind(this.runIrProcess, this, socket));
+		socket.on('editRemoteIrCode', __.bind(this.editRemoteIrCode, this));
+		socket.on('deleteIrRemote', __.bind(this.deleteIrRemote, this, socket));
+		socket.on('createIrRemote', __.bind(this.createIrRemote, this));
+		socket.on('getButtonList', __.bind(this.getButtonList, this));
 		console.log('Added Command Listners!!')
 	},
 	setLogOnCloud : function (flag) {
@@ -68,6 +74,47 @@ var CommandManager = BaseClass.extend({
 		console.log('restarting home controller');
 		var exec = require('child_process').exec;
 		exec("sudo service inoho restart");	
+	},
+	editRemoteIrCode : function (data, callback) {
+		var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
+		var cnf = irRemoteConfig.get(data.remoteId), fileName;
+		if(!cnf || !(fileName = cnf.lirc)) return callback("invalid parameters!!");
+		var lircManager = require(__rootPath+"/classes/lirc/lircFileManager");
+		lircManager.editCode(fileName, data.name, data.raw.replace(/,/g, " "), data.khz, callback);
+
+	},
+	createIrRemote : function (callback) {
+		var lircManager = require(__rootPath+"/classes/lirc/lircFileManager");
+		lircManager.createIrRemote(callback);
+	},
+	deleteIrRemote : function(socket, commandData, callback) {
+		console.log('deleteIrRemote got called')
+		var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
+		var cnf = irRemoteConfig.get(commandData.remoteId), fileName;
+		if(!cnf || !(fileName = cnf.lirc)) return callback("invalid parameters!!");
+		var lircManager = require(__rootPath+"/classes/lirc/lircFileManager");
+		lircManager.deleteLircFile(fileName, callback);
+	},
+	getButtonList : function(commandData, callback){
+		console.log('getButtonList got called');
+		var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
+		var cnf = irRemoteConfig.get(commandData.remoteId), fileName;
+		if(!cnf || !(fileName = cnf.lirc)) return callback("invalid parameters!!");
+		var lircManager = require(__rootPath+"/classes/lirc/lircFileManager");
+		lircManager.getButtonList(fileName, callback);
+	},
+	runIrProcess : function (socket, commandData, callback) {
+		var devId = commandData.devId;
+		var device = deviceManager.getDevice(devId);
+		switch(commandData.process) {
+			case "startReciever" :  device.startIrReciever(function(err, json){
+										if(err) return console.log(err);
+										socket.emit('irCaptureSuccess', json);
+									}); break;
+			case "stopReciever" : 	device.stopIrReciever(); break;
+			case "playRawCode"	: 	device.sendRawCode(commandData.raw, commandData.khz, callback);break;
+		}
+		
 	},
 	updateNow : function () {
 		var sys = require('sys');
@@ -301,7 +348,10 @@ var CommandManager = BaseClass.extend({
 								console.log("removed "+email+' from cloud');
 								createAccount(commandData.email, commandData.password, nwkKey, function (){
 									var sshTunnelConfig = new (BasicConfigManager.extend({file : '/../configs/sshTunnelConfig.json'}))({"callback":function (err) {
-										if(err) sshTunnelConfig = null;
+										if(err) {
+											sshTunnelConfig = null;
+											console.log(err);
+										}
 										if (sshTunnelConfig) {
 											thisObj.changeCloudPassword(commandData.email, commandData.password)
 										}
@@ -437,6 +487,12 @@ var CommandManager = BaseClass.extend({
 			case 'turnSwitchOn' : device.setSwitchState(switchId, true); break;
 			case 'turnSwitchOff': device.setSwitchState(switchId, false); break;
 		}
+	},
+	sendIRCode : function (commandData, callback) {
+		var remoteId = commandData.devId, blasterId = commandData.blasterId, code = commandData.code;
+		var device = deviceManager.getDevice(blasterId);
+		if(!device) {console.log('device not found');return;}
+		device.executeCode(code, remoteId);
 	},
 	activateMood : function (commandData) {
 	    var moodData = moodConfig.get(commandData.id+"");

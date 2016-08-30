@@ -40,7 +40,7 @@ var BaseView = Backbone.View.extend({
         if(params.viewClassName)
             this[params.reference] = new window[params.viewClassName](_.omit(params,'events'));
         return this[params.reference];
-    },    
+    },
     _createSubViewArray : function (orignalParams) {
             var params = _.extend({}, orignalParams);
             _.each(params.eval, function(evalStr){eval('params.'+evalStr);}, this);

@@ -104,6 +104,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
         var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
         var ipCamaraConfig = require(__rootPath+"/classes/configs/ipCamaraConfig");
         __remoteDevInfoConf = require(__rootPath+"/classes/configs/deviceInfoConfig");
+        var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
 
         var UsrCnfMngr = BasicConfigManager.extend({file : '/../configs/userConfig.json'});
         __userConfig = new UsrCnfMngr({'callback':function (err) {
@@ -164,21 +165,28 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             });
 
             var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
+            deviceManager.wifiCommunicator.setServer(app);
             var restoreStateAttempts = 0;
             var checkInternet = require(__rootPath+"/classes/utils/checkInternet").checkInternet;
+            var checkRTC = require(__rootPath+"/classes/utils/checkInternet").checkRTC;
             var restoreState = function () {
-              checkInternet(function(err) {
-                if (err) return(++restoreStateAttempts && setTimeout(restoreState, ((restoreStateAttempts < 8)?30:120)*1000));
-                var sys = require('sys');
-                var exec = require('child_process').exec;
-                var foo = function(error, stdout, stderr) {
-                  console.log(error, stdout, stderr);
-                  if((Date.now() - devStatConfAtBegn.epoch)/1000 < 15*60) deviceManager.restoreDeviceStatus(devStatConfAtBegn);
-                }
-                exec("sudo service syncSystemClock", foo);
-              });
+              console.log('restoring device states');
+              if((Date.now() - devStatConfAtBegn.epoch)/1000 < 15*60) deviceManager.restoreDeviceStatus(devStatConfAtBegn);
             }
-            restoreState();
+            checkRTC(function(err) {
+              var stateRestored = false;
+              if(!err) {stateRestored = true;restoreState();}
+              var syncTimeAttempt = 0;
+              var syncTime = function() {
+                checkInternet(function(err) {
+                  if (err) return(++syncTimeAttempt && setTimeout(syncTime, ((syncTimeAttempt < 8)?30:120)*1000));
+                  var syncSystemClock = require(__rootPath+"/classes/utils/checkInternet").syncSystemClock;
+                  syncSystemClock(function(err){if(!stateRestored)restoreState();});
+                });  
+              }
+              syncTime();              
+            });
+
             //var roomModel = require(__rootPath+"/configs/managers/roomConfigManager");
 
             sm.initilizeSubManagers();

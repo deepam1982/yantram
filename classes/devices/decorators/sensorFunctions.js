@@ -5,11 +5,17 @@ module.exports ={
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
-		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
-		if(sensorStateChanged) this.avoidLogDVST = true;
+		for (var i=0; i<this.numberOfSensors; i++) {
+			if(oldSnSt[i] != this.sensorState[i])
+				if(this.sensorState)
+					this.sensorLastOnTime[i] = (new Date()).getTime();
+				sensorStateChanged = true;
+		}
+//		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
+//		if(sensorStateChanged) this.avoidLogDVST = true;
 		this._super(msg);
 		if(sensorStateChanged) this.emit('stateChanged', 'sensor');
-		this.avoidLogDVST = false;
+//		this.avoidLogDVST = false;
 	},
 	_logDVST : function (msg) {
 		if(!this.avoidLogDVST)

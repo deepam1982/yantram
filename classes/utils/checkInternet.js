@@ -1,3 +1,45 @@
+var checkRTC = function(callback) {
+    var exec = require('child_process').exec, child;
+    child = exec('sudo hwclock -r', function(error, stdout, stderr){
+        if(error !== null) {
+            console.log(error, "RTC not available");
+            return callback("RTC not available");
+        }
+        if(stdout.indexOf("command not found") != -1 || stdout.indexOf("hwclock: Cannot access the Hardware Clock via any known method") != -1) {
+            console.log(error, stdout, stderr);
+            return callback("RTC not available");   
+        }
+        console.log("RTC is available");
+        callback(null);
+    });    
+};
+
+var updateRTC = function(callback) {
+    var exec = require('child_process').exec, child;
+    child = exec('sudo hwclock -w', function(error, stdout, stderr){
+        if(error !== null) {
+            console.log(error,"RTC cannot be updated");
+            return callback && callback("RTC cannot be updated");
+        }
+        if(stdout.indexOf("command not found") != -1 || stdout.indexOf("hwclock: Cannot access the Hardware Clock via any known method") != -1) {
+            console.log(error, stdout, stderr);
+            return callback && callback("RTC not available");   
+        }
+        console.log("RTC is updated");
+        callback && callback(null);
+    });
+};
+
+var syncSystemClock = function (callback) {
+    var sys = require('sys');
+    var exec = require('child_process').exec;
+    exec("sudo service syncSystemClock", function(err) {
+        if(!err) updateRTC();
+        else console.log(err);
+        callback && callback(null);
+    });
+};
+
 var checkInternet = function (callback) {
 	var exec = require('child_process').exec, child;
 	child = exec('ping -c 1 8.8.8.8', function(error, stdout, stderr){
@@ -54,3 +96,6 @@ var sendGetRequest = function (host, path, calbk) {
 module.exports.sendGetRequest = sendGetRequest;
 module.exports.checkInternet = checkInternet;
 module.exports.findIpAddress = findIpAddress;
+module.exports.checkRTC = checkRTC;
+module.exports.updateRTC = updateRTC;
+module.exports.syncSystemClock = syncSystemClock;

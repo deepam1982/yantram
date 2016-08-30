@@ -108,6 +108,7 @@ var LircdConf = function () {
               _this.state = constants.STATE_CODES;
             } else if (_this.isBeginRawCodes(line)) {
               currentRemote.raw_codes = {};
+              currentRemote.raw_code_khz = {};
               _this.state = constants.STATE_RAW_CODES;
             } else {
               var attribute = _this.parseAttribute(line);
@@ -134,7 +135,10 @@ var LircdConf = function () {
               if (code !== null) {
                 if(code.key == 'name'){
                   currentButtonName = code.value;
-                  currentRemote.raw_codes[currentButtonName] = ''
+                  currentRemote.raw_codes[currentButtonName] = '';
+                }
+                else if(code.key == 'khz'){
+                  currentRemote.raw_code_khz[currentButtonName] = parseInt(code.value);
                 }
                 else 
                   currentRemote.raw_codes[currentButtonName] += 
@@ -167,9 +171,12 @@ var LircdConf = function () {
       key: 'processParsed',
       value: function processParsed(parsedData) {
         parsedData.remotes.forEach(function (remote){
+          var fre = (remote.frequency)?parseInt(remote.frequency):0
+          fre = (fre > 1000)?parseInt(fre/1000):fre;
+          remote.khz = fre || 38;
           if(remote.flags.indexOf('SPACE_ENC') != -1) {
         //  remote['MS']=[['M','S'],['M','S']];
-            remote['MS']=[[0,1],[0,1]];
+            remote['MS']=[[0,1],[0,1]]; // as in ZeroOne 0th place is mark and 1st place is space
           }
           else if(remote.flags.indexOf('SHIFT_ENC') != -1) {
           //  remote['MS']=[['M','S'],['S','M']];
@@ -178,16 +185,23 @@ var LircdConf = function () {
           else if(remote.flags.indexOf('RC5') != -1) {
           //  remote['MS']=[['M','S'],['S','M']];
             remote['MS']=[[0,1],[1,0]];
+            remote.khz = 36;
           }
           else if(remote.flags.indexOf('RC6') != -1) { // lirc conf file have inverted bits for RC6
           //  remote['MS']=[['M','S'],['S','M']];
             remote['MS']=[[0,1],[1,0]];
+            remote.khz = 36;
+          }
+          else if(remote.flags.indexOf('RCMM') != -1) {
+          //  remote['MS']=[['M','S'],['M','S']];
+            remote['MS']=[[0,1],[0,1],[0,1],[0,1]];
           }
           remote.totalBits = 0;
           remote.totalBits += remote.bits = (remote.bits)?parseInt(remote.bits):0;
           remote.totalBits += remote.pre_data_bits = (remote.pre_data_bits)?parseInt(remote.pre_data_bits):0;
           remote.totalBits += remote.post_data_bits = (remote.post_data_bits)?parseInt(remote.post_data_bits):0;
           
+          remote.post_data_toggle_bit_mask = remote.data_toggle_bit_mask = remote.pre_data_toggle_bit_mask = 0;
           if(!remote.toggle_bit && remote.repeat_bit) remote.toggle_bit = remote.repeat_bit;
           if(!remote.toggle_bit_mask && remote.toggle_bit) {
             remote.toggle_bit_mask = '0x'+(1<<(remote.totalBits-parseInt(remote.toggle_bit))).toString(16)
@@ -204,15 +218,26 @@ var LircdConf = function () {
         });
       }
   }], [{
+    key: 'getKhz',
+    value: function getKhz(remote, keyName) {
+      if(remote.raw_code_khz) return remote.raw_code_khz[keyName] || remote.khz;
+      return remote.khz;
+    }
+  },{
     key: 'getRaw',
     value: function getRaw(remote, keyName) {
-      if(remote.raw_codes && remote.raw_codes[keyName]) return remote.raw_codes[keyName];
-      if(remote.codes && !remote.codes[keyName]) return [];
+      this.toggleNow = !(this.toggleNow);
+      if(remote.raw_codes && remote.raw_codes[keyName]) return remote.raw_codes[keyName].split(" ");
+      if(!remote.codes || !remote.codes[keyName]) return []; // if keyName not present in codes then it cannot be genrated.
       var zeroOne = [remote.zero.split(" ").map(Number),remote.one.split(" ").map(Number)]
       ,   MS = remote.MS
       ,   rawArr = [], pendingMark=0, pendingSpace=0
-      ,   ieRC6 = (remote.flags.indexOf('RC6') != -1)
+      ,   isRC6 = (remote.flags.indexOf('RC6') != -1)
+      ,   isRCMM = (remote.flags.indexOf('RCMM') != -1)
       ;
+      if(isRCMM){
+        zeroOne.push(remote.two.split(" ")); zeroOne.push(remote.three.split(" "))
+      }
       var insertMarkIntoRawArr = function(mark) {
             pendingSpace && rawArr.push(pendingSpace) && (pendingSpace=0);
             pendingMark += mark;
@@ -238,8 +263,11 @@ var LircdConf = function () {
 //        console.log(rawArr.toString())
         for(var i=0; i<noBits; i++){
           var bitVal = invData & 1; invData >>= 1;
+          if(isRCMM){
+            bitVal <<= 1; bitVal |= invData & 1; invData >>= 1; i++;
+          }
           var ms = MS[bitVal], zo = zeroOne[bitVal];
-          if(ieRC6 && dataBitIndx == 4){
+          if(isRC6 && dataBitIndx == 4){
             if(ms[0] == 0) //MARK SPACE case
               insertMarkSpaceIntoRawArr(2*(+zo[ms[0]]),2*(+zo[ms[1]]));
             else   //SPACE MARK case
@@ -269,7 +297,7 @@ var LircdConf = function () {
         var ms = remote.pre.split(" ").map(Number);
         insertMarkSpaceIntoRawArr(+ms[0],+ms[1]);
       }
-      insertDataIntoRawArr(parseInt(remote.codes[keyName]), remote.bits);
+      insertDataIntoRawArr(parseInt(remote.codes[keyName])^((this.toggleNow)?remote.data_toggle_bit_mask:0), remote.bits);
       
       if(remote.post) {
         var ms = remote.post.split(" ").map(Number);

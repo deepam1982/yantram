@@ -29,8 +29,12 @@ SwitchModel = BaseModel.extend({
 	},
 	setSwitchParam : function (params, calback) {
 		var devId = this.get('devId'), switchId = this.get('switchID');
+		console.log({"devId":devId, "switchId":switchId, "params":params});
 		this.sendActionRequest("setSwitchParam", {"devId":devId, "switchId":switchId, "params":params}, calback);
-
+	},
+	sendIRCode : function (code, calback) {
+		var blasterId = this.get('irBlasterId'), devId = this.get('switchID') // for ir switch id is dev id
+		this.sendActionRequest("sendIRCode", {"devId":devId, "blasterId":blasterId, "code":code}, calback);
 	}
 })
 FanModel = SwitchModel.extend({

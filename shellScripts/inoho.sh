@@ -12,6 +12,12 @@ startWithLogs)
 	sudo -u $USER $NODE $SERVER_JS_FILE > $OUT 2>$OUT &
 	;;
 
+restartWithLogs)
+	killall $NODE
+	echo "starting node: $NODE $SERVER_JS_FILE"
+	sudo -u $USER $NODE $SERVER_JS_FILE > $OUT 2>$OUT &
+	;;	
+
 start)
 	echo "starting node: $NODE $SERVER_JS_FILE"
 	sudo -u $USER $NODE $SERVER_JS_FILE noLogs > $OUT 2>$OUT &
