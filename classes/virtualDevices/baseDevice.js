@@ -71,7 +71,7 @@ var BaseVirtualDevice = BaseClass.extend({
 	_setStateAsPerFollowLogic : function (state) {
 		try {
 			if(this.followLogic)
-				eval("state=("+this.followLogic+")");
+				eval("state=("+this.followLogic+")"); //TODO i think it must be var state
 			if(!this.avoidFollow)
 				__.defer(__.bind(this._setState, this, state));
 		} catch (err) {console.log(err);console.log(this.followLogic); console.log(__.keys(this.followObjs));}
