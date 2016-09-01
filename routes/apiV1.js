@@ -31,7 +31,7 @@ module.exports = function(app, cmdMngr) {
 		var array = [];
 		__.each(deviceInfoConfig.toJSON(), function (devInfo, devId){
 			var config = deviceManager.getConfig(devId);
-			
+			if(config)
 			__.each(config[devId]['sensor'], function(info, id){
 				var ctl = {"id":devId+"-s"+id,"sensorLastOnTime":info.epoch}
 				array.push(ctl);

@@ -8,6 +8,7 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var devCoordConf = new (BasicConfigManager.extend({file : '/../configs/deviceCoordinatorConfig.json'}))({"callback":function () {
 	coordinator.populateUtilNodes();
+	coordinator.applyCoordinationCondition();
 }});
 
 
@@ -138,7 +139,9 @@ var Coordinator = BaseClass.extend({
 	},
 	onNewNodesFound : function (vNodes, deviceId) {
 		__.each(vNodes, function (vNode) {this.manageTimersOnLoad(vNode)}, this);
-		
+		this.applyCoordinationCondition();
+	},
+	applyCoordinationCondition : function () {		
 	//TODO __.each(devCoordConf.toJSON(), function (conf, nodeId) {
 		__.each(devCoordConf.data, function (conf, nodeId) {
 			if (!conf.conditionApplied) {
@@ -190,6 +193,11 @@ var Coordinator = BaseClass.extend({
 	"27B54C01004B1200-l1" : {"onCondition":"27B54C01004B1200-s1", "offCondition":"!27B54C01004B1200-s1", "manualTime":100, "maxTime":300},
 	"96424501004B1200-l1" : {"onCondition":"evening&&(27B54C01004B1200-s0||96424501004B1200-s1||35B24C01004B1200-s0)", "manualTime":600},
 	"96424501004B1200-l2" : {"onCondition":"evening&&(27B54C01004B1200-s0||96424501004B1200-s1||35B24C01004B1200-s0)", "manualTime":600}
+}
+
+{
+	"stabilizer-1" : {"onCondition":"E7281707004B1200-s0", "offAfter":10},
+	"E7281707004B1200-l1" : {"onCondition":"stabilizer-1", "offCondition":"!stabilizer-1", "manualTime":100}
 }
 
 */
