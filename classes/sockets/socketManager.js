@@ -56,6 +56,15 @@ var SocketManager = BaseClass.extend({
 			__.defer(function (conff) {this.cloudSocket && this.cloudSocket.emit('roomConfigUpdated', conff);}, conf);
 		}, this));
 
+		__remoteDevInfoConf.on('publishDeviceConfig', __.bind(function (conf) {
+			this.getSockets().emit('onDeviceUpdate', conf);
+			__.defer(function (conff) {this.cloudSocket && this.cloudSocket.emit('onDeviceUpdate', conff);}, conf);
+		}, this));
+		__remoteDevInfoConf.on('deviceDelete', __.bind(function (deviceId) {
+			this.getSockets().emit('deleteDevice', deviceId);
+			this.cloudSocket && this.cloudSocket.emit('deleteDevice', deviceId);
+		}, this));
+		
 		moodConfig.on('moodDeleteStart', __.bind(function (moodId) {
 			this.getSockets().emit('deleteMood', moodId);
 			this.cloudSocket && this.cloudSocket.emit('deleteMood', moodId);

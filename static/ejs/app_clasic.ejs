@@ -116,6 +116,7 @@
 			color: black;
 		}
 
+		.devStngViewCont .roomTitleCont,
 		.editViewCont .roomTitleCont {
 			background:white;
 			color: black;
@@ -123,6 +124,9 @@
 			margin-bottom: -20px;
 			font-weight:400;
 			padding-top: 8px; 
+		}
+		.devStngViewCont .roomTitleCont {
+			padding-bottom: 8px; 
 		}
 		.groupView {
 			margin: 10px 0px 0px;
@@ -143,7 +147,7 @@
 
 		.onBackdrop .togegelTime, .hide {display:none;}
 
-		.popupPannel, .moodView, .editViewCont .groupView {
+		.popupPannel, .moodView, .editViewCont .groupView, .devStngViewCont .groupView{
 			background:white;
 			border-width:1px; 
 			border-style:solid;
@@ -194,6 +198,7 @@
 			margin-top:-7px;
 		}
 		.deleteMood, .editMood, .editViewCont .editButton {display: block;}
+		.devStngViewCont .powerButton {display:none;}
 
 		.deleteMood.editButton, .editMood.editButton {
 			margin-top:0px;	
@@ -201,6 +206,7 @@
 		.switchCont {
 			font-size: 14px;
 		}
+		.devStngViewCont .switchCont,
 		.editViewCont .switchCont {
 			margin-top:15px;
 		}
@@ -268,14 +274,26 @@
 		}
 		.remoteCountIndicator {
 			position:absolute;
-			height:40px; width:25px;
-			line-height:41px;
-			right: 5px;
-			bottom: 10px;
+			height:32px; width:17px;
+			line-height:33px;
+			right: 10px;
+			top: -5px;
 			border-radius: 5px;
-			font-size: 22px;
-			text-align: left;
+			font-size: 16px;
+			text-align: center;
 		}
+		.followObjIndicator {
+			position: absolute;
+			height: 25px;
+			width: 25px;
+			line-height: 26px;
+			left: 2px;
+			top: 25px;
+			border-radius: 13px;
+			font-size: 18px;
+			text-align: center;
+		}
+
 		.powerOffIcon {
 			position:absolute;
 			right: -25px;
@@ -310,6 +328,18 @@
 		.dialog .buttonDiv {margin-top: 10px;}
 		.dialog .buttonDiv span{float: right;margin-left: 20px;}
 
+		.multiSelectIconTemplate {width:45px; height:60px; float:left;position:relative;}
+		.editSensorRulePannel .multiSelectIconTemplate { margin:5px;}
+		.crossIcon {
+			width:20px; height:20px;
+			background-image: url("/static/<$=revId$>/images/transparentCross.png");
+			background-size: cover; 
+			position:absolute; right:0px; top:13px; z-index: 1;
+			border-radius: 10px;
+			filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/<$=revId$>/images/transparentCross.png', sizingMethod='scale');
+		    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/static/<$=revId$>/images/transparentCross.png', sizingMethod='scale')";
+
+		}
 		.tick {
 			width:20px; height:20px;
 			background-image: url("/static/<$=revId$>/images/transparentTick.png");
@@ -404,6 +434,26 @@
 		    -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
 		    transform: rotate(90deg);
 		}
+		.rotate-45 {
+		    -ms-transform: rotate(-45deg); /* IE 9 */
+		    -webkit-transform: rotate(-45deg); /* Chrome, Safari, Opera */
+		    transform: rotate(-45deg);
+		}
+		.hInvert {
+			-moz-transform: scale(-1, 1);
+			-webkit-transform: scale(-1, 1);
+			-o-transform: scale(-1, 1);
+			-ms-transform: scale(-1, 1);
+			transform: scale(-1, 1);
+		}
+		.vInvert {
+			-moz-transform: scale(1, -1);
+			-webkit-transform: scale(1, -1);
+			-o-transform: scale(1, -1);
+			-ms-transform: scale(1, -1);
+			transform: scale(1, -1);
+		}
+
 		input[type=range] {
 		    -webkit-appearance: none;
 		    background-color: black;
@@ -424,6 +474,11 @@
 		    cursor:pointer;
 		}
 		
+		input[type="range"].pirRange::-webkit-slider-thumb {
+			height: 30px;
+			top:2px;
+		}
+
 		select {background-color: white;}
 		select, input[type=password], input[type=text], input[type=radio], textarea {
 		  @include transition(all 0.30s ease-in-out);
@@ -523,10 +578,13 @@
 			<div class='options mainPannel hideWhileConfigureFlow' jsVarNm='mainPageView'>Home</div>	
 			<br/><br/><br/>
 			<div class='options devStng hideWhileConfigureFlow' jsVarNm='editPageView'>Group Settings</div>
+			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
+			<$ if(typeof sensorsPresent != 'undefined' && sensorsPresent) { $>
+				<div class='options devStng hideWhileConfigureFlow' jsVarNm='devStngPageView'>Device Settings</div>
+			<$ } $>	
 			<$ if(typeof iRSupported != 'undefined' && iRSupported) { $>
 				<div class='options iRStng hideWhileConfigureFlow' jsVarNm='iRSettingPage'>IR Settings</div>
 			<$ } $>	
-			<div class='options mudStng hideWhileConfigureFlow' jsVarNm='editMoodView'>Mood Settings</div>
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<$ if(!cloudRequest) { $>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
@@ -1023,6 +1081,7 @@
 		</div>
 	</script>
 	<script type="text/template" id="basicSwitchTemplate">
+		<% if(typeof state == 'undefined') var state = 'off'%>
 		<div class='basicSwitchTemplate' style=''>
 			<div class='iconPartition' style='width:74px;float:left;text-align:center;cursor:pointer;margin:0 0 0 1px;'>
 				<div style='width:74px;height:74px;position:relative;' class='<%print((state=="on")?"theamBGColor":"whiteBG")%>'>
@@ -1030,8 +1089,8 @@
 					<div class='toggelSwitch' style='width:75px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
 				</div>	
 				<span class='toggelSwitch font12' style='white-space:nowrap;'><%print((name.length>12)?name.substring(0, 10)+'...':name||'&nbsp;')%></span>
-				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/<$=revId$>/images/sandClock.png"); background-size:10px 13px;<%print((hasTimer)?"":"display:none;")%>'></div>
-				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/<$=revId$>/images/clock2.png"); background-size:12px 12px;<%print((hasActiveSchedules)?"":"display:none;")%>'></div>
+				<div style='position:absolute;right:6px; top:-11px; width:10px; height:13px; background-image:url("static/<$=revId$>/images/sandClock.png"); background-size:10px 13px;<%print((typeof hasTimer != "undefined" && hasTimer)?"":"display:none;")%>'></div>
+				<div style='position:absolute;left:5px; top:-10px; width:12px; height:12px; background-image:url("static/<$=revId$>/images/clock2.png"); background-size:12px 12px;<%print((typeof hasActiveSchedules != "undefined" && hasActiveSchedules)?"":"display:none;")%>'></div>
 
 			</div>
 			<% if(typeof autoToggleTime != 'undefined') {%>
@@ -1045,7 +1104,13 @@
 					<b>Done</b>
 				</div>
 			</div>
-			<div class='disabledScreen theamBGColor' style='<% print((disabled)?"":"display:none")%>'>
+			<% if(typeof followObjs != 'undefined' && followObjs.length) {%>
+				<div class='followObjIndicator theamBGColor' style='display:none;'>
+					<i class='fa fa-paperclip rotate-45' style='position:absolute;right:-8px;top:4px;color:black;'></i>
+					<span style='color:black;'><%=followObjs.length%></span>
+				</div>
+			<%}%>
+			<div class='disabledScreen theamBGColor' style='<% print((typeof disabled != "undefined" && disabled)?"":"display:none")%>'>
 				<i class='fa fa-exclamation-circle' style='color:white;'></i>
 			</div>
 		</div>
@@ -1068,6 +1133,23 @@
 		<br/>
 		<% for(var i=1; i<=clusterCount; i++) {%>
 			<div class='editViewCont editViewCont_<%=i%>'></div>
+		<%}%>
+	</script>
+	<script type="text/template" id="devStngPageTemplate">
+		<div class='clusterTabs'>
+			<% if(typeof clusterCount == 'undefined') var clusterCount=1, currentCluster=1;
+				if(clusterCount > 1) for(var i=1; i<=clusterCount; i++) {%>
+				<span class="clusterNameCont translucentBg45 brightColor <% if(i==currentCluster)print('curCluster brightBorderColor')%>" clusterNo='<%=i%>'>Cluster-<%=i%></span>
+			<%}%>	
+		</div>
+		<div class="titleCont theamBGColor"><span style="text-align:left;">Device Settings</span></div>
+			<br/><br/><br/>
+			<span class='theamTextColor' style='<%if(clusterCount == 1)print("display:none;")%>'>Cluster-<%=currentCluster%></span>
+			<span class='helpText' style='float:left;'>Long press icons to edit parameters</span>
+			<div style='clear:both;'></div>
+			<br/>
+		<% for(var i=1; i<=clusterCount; i++) {%>
+			<div class='devStngViewCont devStngViewCont_<%=i%>'></div>
 		<%}%>
 	</script>
 	<script type="text/template" id="iRSettingTemplate">
@@ -1161,6 +1243,20 @@
 			<div style='clear:both;'></div>
 		</div>
 	</script>
+	<script type="text/template" id="editPirTemplate">
+		<div style='padding:0px 10px 10px 70px;'>
+			<br/>
+			<span class='editColumn'>Name</span>
+			<div><input style='width:180px;margin:-3px 0px 0px 0px;' type='text' class='switchName' value='<%=name%>' readonly></input></div>
+			<br/>
+			<span class='editColumn'>Pacificity</span>
+			<div style='margin-top:-4px;'><input type="range" class="pirRange pacificityRange" min="1" max="10" value="2" showemptylabels="false" style="width: 60%; display: inline-block;float: left;margin:7px 15px 0 0;"></div><span class='pacificityVal'></span>
+			<br/><br/>
+			<span class='editColumn'>Icon</span>
+			<div class='iconCont'></div>
+			<div style='clear:both;'></div>
+		</div>
+	</script>
 	<script type="text/template" id="editSwitchTemplate">
 		<div style='padding:0px 10px 10px 70px;'>
 			<br/>
@@ -1224,12 +1320,56 @@
 					<span class='font12 addNewSchedule'>&nbsp;&nbsp;add new</span>
 				</div>
 			</div>
+		<$ if(typeof sensorsPresent != 'undefined' && sensorsPresent) { $>
+			<br/>
+			<span class='editColumn'>Sensors</span>
+			<div class='sensorRuleDisplayCont' style='margin-top:-15px;'></div>
+			<div class='attachSensorRuleBtnCont theamTextColor' style='padding:5px;'>
+					<span class='editSensorRule'><i class='fa fa-paperclip font18'></i></span>
+					<span class='font12 editSensorRule'>&nbsp;&nbsp;attach new</span>
+			</div>
+			<div class='sensorRuleEditorCont' style='display:none;'></div>
+		<$ } $>	
 			<br/>
 			<span class='editColumn'>Icon</span>
 			<div class='iconCont'></div>
 			 
 		</div>
 	</script>
+	<script type="text/template" id="editSensorRulePannel">
+		<div class='dialogCont'>
+			<div class='dialog whiteBG blackTextColor' style='max-height:500px;overflow:auto;padding:0px'>
+				<div style='position:relative;'>
+					<div  style='padding:5px'>
+						<div class='cross' style='top:5px;right:0px;z-index:5;'>
+							<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+							<br/>
+							<b>Done</b>
+						</div>
+					</div>
+				</div>
+				<div class='editSensorRulePannel' style='padding:0px 10px 10px 80px;'>
+					<br/>
+					<span class='editColumn' style='margin:20px 0 0 -70px;'>Sensors:</span>
+					<div class='sensorIconDiv' style='min-height:60px;'></div>
+					<br/>
+					<span class='editColumn' style='margin:20px 0 0 -70px;'>Filters:</span>
+					<div class='filterIconDiv' style='min-height:60px;'></div>
+					<br/>
+					<span class='editColumn' style='margin:0px 0 0 -70px;width:70px;'>Manual Suspension:</span>
+					<div class='manualTimeDiv' style='min-height:50px;'>
+						<input type="range" class="pirRange bringOverMask manualTimeRange" min="1" max="5" value="2" showemptylabels="false" style="width: 40%; display: inline-block;float: left;margin:7px 15px 0 0;"></input>
+						<span class='manualTimeVal' style='float:right;'></span>
+					</div>
+					
+				</div>
+				<div class='theamBGColor maskTransparent' style='opacity:0.3;
+					filter:alpha(opacity=30);'>
+				</div>
+			</div>
+		</div>
+	</script>	
+
 	<script type="text/template" id="editScheduleTemplate">
 		<select class='scheduleType font10'>
 			<option value="on">Turn-on at</option>
@@ -1270,8 +1410,9 @@
 		</div>	
 	</script>
 	<script type="text/template" id="multiSelectIconTemplate">
-		<div style="width:45px; height:60px; float:left;position:relative;">
-			<div class='tick theamBGColor' style='display:none;'></div>
+		<div class="multiSelectIconTemplate" style="">
+			<div class='tick theamBGColor' style='display:<% print((typeof selected == "undefined" || !selected)?"none":"block")%>;'></div>
+			<div class='crossIcon theamBGColor' style='display:none;'></div>
 			<img style="width:45px; height:45px;" src='<%=src%>' icon='<%=icon%>', remId='<%=id%>'/>
 			<div style="width:45px; text-align:center;" class='font10'><%=name%></div>
 			<div style='width:45px; height:60px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);' icon='<%=icon%>' class='selectSwitch' ></div>
@@ -1344,6 +1485,7 @@
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodView.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/deviceSettings.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/irSetting.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
 	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureClusterView.js"></script>

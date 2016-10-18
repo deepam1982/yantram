@@ -25,7 +25,8 @@ var WifiCommunicator = BaseClass.extend({
 		this.emit("msgRecieved", '/ircaptured', data, macId);
 	},
 	scanNetwork : function () {
-		// sudo arp-scan --interface=wlan0  --localnet
+		if(!__systemConfig.get('iRSupported')) return;
+//		sudo arp-scan --interface=wlan0  --localnet
 		var spawn = require('child_process').spawn;
 		var nwkInfc = (__systemConfig.get('wifi'))?'wlan0':'eth0';
 		this.scan_process = spawn('sudo', ['arp-scan', '--interface='+nwkInfc, '--localnet']);
@@ -62,8 +63,10 @@ var WifiCommunicator = BaseClass.extend({
 		}
 		request.get('http://'+ip+'/whoareyou', __.bind(function (err, resp, body){
 			if (!err && resp && resp.statusCode == 200) {
-				var rspJson = JSON.parse(body);
-				if(rspJson.success) {
+				var rspJson = null;
+				try{ rspJson = JSON.parse(body);}
+				catch (err) {console.log("Error in json parse body", err, body)}
+				if(rspJson && rspJson.success) {
 					irBlasterConfig.onNewDeviceFound(macId, rspJson, __.bind(function (err) {
 						if(!err) {
 							var config = irBlasterConfig.get(macId);

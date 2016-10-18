@@ -200,6 +200,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                 var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
                 console.log(groupIds);
                 groupConfig.publishGroupConfig(groupIds);
+                __remoteDevInfoConf.publishDeviceConfig(devId);
               }
               if(nodeType == 'load'){
                 __deviceStateConf.data = deviceManager.getDeviceStateMap();
@@ -236,7 +237,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 
             process.on('uncaughtException', function (err) {
                 console.log( "UNCAUGHT EXCEPTION " );
-                console.log( "[Inside 'uncaughtException' event] " + err.stack || err.message );
+                console.log( "[Inside 'uncaughtException' event] " + err.stack || err.message, err );
             });
 
             var websiteRoutes = require(__rootPath + '/routes/website');

@@ -233,24 +233,8 @@ var CommandManager = BaseClass.extend({
 					}
 					if(groupIds.length) return callback(null, groupIds);	
 				}
-				switch(moduleType){
-					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0; break;
-					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0; break;	
-					case "CNCR01" : var noDim=0, swCnt=1, crtnCnt=2; break;	
-					case "DMBD05" : var noDim=5, swCnt=5, crtnCnt=0; break;	
-					case "DMBD03" : var noDim=3, swCnt=5, crtnCnt=0; break;	
-					default		  : var noDim=1, swCnt=5, crtnCnt=0;
-				}
-				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt, "curtain":crtnCnt}, "loadInfo":{},"deviceCode":"xxx", "category":moduleType};
-				for(var i=0; i<swCnt; i++) {
-					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
-					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
-				}
-				for(var i=0; i<crtnCnt; i++) {
-					devInfo.loadInfo[swCnt+i] = {"type":"curtain", "icon":"curtain", "devId":macAdd, "name":"Device-"+(swCnt+i+1)};
-				}
-				__remoteDevInfoConf.set(macAdd, devInfo);
-				__remoteDevInfoConf.save();
+				var devInfo = __remoteDevInfoConf.registerNewDevice(macAdd, moduleType, commandData.moduleName, function(err) {if(err)console.log(err);});
+				var swCnt=devInfo.loads.normal, crtnCnt=devInfo.loads.curtain;
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
 				if(!maxId || maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}

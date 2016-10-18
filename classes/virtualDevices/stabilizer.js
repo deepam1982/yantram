@@ -18,8 +18,8 @@ var Stabilizer = Timer.extend({
 		this.lastTmSmp = curTmSmp;
 		if((!this.maintainState && this.swOffCldAt && curTmSmp-this.swOffCldAt < 10) || 
 			(Math.max(0.60*this.mnStTm, this.mnStTm-200) < tdif && tdif <= this.mnStTm)) 
-			this.mnStTm = (this.mnStTm < 480)?(this.mnStTm*2):(this.mnStTm*1.5);
-			if(this.maxTime) this.mnStTm = Math.min(this.mnStTm, this.maxTime);
+				this.mnStTm = (this.mnStTm < 480)?(this.mnStTm*2):(this.mnStTm*1.5);
+		if(this.maxTime) this.mnStTm = Math.min(this.mnStTm, this.maxTime);
 		console.log(this.className, this.id, "Switch off after  -", this.mnStTm);
 		this.maintainState = true;
 		this.switchOffAfter(this.mnStTm, __.bind(function () {

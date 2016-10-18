@@ -3,6 +3,7 @@ var ejs = require('ejs');
 var findIpAddress = require(__rootPath+"/classes/utils/checkInternet").findIpAddress;
 ejs.delimiter = '$';
 // var RoomController = require(__rootPath+"/controllers/roomController");
+var deviceManager = require(__rootPath + '/classes/devices/deviceManager');
 module.exports = function(app) {
 	
 	app.get('/', function(req, res) {
@@ -25,6 +26,7 @@ module.exports = function(app) {
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
 			'iRSupported':__systemConfig.get('iRSupported'),
+			'sensorsPresent':deviceManager.sensorsPresentInSystem,
 			'clusteringSupported':__systemConfig.get('clusteringSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
 			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true,

@@ -3,7 +3,7 @@ var __ = require("underscore");
 var BaseVirtualDevice = BaseClass.extend({
 	className : "BaseVirtualDevice",
 	init : function(obj) {
-		__.bindAll(this, 'setState', '_setStateAsPerFollowLogic');
+		__.bindAll(this, 'setState', '_setStateAsPerFollowLogic', '_onBubbleUpFollowObjChange');
 		this.id=(obj && obj.id)?obj.id:new Date().getTime();
 		this.deviceId=(obj && obj.deviceId)?obj.deviceId:null;
 		this.state=(obj && obj.state)?obj.state:false;
@@ -12,9 +12,14 @@ var BaseVirtualDevice = BaseClass.extend({
 		this.avoidFollow = false;
 	},
 	_onStateChange : function (force) {
-	//	console.log("_onStateChange called for", this.className, this.id);
+		// console.log("_onStateChange called for", this.className, this.id);
 		this.emit("stateChanged", this.state);
 		this.emit("switch"+((this.state)?"On":"Off"));
+		this.emit("bubbleUpChange", this.id, this.state);
+	},
+	_onBubbleUpFollowObjChange : function (objId, objState) {
+		if(objId == this.id) return; //to avoid recursion 
+		this.emit("bubbleUpChange", objId, objState);	
 	},
 	setState : function (state) {
 		this._setState(state, true);
@@ -37,7 +42,8 @@ var BaseVirtualDevice = BaseClass.extend({
 	_switchOff : function () {
 		this._setState(false);
 	},
-	getRemainingTimeToToggle :function () { // in seconds
+	getRemainingTimeToToggle :function (sudoState) { // in seconds
+		if(typeof sudoState == 'undefined') sudoState = this.state;
 		if(!__.size(this.followObjs) || this.timeCalculationIsOn) return Infinity;
 		this.timeCalculationIsOn = true;
 		var objectTimeMap = {};
@@ -53,7 +59,7 @@ var BaseVirtualDevice = BaseClass.extend({
 				return Infinity;
 			}
 			sudoFollowObjs[objId].state = !sudoFollowObjs[objId].state
-			if(this.state ^ this._simulateState(sudoFollowObjs)) {
+			if(sudoState ^ this._simulateState(sudoFollowObjs)) {
 				this.timeCalculationIsOn = false; 
 				return objectTimeMap[objId];
 			}
@@ -62,6 +68,7 @@ var BaseVirtualDevice = BaseClass.extend({
 		return Infinity;
 	},
 	_simulateState : function (sudoFollowObjs) {
+		if(!sudoFollowObjs) sudoFollowObjs = this.followObjs;
 		var actualFollowObjects = this.followObjs;
 		this.followObjs = sudoFollowObjs;
 		eval("var state=("+this.followLogic+")");
@@ -71,7 +78,7 @@ var BaseVirtualDevice = BaseClass.extend({
 	_setStateAsPerFollowLogic : function (state) {
 		try {
 			if(this.followLogic)
-				eval("state=("+this.followLogic+")"); //TODO i think it must be var state
+				eval("state=("+this.followLogic+")"); // state is function call parameter
 			if(!this.avoidFollow)
 				__.defer(__.bind(this._setState, this, state));
 		} catch (err) {console.log(err);console.log(this.followLogic); console.log(__.keys(this.followObjs));}
@@ -82,6 +89,7 @@ var BaseVirtualDevice = BaseClass.extend({
 		objs = [].concat(objs);
 		__.each(objs, function (obj){
 			obj.on("stateChanged", this._setStateAsPerFollowLogic);
+			obj.on("bubbleUpChange", this._onBubbleUpFollowObjChange);
 			this.followObjs[obj.id]=obj;
 		}, this);
 		if (followLogic) {
@@ -97,6 +105,7 @@ var BaseVirtualDevice = BaseClass.extend({
 		objs = [].concat(objs);
 		__.each(objs, function (obj){
 			obj.off("stateChanged", this._setStateAsPerFollowLogic);
+			obj.off("bubbleUpChange", this._onBubbleUpFollowObjChange);
 			this.followObjs = __.omit(this.followObjs, obj.id);
 		}, this);
 	},

@@ -45,7 +45,16 @@ var checkInternet = function (callback) {
 	child = exec('ping -c 1 8.8.8.8', function(error, stdout, stderr){
     	if(error !== null) {
         	console.log(error, stdout, stderr);
-        	callback("Internet not available");
+        	child = exec('wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date:', function(error, stdout, stderr) {
+                if(stdout.indexOf('Date:') == -1) {
+                    console.log("Internet Check failed");
+                    callback("Internet not available");
+                }
+                else {
+                    console.log("Internet is available");
+                    callback(null);
+                }
+            })
         }
     	else{
         	console.log("Internet is available");

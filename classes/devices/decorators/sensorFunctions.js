@@ -5,11 +5,13 @@ module.exports ={
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
+		var sensorStateChanged = false;
 		for (var i=0; i<this.numberOfSensors; i++) {
-			if(oldSnSt[i] != this.sensorState[i])
+			if(oldSnSt[i] != this.sensorState[i]){
 				if(this.sensorState)
 					this.sensorLastOnTime[i] = (new Date()).getTime();
 				sensorStateChanged = true;
+			}
 		}
 //		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
 //		if(sensorStateChanged) this.avoidLogDVST = true;
@@ -34,6 +36,8 @@ module.exports ={
 		msg = parseInt(msg)
 		this.sensorState[0] = ((1<<0)&msg)?1:0;
 		this.sensorState[1] = ((1<<1)&msg)?1:0;
+		if(this.sensorState[0]) __remoteDevInfoConf.setSensorActive(this.id, 0);
+		if(this.sensorState[1]) __remoteDevInfoConf.setSensorActive(this.id, 1);
 	}
 
 }

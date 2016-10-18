@@ -74,11 +74,19 @@ SwitchProxy = BaseView.extend({
 	}
 });
 
+DeviceGroupSwitchProxy = SwitchProxy.extend({
+	render : function () {
+		if(_.contains(['sensor'], this.model.type)) return this;
+		return SwitchProxy.prototype.render.apply(this, arguments);
+	}
+});
+
 DeviceGroupView = BaseView.extend({
 	name : "DeviceGroupView",
 	templateSelector:"#deviceGroupTemplate",
-	subViewArrays : [{'viewClassName':'SwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")'}]
+	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")'}]
 	//TODO arr should be collection and not simple array.
+
 });
 
 ChoseGroupIconPannel = BasicDialog.extend({

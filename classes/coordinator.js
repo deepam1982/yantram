@@ -6,21 +6,32 @@ var AutoOffTimer = require(__rootPath+"/classes/virtualDevices/autoOffTimer");
 var Stabilizer = require(__rootPath+"/classes/virtualDevices/stabilizer");
 var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager");
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
-var devCoordConf = new (BasicConfigManager.extend({file : '/../configs/deviceCoordinatorConfig.json'}))({"callback":function () {
-	coordinator.populateUtilNodes();
-	coordinator.applyCoordinationCondition();
-}});
+var devCoordConf = require(__rootPath+"/classes/configs/deviceCoordinatorConfig");
 
 
 var Coordinator = BaseClass.extend({
 	utilNodes : {},
 	init : function (obj) {
-		__.bindAll(this, "onNewNodesFound");
+		__.bindAll(this, "onNewNodesFound", "onParamChange");
 		this.deviceManager = obj.deviceManager;
-		this.deviceManager.on("newNodesFound", this.onNewNodesFound);
 		timerConfig.on('timerModified', __.bind(function (devId, loadId) {
 			this.manageTimersOnLoad(this.deviceManager.getVirtualLoad(devId, loadId));
 		}, this));
+		setTimeout(__.bind(this._delayedInit, this), 30*1000); // delay for 30 second so that time sync of the system takeplace
+	},
+	_delayedInit : function () {
+		this.deviceManager.on("newNodesFound", this.onNewNodesFound);
+		this.deviceManager.on("deviceParamChanged", this.onParamChange);
+		this.populateUtilNodes();
+		this.putTimersOnDiscoveredNoads();
+		this.applyCoordinationCondition(this.stablizerData);
+		this.applyCoordinationCondition();
+		this.deviceManager.publishDeviceStatus(); // whatever changes above statment brings must get published on app
+	},
+	putTimersOnDiscoveredNoads : function () {
+		__.each(this.deviceManager.getVirtualNoads(['Load']), function (vNode) {
+			this.manageTimersOnLoad(vNode)
+		}, this);
 	},
 	populateUtilNodes : function () {
 		this.utilNodes['dayLight'] = new CronDevice({'switchOnAt':'00 30 6 * * *', 'switchOffAt':'00 00 17 * * *', 'id':'dayLight'});
@@ -38,9 +49,25 @@ var Coordinator = BaseClass.extend({
         __.each(devCoordConf.data, function (conf, nodeId) {
 			if(1+nodeId.indexOf("autoOffTimer"))
 				this.utilNodes[nodeId] = new AutoOffTimer({"switchOffAfter":conf.turnOffAfter, 'id':nodeId});
-			if(1+nodeId.indexOf("stabilizer"))
-				this.utilNodes[nodeId] = new Stabilizer({"switchOffAfter":conf.offAfter, 'id':nodeId});
+			// if(1+nodeId.indexOf("stabilizer"))
+			// 	this.utilNodes[nodeId] = new Stabilizer({"defaultTime":conf.defaultTime, 'id':nodeId});
 		}, this);
+		this.stablizerData = {}
+		__.each(__remoteDevInfoConf.getListOfSensors(), function (conf, nodeId) {
+			var stbId = 'stb-'+nodeId;
+			this.stablizerData[stbId] = {"onCondition":nodeId};
+			this.utilNodes[stbId] = new Stabilizer({"defaultTime":conf.pacificity || 120, 'id':stbId});
+			console.log(stbId, conf.pacificity);
+		}, this);
+	},
+	onParamChange : function (devId, loadId, changingParams) {
+		if(__.contains(changingParams,'pacificity')) {
+			__.each(__remoteDevInfoConf.getListOfSensors(), function (conf, nodeId) {
+				var stbId = 'stb-'+nodeId;
+				this.utilNodes[stbId].defaultTime = conf.pacificity || 120;
+				console.log('pacificity of', stbId, 'changed to', conf.pacificity||120);
+			}, this);
+		}
 	},
 	getNodeMap : function (nodeIdArr) {
 		var nodeMap = this.deviceManager.getDeviceNodes(nodeIdArr);
@@ -139,12 +166,14 @@ var Coordinator = BaseClass.extend({
 	},
 	onNewNodesFound : function (vNodes, deviceId) {
 		__.each(vNodes, function (vNode) {this.manageTimersOnLoad(vNode)}, this);
+		this.applyCoordinationCondition(this.stablizerData);
 		this.applyCoordinationCondition();
 	},
-	applyCoordinationCondition : function () {		
+	conditionApplied : {},
+	applyCoordinationCondition : function (data) {		
 	//TODO __.each(devCoordConf.toJSON(), function (conf, nodeId) {
-		__.each(devCoordConf.data, function (conf, nodeId) {
-			if (!conf.conditionApplied) {
+		__.each(data || devCoordConf.data, function (conf, nodeId) {
+			if (!this.conditionApplied[nodeId]) {
 				try {
 					var nodeIdArr = []
 					if (conf.onCondition)
@@ -168,8 +197,11 @@ var Coordinator = BaseClass.extend({
 					}
 					nodeMap[nodeId].follow(__.values(__.omit(nodeMap, nodeId)), conf.onCondition, offCond);
 					nodeMap[nodeId].manualTime = conf.manualTime;
+
+					if(conf.manualTime && nodeMap[nodeId].state)
+						nodeMap[nodeId].startAvoidFollow();	
 					nodeMap[nodeId].maxTime = conf.maxTime;
-					conf.conditionApplied = true;
+					this.conditionApplied[nodeId] = true;
 				}catch(err) {console.log("#### error #### "+err);}
 			}
 		}, this)
@@ -196,10 +228,23 @@ var Coordinator = BaseClass.extend({
 }
 
 {
-	"stabilizer-1" : {"onCondition":"E7281707004B1200-s0", "offAfter":10},
-	"E7281707004B1200-l1" : {"onCondition":"stabilizer-1", "offCondition":"!stabilizer-1", "manualTime":100}
+	"stabilizer-1" : {"onCondition":"52E95D07004B1200-s0", "defaultTime":15},
+	"stabilizer-2" : {"onCondition":"52E95D07004B1200-s1", "defaultTime":15},
+	"52E95D07004B1200-l0" : {"onCondition":"stabilizer-1||stabilizer-2", "offCondition":"!stabilizer-1&&!stabilizer-2", "manualTime":900},
+	"52E95D07004B1200-l1" : {"onCondition":"stabilizer-1||stabilizer-2", "offCondition":"!stabilizer-1&&!stabilizer-2", "manualTime":900},
+	"52E95D07004B1200-l2" : {"onCondition":"stabilizer-1||stabilizer-2", "offCondition":"!stabilizer-1&&!stabilizer-2", "manualTime":900},
+	"52E95D07004B1200-l3" : {"onCondition":"stabilizer-1||stabilizer-2", "offCondition":"!stabilizer-1&&!stabilizer-2", "manualTime":900},
+	"52E95D07004B1200-l4" : {"onCondition":"stabilizer-1||stabilizer-2", "offCondition":"!stabilizer-1&&!stabilizer-2", "manualTime":900}
 }
 
+{ 
+	"stabilizer-1" : {"onCondition":"E7281707004B1200-s0", "defaultTime":30},
+	"stabilizer-2" : {"onCondition":"862B1707004B1200-s1", "defaultTime":30},
+	"E7281707004B1200-l1" : {"onCondition":"stabilizer-1", "offCondition":"!stabilizer-1", "manualTime":300},
+	"862B1707004B1200-l1" : {"onCondition":"evening&&stabilizer-2", "offCondition":"!stabilizer-2", "manualTime":300}
+}
+vega12345
+60:01:94:03:88:CF
 */
 if(typeof coordinator == 'undefined')
 	coordinator = new Coordinator({"deviceManager":deviceManager});
