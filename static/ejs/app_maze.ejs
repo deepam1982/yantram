@@ -848,8 +848,12 @@
 					<div class='dropDownOptions font14 theamBGColor brightColor' style='width:100%; display:none; top:30px; left:0px; position:absolute; z-index:1'>
 						<hr/>
 						<div class='optionTab' viewName='cnfgrSMView'>Configure switchboard module</div>
+						<$ if(ipCamaraSupported) { $>
 						<div class='optionTab' viewName='cnfgrIPCamView'>Configure IP camera</div>
+						<$ } $>	
+						<$ if(clusteringSupported) { $>
 						<div class='optionTab' viewName='cnfgrClusterView'>Configure Clusters</div>
+						<$ } $>	
 					</div>	
 			</div>
 		<$ } $>
@@ -1044,6 +1048,7 @@
 					<% var art = <$=avoidRestoTime$>; var ar=[0, 5, 10, 15, 20, 30, 45, 60]; print("<select style='vertical-align:middle;' class='avoidRestoTime'>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"'"+((art == ar[i])?" selected":"")+">"+ar[i]+" minutes</option>");}print("</select>");%>
 				</span>	
 				<br/><br/><br/>
+			<$ if(typeof sensorsPresent != 'undefined' && sensorsPresent) { $>
 				<div class='helpText'>Sensors can be combined with following time based filters.</div>
 				<div class='theamTextColor font12' style='vertical-align:middle;'>
 					<div style='float:left;width:100px;padding-top:7px;'>Day Light:</div>From <span class='dayLightTime' ><%var dLP=['<$=periods.dLP[0]$>', '<$=periods.dLP[1]$>']; var ar=['05:00', '05:30', '06:00', '06:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((dLP[0]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%> to <% var ar=['17:00', '17:30', '18:00', '18:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((dLP[1]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%></span>
@@ -1056,6 +1061,7 @@
 				</div>
 				<br/>
 				<br/>
+			<$ } $>	
 				<div class='helpText'>Duration modifications need HC restart.</div>
 				<span class='button theamBorderColor theamTextColor' id='restartInoho' style='float:right;'>Restart HC</span>
 			<br/><br/>
