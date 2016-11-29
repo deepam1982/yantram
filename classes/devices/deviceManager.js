@@ -8,6 +8,7 @@ var DmBd05 = require(__rootPath+"/classes/devices/switchBoards/dmBd05");
 var DmBd03 = require(__rootPath+"/classes/devices/switchBoards/dmBd03");
 var IRBLR1 = require(__rootPath+"/classes/devices/irBlasters/baseIrBlaster");
 var IRWIFI01 = require(__rootPath+"/classes/devices/irBlasters/irWifi01");
+var ZMOTE01 = require(__rootPath+"/classes/devices/irBlasters/zmote01");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
@@ -107,9 +108,10 @@ var DeviceManager = BaseClass.extend({
 			case "DMBD03"		 : var device = new DmBd03 (deviceId, this); break;
 			case "IRBLR1"		 : var device = new IRBLR1 (deviceId, this.wifiCommunicator); break;
 			case "IRWIFI01"		 : var device = new IRWIFI01 (deviceId, this.wifiCommunicator); break;
+			case "ZMOTE01"		 : var device = new ZMOTE01 (deviceId, this.wifiCommunicator); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
-		if(!__.contains(["IRBLR1", "IRWIFI01"], type))__remoteDevInfoConf.registerNewDevice(deviceId, type); //remoteDevInfoConf will ignore if already registered
+		if(!__.contains(["IRBLR1", "IRWIFI01", "ZMOTE01"], type))__remoteDevInfoConf.registerNewDevice(deviceId, type); //remoteDevInfoConf will ignore if already registered
 		
 		console.log("#### Registered Device:" +deviceId+" of type:"+device.type);
 		device.on('stateChanged', __.bind(function (device, nodeType, switchIds) {

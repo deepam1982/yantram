@@ -56,7 +56,7 @@ IrButtonRecorder = BasicDialog.extend({
 		this.$el.find('#code').html("&nbsp");
 		this.$el.find('#length').html("&nbsp");
 
-		this.options.socket.emit('runIrProcess', {devId:this.blstrId, process:"startReciever"});
+		this.options.socket.emit('runIrProcess', {devId:this.blstrId, process:"startReciever"}, function(err){console.log('startReciever command sent!!');});
 		this.$el.find('#saveCaptured').hide();
 		this.$el.find('#startIrCapture').hide();
 		this.$el.find('#stopIrCapture').show();
@@ -100,10 +100,10 @@ RemoteEditViewer = RemoteViewer.extend({
 		this.$el.find('.recoderMeta').show();
 		var blasters = this.options.deviceCollection.where({"id":"irBlasters"})[0].get("loadInfo");
 		_.each(blasters, function(blstr, id){
-			this.$el.find('.blstrIconListCont').append($('<div class="blstrIconCont" blstrId="'+id+'" style="position:relative;width:50px;float:left;margin:5px 0px;"><img style="width:100%;cursor:pointer;" src="static/'+revId+'/images/transparent/'+blstr.icon+'.png" /><div class="tick theamBGColor"></div></div>'));
+			this.$el.find('.blstrIconListCont').append($('<div class="blstrIconCont" blstrId="'+id+'" style="position:relative;width:50px;float:left;margin:5px 0px;z-index:5;"><img style="width:100%;cursor:pointer;" src="static/'+revId+'/images/transparent/'+blstr.icon+'.png" /><div class="tick theamBGColor"></div></div>'));
 		}, this);
 		_.each(this.iconList, function(icon, indx){
-			this.$el.find('.iconListCont').append($('<div class="remoteIconCont" icon="'+icon+'" style="position:relative;width:50px;float:left;margin:5px 0px;"><img style="width:100%;cursor:pointer;" src="static/'+revId+'/images/transparent/'+icon+'.png" /><div class="tick theamBGColor"></div></div>'));
+			this.$el.find('.iconListCont').append($('<div class="remoteIconCont" icon="'+icon+'" style="position:relative;width:50px;float:left;margin:5px 0px;z-index:5;"><img style="width:100%;cursor:pointer;" src="static/'+revId+'/images/transparent/'+icon+'.png" /><div class="tick theamBGColor"></div></div>'));
 		}, this);
 		return this;
 	},

@@ -3,6 +3,15 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var groupConfig = require(__rootPath+"/classes/configs/groupConfig");
 var MoodConfigManager = BasicConfigManager.extend({
 	file : '/../configs/moodConfig.json',
+	getMoodIdByName : function(name) {
+		var moodId = null;
+		for(var key in this.data) {
+			if(this.data[key].name == name){
+				moodId = key;break;	
+			}
+		}
+		return moodId;
+	},
 	getMoodDetails : function (id) {
 		var keys = __.keys(this.data);
 		var count = keys.length;

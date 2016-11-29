@@ -170,8 +170,12 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             var checkInternet = require(__rootPath+"/classes/utils/checkInternet").checkInternet;
             var checkRTC = require(__rootPath+"/classes/utils/checkInternet").checkRTC;
             var restoreState = function () {
-              console.log('restoring device states');
-              if((Date.now() - devStatConfAtBegn.epoch)/1000 < 15*60) deviceManager.restoreDeviceStatus(devStatConfAtBegn);
+              var avdRestTm = __userConfig.get('restoreWithInMins');
+              avdRestTm = parseInt(avdRestTm || 15); //15 min
+              if((Date.now() - devStatConfAtBegn.epoch)/1000 < avdRestTm*60) {
+                console.log('restoring device states');
+                deviceManager.restoreDeviceStatus(devStatConfAtBegn);
+              }
             }
             checkRTC(function(err) {
               var stateRestored = false;
@@ -197,6 +201,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType, switchIds) {
               if(nodeType != 'sensor') {
                 console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
+                if(!devId) return;
                 var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
                 console.log(groupIds);
                 groupConfig.publishGroupConfig(groupIds);
@@ -244,6 +249,24 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             var ajaxRoutes = require(__rootPath + '/routes/ajax');
             websiteRoutes(app, socComMngr);
             ajaxRoutes(app, socComMngr);
+            if(__systemConfig.get('iRSupported')) {
+              var zmoteRoute = require(__rootPath + '/partners/zmote/app/routes/irp.server.routes');
+              zmoteRoute(app);
+            }
+            try {
+              var fs = require('fs'),path = require('path');
+              var getDirectories = function (srcpath) {
+                return fs.readdirSync(srcpath).filter(function(file) {
+                  return fs.statSync(path.join(srcpath, file)).isDirectory();
+                });
+              }
+              var directories = getDirectories(__rootPath + '/whiteLabeledApps');
+              __.each(directories, function(directory) {
+                var thirdPartyMain = require(__rootPath + '/whiteLabeledApps/' + directory + "/main");  
+                thirdPartyMain(app);
+              });
+            }
+            catch (err) {console.log(err.message)}
             if(__systemConfig.get('ipCamaraSupported')){
               var cameraRoutes = require(__rootPath + '/routes/cam');
               cameraRoutes(app, socComMngr)

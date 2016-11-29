@@ -1,3 +1,4 @@
+var __ = require("underscore");
 var express = require('express');
 var ejs = require('ejs');
 var findIpAddress = require(__rootPath+"/classes/utils/checkInternet").findIpAddress;
@@ -22,11 +23,24 @@ module.exports = function(app) {
 		var ipMask = ip.join('.');
 		//JSON.stringify(
 		var clusterIpArr = __systemConfig.get('clusterIps');
+		var avoidRestoTime = __userConfig.get('restoreWithInMins');
+		var dLP = __userConfig.get('periods.dayLight'); if(!dLP) dLP = [6,30,17,0];
+		var sHP = __userConfig.get('periods.sleepHour'); if(!sHP) sHP = [22,0,7,0];
+		var evP = __userConfig.get('periods.evening'); if(!evP) evP = [17,30,23,0];
+		__.each(dLP, function(num, idx){if(num<10)dLP[idx]='0'+num;});
+		dLP = [dLP[0]+':'+dLP[1], dLP[2]+':'+dLP[3]];
+		__.each(sHP, function(num, idx){if(num<10)sHP[idx]='0'+num;});
+		sHP = [sHP[0]+':'+sHP[1], sHP[2]+':'+sHP[3]];
+		__.each(evP, function(num, idx){if(num<10)evP[idx]='0'+num;});
+		evP = [evP[0]+':'+evP[1], evP[2]+':'+evP[3]];
+
 		clusterIpArr = (clusterIpArr)?[piIpAddr].concat(clusterIpArr):[piIpAddr];
 		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
 			'iRSupported':__systemConfig.get('iRSupported'),
 			'sensorsPresent':deviceManager.sensorsPresentInSystem,
+			'avoidRestoTime':(avoidRestoTime)?avoidRestoTime:15,//15 minutes
+			'periods':{'dLP':dLP, 'sHP':sHP, 'evP':evP},
 			'clusteringSupported':__systemConfig.get('clusteringSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
 			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true,
@@ -83,6 +97,16 @@ module.exports = function(app) {
 		// res.write(req.headers);
 		// res.write(req.query);
 		// res.end()
+	});
+	app.get('/test/:data', function (req,res) {
+		var analyse = require(__rootPath + '/partners/zmote/lib/analyse');
+		analyse(req.params.data, function(err, respJson){
+			var response = JSON.stringify(respJson);
+            res.writeHead(200, {
+                'Content-Type': 'application/json; charset=utf-8'
+            });
+            res.end(response);
+        });
 	});
 
 };

@@ -46,10 +46,11 @@ EditMoodPannel = BaseView.extend({
 
 		this.options.gC.each(function (grp) {
 			_.each(grp.get('controls'), function (sw, key) {
-				sw.task='moodSelection';sw.selected=false;
+				sw.task='moodSelection';sw.selected=sw.hidden=false;
 				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){
-					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID]
+					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID];
 				}
+				if(_.contains(['irRem', 'irBlstr', 'ipCam', 'curtain'], sw.type)) sw.hidden=true;
 			}, this);
 		}, this);
 

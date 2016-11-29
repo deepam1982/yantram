@@ -36,16 +36,22 @@ module.exports ={
 		this.__foo();
 	},
 	_processSetSwitchQ : function () {
-		var copy = __.clone(this.switchState);
+		if(typeof this.newSwitchState == 'undefined') this.newSwitchState = null;
+		var copy = __.clone(this.newSwitchState||this.switchState);
 		var setSwitchQ = this.setSwitchQ
 		this.setSwitchQ = null;
 		__.each(setSwitchQ, function (obj){
 			if (obj.switchNo >= this.switchState.length) return;
 			copy[obj.switchNo] = (obj.state)?1:0;	
 		}, this);
+		this.newSwitchState = copy;
 		var swst = this._binStateToInt(copy);
 //		console.log("Processing Switch Q");
 		this._setSwitch(swst, __.bind(function () {
+			if (this._binStateToInt(this.switchState) == this._binStateToInt(this.newSwitchState) ){
+				this.newSwitchState = null;
+				clearTimeout(this.retryTimeout);
+			}
 			__.each(setSwitchQ, function (obj) {obj.callback && obj.callback();}, this);
 		}, this))
 	},
@@ -55,13 +61,16 @@ module.exports ={
 		if(!retryCount)retryCount=0;
 		this._sendQuery({name:"STSWPT", value:this._intToHexStr(swst)}, 
 			__.bind(function(){
+				clearTimeout(this.retryTimeout);
+				this.retryTimeout = null;
+				if(this._binStateToInt(this.newSwitchState)^swst){
+					callback && callback();	return;
+				}
 				// successful response comes only when request registers successfully :D
 				this.syncState(__.bind(function () {
-					if(!this.retryTimeout && !retryCount && this._binStateToInt(this.switchState)^swst) {
-						console.log("#### retrying STSWPT")
-						this._setSwitch(swst, callback, retryCount+1);
+					if(!this._binStateToInt(this.switchState)^swst) {
+						callback && callback()
 					}
-					else callback && callback()
 				}, this));
 				this.retryTimeout = setTimeout(__.bind(function () {
 					if(retryCount < 10 && this._binStateToInt(this.switchState)^swst)

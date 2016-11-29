@@ -34,9 +34,12 @@ var Coordinator = BaseClass.extend({
 		}, this);
 	},
 	populateUtilNodes : function () {
-		this.utilNodes['dayLight'] = new CronDevice({'switchOnAt':'00 30 6 * * *', 'switchOffAt':'00 00 17 * * *', 'id':'dayLight'});
-		this.utilNodes['sleepHour'] = new CronDevice({'switchOnAt':'00 00 22 * * *', 'switchOffAt':'00 00 7 * * *', 'id':'sleepHour'});
-		this.utilNodes['evening'] = new CronDevice({'switchOnAt':'00 00 18 * * *', 'switchOffAt':'00 00 23 * * *', 'id':'evening'});
+		var dLT = __userConfig.get('periods.dayLight'); if(!dLT) dLT = [6,30,17,0];
+		var sHT = __userConfig.get('periods.sleepHour'); if(!sHT) sHT = [22,0,7,0];
+		var evT = __userConfig.get('periods.evening'); if(!evT) evT = [17,30,22,30];
+		this.utilNodes['dayLight'] = new CronDevice({'switchOnAt':'00 '+dLT[1]+' '+dLT[0]+' * * *', 'switchOffAt':'00 '+dLT[3]+' '+dLT[2]+' * * *', 'id':'dayLight'});
+		this.utilNodes['sleepHour'] = new CronDevice({'switchOnAt':'00 '+sHT[1]+' '+sHT[0]+' * * *', 'switchOffAt':'00 '+sHT[3]+' '+sHT[2]+' * * *', 'id':'sleepHour'});
+		this.utilNodes['evening'] = new CronDevice({'switchOnAt':'00 '+evT[1]+' '+evT[0]+' * * *', 'switchOffAt':'00 '+evT[3]+' '+evT[2]+' * * *', 'id':'evening'});
 		this.utilNodes['weekday'] = new CronDevice({'switchOnAt':'00 00 00 * * 1', 'switchOffAt':'00 00 18 * * 5', 'id':'weekday'});
 		this.utilNodes['weekend'] = new CronDevice({'switchOnAt':'00 00 18 * * 5', 'switchOffAt':'00 00 00 * * 1', 'id':'weekend'});
 		this.utilNodes['day'] = this.utilNodes['dayLight']
@@ -117,10 +120,11 @@ var Coordinator = BaseClass.extend({
 				var id = vNode.id+'-'+type+'Timer-'+indx;
 				nodeIdArr.push(id);
 				console.log(timer.minute, timer.hour, timer.amPm)
+				var sec = parseInt(timer.second || 0); if(sec > 57)sec=57;
 				var min = parseInt(timer.minute); 
 				var hour = parseInt(timer.hour)+((timer.amPm == 'AM')?0:12) - ((parseInt(timer.hour)==12)?12:0); 
-				var onPattern = "00 "+min+" "+hour+" * * *";
-				var offPattern = "02 "+min+" "+hour+" * * *";
+				var onPattern = sec+" "+min+" "+hour+" * * *";
+				var offPattern = (sec+2)+" "+min+" "+hour+" * * *";
 				// offPattern = onPattern + 2 seconds. having +10 mins instead, causes the problem where geyser on-ed by timer, could not be turned off for 10 mins.
 				//var offPattern ="00 "+((min+10)%60)+" "+((hour+parseInt((min+10)/60))%24)+" * * *";
 				console.log(onPattern, offPattern);

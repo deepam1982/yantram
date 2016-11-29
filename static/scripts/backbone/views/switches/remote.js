@@ -73,6 +73,14 @@ function nevigationPannelHtml () {
 		<div class='btn absDiv' code='KEY_RIGHT' style='width:26px; height:67px; top:30px; right:0px;'><div class='tick' style='background-color:black;'></div><div class='maskTransparent'></div></div>\
 		<div class='btn absDiv theamBGColor' code='KEY_OK' style='width:55px; height:55px; border:10px solid white; top:27px; left:27px; border-radius:20px; line-height:56px;'>OK<div class='tick'></div><div class='maskTransparent'></div></div>\
 	</div>\
+	<div>\
+		<div class='leftDiv' style='width:33%; margin-top:-40px; float:left; text-align:center;'>\
+			<div code='KEY_BACK' class='btn buttonBG theamBGColor'><i class='fa fa-reply'></i><div class='tick'></div><div class='maskTransparent'></div></div>\
+		</div>\
+		<div class='rightDiv' style='width:33%; margin-top:-40px; float:right; text-align:center;'>\
+			<div code='KEY_AV' class='btn buttonBG theamBGColor' style='font-size:20px;'>AV<div class='tick'></div><div class='maskTransparent'></div></div>\
+		</div>\
+	</div>\
 	"
 }
 function numberKeyPannel () {
@@ -87,9 +95,8 @@ function numberKeyPannel () {
 		<div class='numberButton' ><div code='KEY_7' class='btn buttonBG theamBGColor'>7<div class='tick'></div><div class='maskTransparent'></div></div></div>\
 		<div class='numberButton' ><div code='KEY_8' class='btn buttonBG theamBGColor'>8<div class='tick'></div><div class='maskTransparent'></div></div></div>\
 		<div class='numberButton' ><div code='KEY_9' class='btn buttonBG theamBGColor'>9<div class='tick'></div><div class='maskTransparent'></div></div></div>\
-		<div class='numberButton' ><div code='KEY_AV' class='btn buttonBG theamBGColor' style='font-size:20px;'>AV<div class='tick'></div><div class='maskTransparent'></div></div></div>\
+		<div class='numberButton' ></div>\
 		<div class='numberButton' ><div code='KEY_0' class='btn buttonBG theamBGColor'>0<div class='tick'></div><div class='maskTransparent'></div></div></div>\
-		<div class='numberButton' ><div code='KEY_BACK' class='btn buttonBG theamBGColor'><i class='fa fa-ellipsis-h'></i><div class='tick'></div><div class='maskTransparent'></div></div></div>\
 		<div style='clear:both;'></div>\
 	</div>\
 	"	

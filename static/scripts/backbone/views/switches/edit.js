@@ -126,7 +126,7 @@ SelectSwitchIcon = BaseView.extend({
 
 EditSwitchParams = BaseView.extend({
 	templateSelector:"#editSwitchTemplate",
-	iconList : ['switch', 'bulb', 'cfl', 'cfl1', 'tubelight', 'fan', 'fan1', 'plug', 'plug1', 'lamp', 'lamp1', 'mosquito coil', 'iron', 'geyser', 'tv', 'tv1', 'ac', 'ac1', 'heater', 'air cooler', 'washing machine', 'water purifier'],
+	iconList : ['switch', 'bulb', 'cfl', 'cfl1', 'tubelight', 'chandelier', 'ceiling', 'ceiling1', 'fan', 'fan1', 'plug', 'plug1', 'lamp', 'lamp1', 'mosquito coil', 'iron', 'geyser', 'tv', 'tv1', 'ac', 'ac1', 'heater', 'air cooler', 'washing machine', 'water purifier'],
 	subViews : [{'viewClassName':'EditSensorRulePannel', 'reference':'sensorRuleDialog', 'parentSelector':'.sensorRuleEditorCont', 'model':'this.model', 'eval':['deviceCollection=this.options.deviceCollection'], 'supressRender':true},
 				{'viewClassName':'ScheduleEditor', 'reference':'schEditor', 'parentSelector':'#scheduleEditor', 'model':'this.model', 'events' : {
 		'change':'doneEditSchedule',
@@ -389,7 +389,7 @@ EditableSwitch = AdvanceSwitch.extend({
 			var remotes = this.model.get("remotes");
 			var count = (remotes)?remotes.length:0;
 			if(count)
-				this.$el.find('.basicSwitchTemplate .fa-exclamation-circle').parent().before("<div class='remoteCountIndicator theamBGColor'><i class='fa fa-paperclip hInvert' style='position:absolute;left:-7px;bottom:-7px;color:white;'></i><span style='color:white;'>"+count+"</span></div>")
+				this.$el.find('.basicSwitchTemplate .fa-exclamation-circle').parent().before("<div class='remoteCountIndicator theamBGColor'><i class='fa fa-paperclip hInvert' style='position:absolute;left:-7px;bottom:-7px;'></i><span style='color:white;'>"+count+"</span></div>")
 		}
 
 		return retObj;

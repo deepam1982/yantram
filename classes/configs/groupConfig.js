@@ -44,10 +44,11 @@ var GroupConfigManager = BasicConfigManager.extend({
 		var ctlCount = conf.controls.length;
 		__.each(conf.controls, function (ctl, indx) {
 			if (ctl.devId == 'irBlasters') {
+				ctl.irBlasterId = ctl.switchID;
 				var irBlasterConfig = require(__rootPath+"/classes/configs/irBlasterConfig");	
 				var irBlstrCnf = irBlasterConfig.get(ctl.switchID);
+				if(!irBlstrCnf) return;
 				var remoteIds = irBlstrCnf.remotes; 
-				ctl.irBlasterId = ctl.switchID;
 				__.each(remoteIds, function(remId, idx){
 					conf.controls.push({"id":++ctlCount, "devId":"irRemotes", "switchID":remId, "irBlasterId":ctl.switchID})
 				}, this);
@@ -66,6 +67,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 			if(ctl.devId == 'irBlasters') {
 				var irBlasterConfig = require(__rootPath+"/classes/configs/irBlasterConfig");
 				var irBlstrCnf = irBlasterConfig.get(ctl.switchID+'');
+				if(!irBlstrCnf) return;
 				__.extend(ctl, {"type":"irBlstr", "name":irBlstrCnf.name, "icon":irBlstrCnf.icon  ||"irBlaster", "groupId":conf.id, "remotes":irBlstrCnf.remotes});
 			}
 			if (ctl.devId == 'irRemotes') {

@@ -333,8 +333,8 @@
 			position:absolute;
 			height:32px; width:17px;
 			line-height:33px;
-			right: 10px;
-			top: -5px;
+			right: 4px;
+			top: -13px;
 			border-radius: 5px;
 			font-size: 16px;
 			text-align: center;
@@ -491,6 +491,9 @@
 
 		.theamSettingPage .paddingDiv{
 			padding : 20px 20px 50px ;
+		}
+		.systemSettingPage .paddingDiv{
+			padding : 20px;
 		}
 		.cloudSettingPage .paddingDiv{
 			padding : 0px 20px;
@@ -710,13 +713,13 @@
 				<div class='options devStng hideWhileConfigureFlow' jsVarNm='devStngPageView'>Device Settings</div>
 			<$ } $>	
 			<$ if(typeof iRSupported != 'undefined' && iRSupported) { $>
-				<div class='options iRStng hideWhileConfigureFlow' jsVarNm='iRSettingPage'>IR Settings</div>
+				<div class='options iRStng hideWhileConfigureFlow' jsVarNm='iRSettingPage'>IR Remote Settings</div>
 			<$ } $>	
 			<div class='options nwkStng hideWhileConfigureFlow' jsVarNm='networkSettingPage' style='display:none;'>Network Settings</div>
 			<$ if(!cloudRequest) { $>
 			<div class='options cldStng hideWhileConfigureFlow' jsVarNm='cloudSettingPage'>Cloud Settings</div>
 			<$ } $>
-			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>Theme Settings</div>
+			<div class='options theamStng hideWhileConfigureFlow' jsVarNm='themeSettingPage'>System Settings</div>
 			<$ if(!cloudRequest) { $>
 			<div class='options cnfrMdl hideWhileConfigureFlow' jsVarNm='configureModulePage'>Configure Module</div>
 			<$ } $>
@@ -759,7 +762,7 @@
 			</div>
 			<div class='theamBorderColor whiteBG'>
 				<div class='recoderMeta' style='display:none;color:black; padding-left:60px;font-size:12px;'>
-					<span style='margin:10px 0 0 -60px;float:left;'>Name:</span><div><input id='remoteName' type='text' placeholder='eg. LG TV'></input></div>
+					<span style='margin:10px 0 0 -60px;float:left;'>Name:</span><div><input id='remoteName' type='text' style='position:relative;z-index:5;' placeholder='eg. LG TV'></input></div>
 					<br/>
 					<span style='margin:10px 0 0 -60px;float:left;'>Hardware:</span><div class='blstrIconListCont'></div>
 					<div style='clear:both'></div>
@@ -1025,9 +1028,37 @@
 						<% print(('<$=homeView$>'=='grid')?'checked="checked"':'' )%>/>
 				</div>
 				<div style='clear:both;'></div>
-			</div>			
+			</div>
 			<br/>
 			<span class='button theamBorderColor theamTextColor' id='applyTheamButton' style='float:right;'>Apply</span>
+			</div>
+		</div>
+		<br/>
+		<div class="systemSettingPage translucentBg30">
+			<br/>
+			<div class="titleCont brightColor"><span style="text-align:left;">Duration Settings</span></div>
+			<div class='paddingDiv'>
+				<div class='helpText'>After a power outage, devices whose physical switch were on, retain their states. For the other devices, Home Controller restores there state after it boots up.
+				</div>
+				<span class='theamTextColor font12'>Avoid restoration for outages beyond
+					<% var art = <$=avoidRestoTime$>; var ar=[0, 5, 10, 15, 20, 30, 45, 60]; print("<select style='vertical-align:middle;' class='avoidRestoTime'>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"'"+((art == ar[i])?" selected":"")+">"+ar[i]+" minutes</option>");}print("</select>");%>
+				</span>	
+				<br/><br/><br/>
+				<div class='helpText'>Sensors can be combined with following time based filters.</div>
+				<div class='theamTextColor font12' style='vertical-align:middle;'>
+					<div style='float:left;width:100px;padding-top:7px;'>Day Light:</div>From <span class='dayLightTime' ><%var dLP=['<$=periods.dLP[0]$>', '<$=periods.dLP[1]$>']; var ar=['05:00', '05:30', '06:00', '06:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((dLP[0]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%> to <% var ar=['17:00', '17:30', '18:00', '18:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((dLP[1]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%></span>
+					<br/>
+					<div style='float:left;width:100px;padding-top:7px;'>Evening:</div>From <span class='eveningTime'><%var evP=['<$=periods.evP[0]$>', '<$=periods.evP[1]$>'];  var ar=['17:00', '17:30', '18:00', '18:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((evP[0]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%> to <% var ar=['21:00', '21:30', '22:00', '22:30', '23:00', '23:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((evP[1]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%></span>
+					<br/>
+					<div style='float:left;width:100px;padding-top:7px;'>Sleep Hours:</div>From <span class='sleepHourTime'><%var sHP=['<$=periods.sHP[0]$>', '<$=periods.sHP[1]$>']; var ar=['21:00', '21:30', '22:00', '22:30', '23:00', '23:30']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((sHP[0]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%> to <% var ar=['05:00', '05:30', '06:00', '06:30', '07:00']; print("<select>"); for(var i=0; i<ar.length; i++){print("<option value='"+ar[i]+"' "+((sHP[1]==ar[i])?"selected":"")+">"+ar[i]+"</option>");}print("</select>");%></span>
+					<br/>
+					<div style='clear:both;'></div>
+				</div>
+				<br/>
+				<br/>
+				<div class='helpText'>Duration modifications need HC restart.</div>
+				<span class='button theamBorderColor theamTextColor' id='restartInoho' style='float:right;'>Restart HC</span>
+			<br/><br/>
 		</div>
 	</script>
 	<script type="text/template" id="moodProxyTemplate">

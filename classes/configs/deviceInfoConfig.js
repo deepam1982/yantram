@@ -74,11 +74,15 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 		var vLoad = deviceManager.getVirtualLoad(deviceId, loadId);
 		if(vLoad) ctl.id = vLoad.id;
 		else if (ctl.type == 'sensor'){
-			var vSen = deviceManager.getVirtualSensor(deviceId, lodIndx-(nrmlCnt+crtnCnt))
+			var sensorIndx = lodIndx-(nrmlCnt+crtnCnt);
+			var vSen = deviceManager.getVirtualSensor(deviceId, sensorIndx)
 			if(vSen) ctl.id = vSen.id;
 		}
 
 		var config = deviceManager.getConfig(deviceId);
+		if(config && ctl.type == 'sensor') {
+			ctl.sensorLastOnTime = config[ctl.devId]['sensor'][sensorIndx].epoch || 0;
+		}
 		ctl.disabled = (!config)?true:((!config.reachable)?true:false);
 		ctl.state = false;
 		if(!(lodIndx < (nrmlCnt+crtnCnt))) return ctl;
@@ -155,8 +159,10 @@ var DevInfoConfigManager = BasicConfigManager.extend({
                 "devId": deviceId,
                 "name": "Sensor-"+(sensorId+1),
                 "dimmable": false,
-                "isActive": true
+                "isActive": true,
+                "pacificity": 120
 			});	
+			this.publishDeviceConfig(deviceId);
 		}
 		this.save(callback);
 	},

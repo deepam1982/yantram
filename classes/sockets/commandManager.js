@@ -53,6 +53,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
 		socket.on('getThemeSettings', __.bind(this.getThemeSettings, this));
 		socket.on('modifyThemeSettings', __.bind(this.modifyThemeSettings, this));
+		socket.on('modifySystemSettings', __.bind(this.modifySystemSettings, this));
 		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
@@ -70,10 +71,11 @@ var CommandManager = BaseClass.extend({
 		__userConfig.set('logOnCloud', (flag === true));
 		__userConfig.save(__.bind(this.restartHomeController, this));
 	},
-	restartHomeController : function() {
+	restartHomeController : function(callback) {
 		console.log('restarting home controller');
 		var exec = require('child_process').exec;
-		exec("sudo service inoho restart");	
+		exec("sudo service inoho restart");
+		callback && callback();
 	},
 	editRemoteIrCode : function (data, callback) {
 		var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
@@ -268,6 +270,17 @@ var CommandManager = BaseClass.extend({
 		__userConfig.save(function (err) {
 			if(err) return console.log(err);
 			console.log('App theam modification success');
+			callback({'success':true});
+		});
+	},
+	modifySystemSettings : function (commandData, callback) {
+		__userConfig.set('restoreWithInMins', commandData.restoreWithInMins);
+		__userConfig.set('periods.dayLight', commandData.dLP);
+		__userConfig.set('periods.evening', commandData.evP);
+		__userConfig.set('periods.sleepHour', commandData.sHP);
+		__userConfig.save(function (err) {
+			if(err) return console.log(err);
+			console.log('System setting modification success');
 			callback({'success':true});
 		});
 	},

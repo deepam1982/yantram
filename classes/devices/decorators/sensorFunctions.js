@@ -3,6 +3,7 @@ module.exports ={
 	_recordDeviceStatus : function (msg) {
 		if (msg.lenght < 8) return;
 		this._setActiveSensor(this._getActiveSensorMsg(msg));
+		if(!this.senToglCnt) this.senToglCnt = [8,8];
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
 		var sensorStateChanged = false;
@@ -11,6 +12,8 @@ module.exports ={
 				if(this.sensorState)
 					this.sensorLastOnTime[i] = (new Date()).getTime();
 				sensorStateChanged = true;
+				if(this.senToglCnt[i]) --this.senToglCnt[i];
+				else __remoteDevInfoConf.setSensorActive(this.id, i);
 			}
 		}
 //		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
@@ -36,8 +39,6 @@ module.exports ={
 		msg = parseInt(msg)
 		this.sensorState[0] = ((1<<0)&msg)?1:0;
 		this.sensorState[1] = ((1<<1)&msg)?1:0;
-		if(this.sensorState[0]) __remoteDevInfoConf.setSensorActive(this.id, 0);
-		if(this.sensorState[1]) __remoteDevInfoConf.setSensorActive(this.id, 1);
 	}
 
 }
