@@ -86,6 +86,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	.whiteBG{background-color: white;}\
 	.whiteBorderColor{border-color:white;}\
 	input[type='range']::-webkit-slider-thumb, input[type='radio']:checked:after{background-color: "+inputColor+";}\
+	input[type='range'].bringOverMask::-webkit-slider-thumb {background-color:"+themeColor+"}\
 	.theamColor{color: "+color+";}\
 	.theamBGColor{background-color: "+color+";}\
 	.brightBGColor{background-color: "+brightColor+";}\
@@ -151,6 +152,10 @@ var connectSocket = function (ip, idx, callback) {
 	ioSockets[idx].on('deleteGroup', function (groupId) {
 		if(!groupId) return;
 		gCs[idx].remove(gCs[idx].get(groupId));
+	});
+	ioSockets[idx].on('deleteDevice', function (deviceId) {
+		if(!deviceId) return;
+		dCs[idx].remove(dCs[idx].get(deviceId));
 	});
 	ioSockets[idx].on('onDeviceUpdate', function (config) {
 		if(!_.isObject(config)) config = JSON.parse(JXG.decompress(config));
@@ -287,6 +292,11 @@ var editPageView = new EditPageView({'collections':gCs, 'deviceCollections':dCs}
 $('#appCont').append(editPageView.$el);
 // editPageView.render();
 // sideMenu.currentPage = editPageView;
+try {
+var devStngPageView = new DevStngPageView({'collections':dCs, 'deviceCollections':dCs});
+$('#appCont').append(devStngPageView.$el);
+}catch(err){console.log(err);}
+
 var iRSettingPage = new IRSettingPage({'deviceCollection':dCs[0], socket:ioSockets[primeIndx]});
 $('#appCont').append(iRSettingPage.$el);
 

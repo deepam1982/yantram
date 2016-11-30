@@ -32,25 +32,26 @@ module.exports = function(app, cmdMngr) {
 		__.each(deviceInfoConfig.toJSON(), function (devInfo, devId){
 			var config = deviceManager.getConfig(devId);
 			if(config)
-			__.each(config[devId]['sensor'], function(info, id){
-				var ctl = {"id":devId+"-s"+id,"sensorLastOnTime":info.epoch}
-				array.push(ctl);
-			});
+			// __.each(config[devId]['sensor'], function(info, id){
+			// 	var ctl = {"id":devId+"-s"+id,"sensorLastOnTime":info.epoch}
+			// 	array.push(ctl);
+			// });
 			__.each(devInfo.loadInfo, function(info, id) {
-			
-				var ctl = {"id":devId+"-"+id,"name":info.name,"type":info.type}
-				ctl.disabled = (devId == 'ipCamaras')?false:((!config)?true:((!config.reachable)?true:false));
-				ctl.state = (ctl.disabled)?false:config[devId]["switch"][id]["state"];
-				ctl.state = (ctl.state)?'on':'off';
-				if(config && config[devId]["dimmer"][id])
-					ctl.duty = config[devId]["dimmer"][id]["state"];
-				var timers = timerConfig.getTimers(devId, parseInt(id));
-				var autoOff = timers.autoOff[0];
-				ctl.autoOff = (autoOff && autoOff.enabled)?autoOff.time:0;
-				ctl.schedules = [];
-				timers.schedules.forEach (function(schedule){
-					ctl.schedules.push(__.omit(schedule, "devId", "loadId"));
-				})
+				var ctl = __.pick(deviceInfoConfig.getLoadInfo(devId, id), 
+					"id", "name", "type", "disabled", "state", "duty", "autoOff", "schedules", "sensorLastOnTime");
+				// var ctl = {"id":devId+"-"+id,"name":info.name,"type":info.type}
+				// ctl.disabled = (devId == 'ipCamaras')?false:((!config)?true:((!config.reachable)?true:false));
+				// ctl.state = (ctl.disabled)?false:config[devId]["switch"][id]["state"];
+				// ctl.state = (ctl.state)?'on':'off';
+				// if(config && config[devId]["dimmer"][id])
+				// 	ctl.duty = config[devId]["dimmer"][id]["state"];
+				// var timers = timerConfig.getTimers(devId, parseInt(id));
+				// var autoOff = timers.autoOff[0];
+				// ctl.autoOff = (autoOff && autoOff.enabled)?autoOff.time:0;
+				// ctl.schedules = [];
+				// timers.schedules.forEach (function(schedule){
+				// 	ctl.schedules.push(__.omit(schedule, "devId", "loadId"));
+				// })
 			
 				array.push(ctl);
 			});
@@ -135,5 +136,11 @@ module.exports = function(app, cmdMngr) {
 			if(!err) deviceManager.emit('deviceStateChanged', devId, null, 'switchParams');
 		});
 
+	});
+	app.get('/api/v1/activatemoodbyname/:moodname', function(req, res) {
+		var moodId = moodConfig.getMoodIdByName(req.params.moodname);
+		if(!moodId) return res.send({'success':false, 'msg':"mood by the name '"+req.params.moodname+"'' does not exist."})
+		cmdMngr.activateMood({'id':moodId});
+		res.send({'success':true});
 	});
 };

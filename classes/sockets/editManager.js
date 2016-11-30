@@ -32,6 +32,12 @@ var EditManager = BaseClass.extend({
 		socket.on('getIpCamaraData', __.bind(this.getIpCamaraData, this));
 		socket.on('updateIpOctet', __.bind(this.updateIpOctet, this));
 		socket.on('updateClusterIps', __.bind(this.updateClusterIps, this));
+		socket.on('deleteDevice', __.bind(this.deleteDevice, this));
+	},
+	deleteDevice : function (devId, callback) {
+		var config = deviceManager.getConfig(devId);
+		if(config) return callback("cannot delete device!!");
+		deviceInfoConfig.deleteDevice(devId, callback);
 	},
 	updateClusterIps : function (obj, callback) {
 		if(!obj || !obj.ipArr || !__.isArray(obj.ipArr))
@@ -224,6 +230,8 @@ var EditManager = BaseClass.extend({
 		if(obj.devId == 'ipCamaras') return this.modifyIpCamaraParam(obj, callback);
 		if(obj.devId == 'irBlasters') return this.modifyIrBlasterParam(obj, callback);
 		if(obj.devId == 'irRemotes') return this.modifyIrRemoteParam(obj, callback);
+		if(obj.params.followObjects) 
+			return deviceInfoConfig.modifyFollowObjects(obj.devId, parseInt(obj.switchId), obj.params.followObjects, callback);
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
 		if(obj.params.autoOff) { //TODO this piece of code should not be along with deviceInfoConfig
@@ -248,13 +256,16 @@ var EditManager = BaseClass.extend({
 			if(__.indexOf(this.allowedSwitchParams, key) == -1) 
 				return callback && callback({'success':false, 'msg':'invalid key'});
 		});
+		var changingParams = [];
 		__.each(obj.params, function (val, key) {
-			deviceInfoConfig.set(obj.devId+".loadInfo."+obj.switchId+'.'+key, val)
+			deviceInfoConfig.set(obj.devId+".loadInfo."+obj.switchId+'.'+key, val);
+			changingParams.push(key);
 		});
 		deviceInfoConfig.save(function (err) {
 			if(err) return callback && callback({'success':false, 'msg':err});
 			callback && callback({'success':true});
 			deviceManager.emit('deviceStateChanged', obj.devId, null, 'switchParams');
+			deviceManager.emit('deviceParamChanged', obj.devId, obj.switchId, changingParams);
 		});
 	}
 

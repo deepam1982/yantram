@@ -24,10 +24,13 @@ EditMoodPannel = BaseView.extend({
 		moodInfo.rank = this.$el.find('input[name=rank]:checked').val() || moodInfo.id;
 		moodInfo.name=this.$el.find('.moodName').val() || moodInfo.name;
 		moodInfo.name=moodInfo.name.charAt(0).toUpperCase() + moodInfo.name.slice(1);
-		var controls = [], id=0;
+		var controls = [], id=0, arr=[];
 		this.options.gC.each(function (grp) {
 			_.each(grp.get('controls'), function (sw, key) {
-				sw.selected && controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
+				if(sw.selected && !_.contains(arr, sw.devId+sw.switchID)) {
+					arr.push(sw.devId+sw.switchID);
+					controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
+				}
 			}, this);
 		}, this);
 		moodInfo.controls = controls;
@@ -46,10 +49,11 @@ EditMoodPannel = BaseView.extend({
 
 		this.options.gC.each(function (grp) {
 			_.each(grp.get('controls'), function (sw, key) {
-				sw.task='moodSelection';sw.selected=false;
+				sw.task='moodSelection';sw.selected=sw.hidden=false;
 				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){
-					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID]
+					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID];
 				}
+				if(_.contains(['irRem', 'irBlstr', 'ipCam', 'curtain'], sw.type)) sw.hidden=true;
 			}, this);
 		}, this);
 

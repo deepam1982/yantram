@@ -74,11 +74,19 @@ SwitchProxy = BaseView.extend({
 	}
 });
 
+DeviceGroupSwitchProxy = SwitchProxy.extend({
+	render : function () {
+		if(_.contains(['sensor'], this.model.type) || this.model.hidden) return this;
+		return SwitchProxy.prototype.render.apply(this, arguments);
+	}
+});
+
 DeviceGroupView = BaseView.extend({
 	name : "DeviceGroupView",
 	templateSelector:"#deviceGroupTemplate",
-	subViewArrays : [{'viewClassName':'SwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")'}]
+	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")'}]
 	//TODO arr should be collection and not simple array.
+
 });
 
 ChoseGroupIconPannel = BasicDialog.extend({
@@ -124,7 +132,7 @@ EditGroupPannel = BaseView.extend({
 		var irRemIndx = -1;
 		this.options.deviceCollection.each(function (dev, indx) {
 			if(dev.get("id") == "irRemotes") irRemIndx = indx;
-			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=false;}, this);
+			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=sw.hidden=false;}, this);
 		}, this);
 		_.each(this.model.get('controls'), function (obj) {
 			this.options.deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;

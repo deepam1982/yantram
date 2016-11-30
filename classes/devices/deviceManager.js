@@ -8,6 +8,7 @@ var DmBd05 = require(__rootPath+"/classes/devices/switchBoards/dmBd05");
 var DmBd03 = require(__rootPath+"/classes/devices/switchBoards/dmBd03");
 var IRBLR1 = require(__rootPath+"/classes/devices/irBlasters/baseIrBlaster");
 var IRWIFI01 = require(__rootPath+"/classes/devices/irBlasters/irWifi01");
+var ZMOTE01 = require(__rootPath+"/classes/devices/irBlasters/zmote01");
 var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var DeviceManager = BaseClass.extend({
 	communicator : null,
@@ -31,6 +32,10 @@ var DeviceManager = BaseClass.extend({
 		this._deviceMap[deviceId].reachable = reachable;
 		this.emit('deviceStateChanged', deviceId);
 	},
+	publishDeviceStatus : function (deviceIds) {
+		if (!deviceIds) return this.emit('deviceStateChanged'); // if no device id then publish change for all
+		__.each(deviceIds, function(deviceId){this.emit('deviceStateChanged', deviceId);}, this);
+	},
 	restoreDeviceStatus : function (stateMap) {
 		this._virtualNodesOldState = stateMap;
 		__.each(this._virtualNodes, function (node, id) {
@@ -41,8 +46,20 @@ var DeviceManager = BaseClass.extend({
 		var dev = this._deviceMap[deviceId];
 		if(dev) return dev.getVirtualLoad(loadIndx);
 	},
+	getVirtualSensor : function (deviceId, senIndx) {
+		var dev = this._deviceMap[deviceId];
+		if(dev) return dev.getVirtualSensor(senIndx);
+	},
 	getDeviceNodes	: function (nodeIds) {
 		return __.pick(this._virtualNodes, nodeIds);
+	},
+	getVirtualNoads : function (types) {
+		var nodeArr = [];
+		__.each(this._virtualNodes, function(vNode) {
+			if(types && !__.contains(types, vNode.className)) return;
+			nodeArr.push(vNode);
+		});
+		return nodeArr
 	}, 
 	getDeviceStateMap : function () {
 		var stateMap = {};
@@ -91,12 +108,20 @@ var DeviceManager = BaseClass.extend({
 			case "DMBD03"		 : var device = new DmBd03 (deviceId, this); break;
 			case "IRBLR1"		 : var device = new IRBLR1 (deviceId, this.wifiCommunicator); break;
 			case "IRWIFI01"		 : var device = new IRWIFI01 (deviceId, this.wifiCommunicator); break;
+			case "ZMOTE01"		 : var device = new ZMOTE01 (deviceId, this.wifiCommunicator); break;
 			default : var device = new BaseDevice(deviceId, this); break;
 		}
+		if(!__.contains(["IRBLR1", "IRWIFI01", "ZMOTE01"], type))__remoteDevInfoConf.registerNewDevice(deviceId, type); //remoteDevInfoConf will ignore if already registered
+		
 		console.log("#### Registered Device:" +deviceId+" of type:"+device.type);
 		device.on('stateChanged', __.bind(function (device, nodeType, switchIds) {
+			if(nodeType == 'sensor') this.sensorsPresentInSystem = true;
 			this.emit('deviceStateChanged', device.id, device.getConfig(), nodeType, switchIds);
 		}, this, device));
+		if(!this.sensorsPresentInSystem) {
+			if(__.keys(__remoteDevInfoConf.getListOfSensors(deviceId)).length)
+				this.sensorsPresentInSystem = true;
+		}
 		this._deviceMap[deviceId] = device;
 		__.extend(this._virtualNodes, device.virtualNodes);
 		if(this._virtualNodesOldState ) __.each(device.virtualNodes, function (node, id) {

@@ -6,6 +6,9 @@ var IrBlasterConfigManager = BasicConfigManager.extend({
 		if(!this.get(id)) {
 			var conf = {"name": data.name, "macAddr": id, "category": data.type, "icon": "defaultIr", "remotes":[]}
 			if (data.type == "IRWIFI01") conf.icon = "irBlaster";
+			if (data.type == "ZMT2") {
+				__.extend(conf, {"category":"ZMOTE01", "icon": "zmote", "uuid":data.uuid, "name":"Blstr_"+data.uuid.substr(6)});
+			}
 			this.set(id, conf);
 			//return this.save(calback); dont save.
 			return calback(null);

@@ -44,10 +44,11 @@ var GroupConfigManager = BasicConfigManager.extend({
 		var ctlCount = conf.controls.length;
 		__.each(conf.controls, function (ctl, indx) {
 			if (ctl.devId == 'irBlasters') {
+				ctl.irBlasterId = ctl.switchID;
 				var irBlasterConfig = require(__rootPath+"/classes/configs/irBlasterConfig");	
 				var irBlstrCnf = irBlasterConfig.get(ctl.switchID);
+				if(!irBlstrCnf) return;
 				var remoteIds = irBlstrCnf.remotes; 
-				ctl.irBlasterId = ctl.switchID;
 				__.each(remoteIds, function(remId, idx){
 					conf.controls.push({"id":++ctlCount, "devId":"irRemotes", "switchID":remId, "irBlasterId":ctl.switchID})
 				}, this);
@@ -55,8 +56,6 @@ var GroupConfigManager = BasicConfigManager.extend({
 		}, this);
 		__.each(conf.controls, function (ctl) {
 			var cnt = __.keys(ctl).length;
-			var curtainId = parseInt(ctl.switchID) - parseInt(__remoteDevInfoConf.get(ctl.devId+'.loads.normal'));
-			if(curtainId > -1) ctl['curtainId'] = curtainId;
 			__.each(__remoteDevInfoConf.get(ctl.devId+'.loadInfo.'+ctl.switchID), function (val, key) {
 				ctl[key] = val;
 			});
@@ -68,6 +67,7 @@ var GroupConfigManager = BasicConfigManager.extend({
 			if(ctl.devId == 'irBlasters') {
 				var irBlasterConfig = require(__rootPath+"/classes/configs/irBlasterConfig");
 				var irBlstrCnf = irBlasterConfig.get(ctl.switchID+'');
+				if(!irBlstrCnf) return;
 				__.extend(ctl, {"type":"irBlstr", "name":irBlstrCnf.name, "icon":irBlstrCnf.icon  ||"irBlaster", "groupId":conf.id, "remotes":irBlstrCnf.remotes});
 			}
 			if (ctl.devId == 'irRemotes') {
@@ -78,40 +78,16 @@ var GroupConfigManager = BasicConfigManager.extend({
 			if (cnt == __.keys(ctl).length) 
 				return conf.controls = __.without(conf.controls, ctl);
 
+			if(!__.contains(['irRemotes', 'irBlasters', 'ipCamaras'], ctl.devId))
+			__.each(__remoteDevInfoConf.getLoadInfo(ctl.devId, ctl.switchID), function (val, key) {
+				ctl[key] = val;
+			});
+
 			var config = deviceManager.getConfig((ctl.irBlasterId)?ctl.irBlasterId:ctl.devId);
 			ctl.disabled = (ctl.devId == 'ipCamaras')?false:((!config)?true:((!config.reachable)?true:false));
 			(ctl.disabled && conf.disabledCtls++);
-			ctl.state = false;
-			if(config && config[ctl.devId]){
-				if(curtainId > -1){
-					ctl.state = config[ctl.devId]["curtain"][ctl.curtainId]["state"];
-					ctl.state = (ctl.state)?ctl.state:'off';
-				}
-				else{
-					ctl.state = config[ctl.devId]["switch"][ctl.switchID]["state"];
-					ctl.state = (ctl.state)?'on':'off';
-				}
-			}
-			if(!(curtainId > -1) && ctl.state=='on') conf.poweredCount++;
-			var timers = timerConfig.getTimers(ctl.devId, ctl.switchID);
-			ctl.autoOff = timers.autoOff[0];
-			if(ctl.autoOff) ctl.autoOff = __.omit(ctl.autoOff, "devId", "loadId");
-			ctl.schedules = [];
-			__.each(timers.schedules, function (schdl){ctl.schedules.push(__.omit(schdl, "devId", "loadId"))});
-			ctl.hasActiveSchedules = __.max(__.pluck(ctl.schedules, 'enabled'));// ctl.schedules.length;
-			ctl.hasTimer = (!ctl.autoOff)?false:ctl.autoOff.enabled;
-			ctl.autoToggleTime = null;
-			var vLoad = deviceManager.getVirtualLoad(ctl.devId, ctl.switchID);
-			if(vLoad) {
-				var tmp = vLoad.getRemainingTimeToToggle();
-				if(tmp < Infinity) {
-					var d = new Date(new Date().getTime() + tmp*1000), hour = d.getHours(), min = d.getMinutes();
-					ctl.autoToggleTime = ((hour<10)?'0':'')+hour+':'+((min<10)?'0':'')+min;	
-				}
-			}
-			if (config && config[ctl.devId] && config[ctl.devId]["dimmer"] && config[ctl.devId]["dimmer"][ctl.switchID]) {
-				ctl.duty = config[ctl.devId]["dimmer"][ctl.switchID]["state"];
-			}
+			if((typeof ctl.curtainId == 'undefined') && ctl.state=='on') conf.poweredCount++;
+			
 		});
 		return conf;
 	},

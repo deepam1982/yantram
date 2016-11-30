@@ -53,6 +53,7 @@ var CommandManager = BaseClass.extend({
 		socket.on('modifyCloudSettings', __.bind(this.modifyCloudSettings, this));
 		socket.on('getThemeSettings', __.bind(this.getThemeSettings, this));
 		socket.on('modifyThemeSettings', __.bind(this.modifyThemeSettings, this));
+		socket.on('modifySystemSettings', __.bind(this.modifySystemSettings, this));
 		socket.on('getCloudSettings', __.bind(this.getCloudSettings, this));
 		socket.on('checkSerialCableConnection', __.bind(this.checkSerialCableConnection, this));
 		socket.on('configureConnectedModule', __.bind(this.configureConnectedModule, this));
@@ -70,10 +71,11 @@ var CommandManager = BaseClass.extend({
 		__userConfig.set('logOnCloud', (flag === true));
 		__userConfig.save(__.bind(this.restartHomeController, this));
 	},
-	restartHomeController : function() {
+	restartHomeController : function(callback) {
 		console.log('restarting home controller');
 		var exec = require('child_process').exec;
-		exec("sudo service inoho restart");	
+		exec("sudo service inoho restart");
+		callback && callback();
 	},
 	editRemoteIrCode : function (data, callback) {
 		var irRemoteConfig = require(__rootPath+"/classes/configs/irRemoteConfig");
@@ -233,24 +235,8 @@ var CommandManager = BaseClass.extend({
 					}
 					if(groupIds.length) return callback(null, groupIds);	
 				}
-				switch(moduleType){
-					case "SWBD01" : var noDim=2, swCnt=5, crtnCnt=0; break;
-					case "SWBD02" : var noDim=1, swCnt=5, crtnCnt=0; break;	
-					case "CNCR01" : var noDim=0, swCnt=1, crtnCnt=2; break;	
-					case "DMBD05" : var noDim=5, swCnt=5, crtnCnt=0; break;	
-					case "DMBD03" : var noDim=3, swCnt=5, crtnCnt=0; break;	
-					default		  : var noDim=1, swCnt=5, crtnCnt=0;
-				}
-				var devInfo = {"name":commandData.moduleName, "loads":{"dimmer":noDim, "normal":swCnt, "curtain":crtnCnt}, "loadInfo":{},"deviceCode":"xxx", "category":moduleType};
-				for(var i=0; i<swCnt; i++) {
-					devInfo.loadInfo[i] = {"type":"normal", "icon":"switch", "devId":macAdd, "name":"Device-"+(i+1)};
-					if(i < noDim) devInfo.loadInfo[i].dimmable = true;
-				}
-				for(var i=0; i<crtnCnt; i++) {
-					devInfo.loadInfo[swCnt+i] = {"type":"curtain", "icon":"curtain", "devId":macAdd, "name":"Device-"+(swCnt+i+1)};
-				}
-				__remoteDevInfoConf.set(macAdd, devInfo);
-				__remoteDevInfoConf.save();
+				var devInfo = __remoteDevInfoConf.registerNewDevice(macAdd, moduleType, commandData.moduleName, function(err) {if(err)console.log(err);});
+				var swCnt=devInfo.loads.normal, crtnCnt=devInfo.loads.curtain;
 				var maxId = parseInt(__.max(__.keys(groupConfig.data), function (id) {return parseInt(id);}));
 				if(!maxId || maxId < 0) maxId = 0; 
 				var group = {"name":commandData.moduleName, "controls":[]}
@@ -284,6 +270,17 @@ var CommandManager = BaseClass.extend({
 		__userConfig.save(function (err) {
 			if(err) return console.log(err);
 			console.log('App theam modification success');
+			callback({'success':true});
+		});
+	},
+	modifySystemSettings : function (commandData, callback) {
+		__userConfig.set('restoreWithInMins', commandData.restoreWithInMins);
+		__userConfig.set('periods.dayLight', commandData.dLP);
+		__userConfig.set('periods.evening', commandData.evP);
+		__userConfig.set('periods.sleepHour', commandData.sHP);
+		__userConfig.save(function (err) {
+			if(err) return console.log(err);
+			console.log('System setting modification success');
 			callback({'success':true});
 		});
 	},

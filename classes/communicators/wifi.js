@@ -25,12 +25,14 @@ var WifiCommunicator = BaseClass.extend({
 		this.emit("msgRecieved", '/ircaptured', data, macId);
 	},
 	scanNetwork : function () {
-		// sudo arp-scan --interface=wlan0  --localnet
+		if(!__systemConfig.get('iRSupported')) return;
+//		sudo arp-scan --interface=wlan0  --localnet
 		var spawn = require('child_process').spawn;
 		var nwkInfc = (__systemConfig.get('wifi'))?'wlan0':'eth0';
 		this.scan_process = spawn('sudo', ['arp-scan', '--interface='+nwkInfc, '--localnet']);
 		this.scan_process.stdout.on('data', __.bind(function(chunk) { 
 			var pairs = chunk.toString('utf-8').match(/([0-9]{1,3}\.){3}[0-9]{1,3}\s+([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}/g);
+			if(!pairs) pairs=[];
 			if(irBlasterConfig.get('HcIrBlaster')) pairs.push("127.0.0.1 HcIrBlaster");
 			__.each(pairs, __.bind(function(pair){
 				pair = pair.split(/\s+/);
@@ -57,13 +59,16 @@ var WifiCommunicator = BaseClass.extend({
 		this._macIdNwkIdMap[macId] = {};
 		var config = irBlasterConfig.get(macId);
 		if (config) {
+			config.ip=ip;
 			this.emit("newDeviceFound", macId, config.category);
 			return this._macIdNwkIdMap[macId]['isInohoDevice'] = true;
 		}
 		request.get('http://'+ip+'/whoareyou', __.bind(function (err, resp, body){
 			if (!err && resp && resp.statusCode == 200) {
-				var rspJson = JSON.parse(body);
-				if(rspJson.success) {
+				var rspJson = null;
+				try{ rspJson = JSON.parse(body);}
+				catch (err) {console.log("Error in json parse body", err, body)}
+				if(rspJson && rspJson.success) {
 					irBlasterConfig.onNewDeviceFound(macId, rspJson, __.bind(function (err) {
 						if(!err) {
 							var config = irBlasterConfig.get(macId);
@@ -82,6 +87,10 @@ var WifiCommunicator = BaseClass.extend({
 			case '/captureIr' : data.callbackUrl = "http://"+__piIpAddr+"/ircaptured"; break;
 		}
 		return data;
+	},
+	getNetworkAdd : function (macId) {
+		var map = this._macIdNwkIdMap[macId];
+		return (map)?map.ipAdd:null;
 	},
 	sendCommand : function (macId, cmdObj, calback) {
 		var url = 'http://'+this._macIdNwkIdMap[macId].ipAdd+((cmdObj.urlPath)?cmdObj.urlPath:'');

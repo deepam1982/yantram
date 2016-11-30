@@ -60,6 +60,9 @@ var BaseDevice = BaseClass.extend({
 	getVirtualLoad : function (indx) {
 		return this.virtualNodes[this.id+"-l"+indx];
 	},
+	getVirtualSensor : function (indx) {
+		return this.virtualNodes[this.id+"-s"+indx];
+	},
 	_initDimmers : function () {
 		__.times(this.numberOfDimmers, function(){this.dimmerState.push(0)}, this);
 	},
@@ -73,6 +76,9 @@ var BaseDevice = BaseClass.extend({
 	},
 	_bindWithVirtualLoad : function (loadIndex, vDevice) {
 		if (loadIndex >= this.numberOfSwitches) return;
+		vDevice.on('onToggleTimeUpdate', __.bind(function(swIndx){
+			this.emit('stateChanged', 'load', [swIndx]);
+		}, this, loadIndex));
 		vDevice.onStateChange = __.bind(function (force) {
 			if(vDevice.state ^ this.switchState[loadIndex]) {
 				vDevice.syncPending = true;
@@ -126,7 +132,10 @@ var BaseDevice = BaseClass.extend({
 		__.times(this.numberOfSensors, function(indx){
 			this.isSensorActive[indx] && this.virtualNodes[this.id+"-s"+indx].setState(this.sensorState[indx]);
 		}, this);
-		while(callback = this.syncCallbackStack.shift()) callback();
+		while(callback = this.syncCallbackStack.shift()) {
+			try{callback();}
+			catch(err){console.log("error while calling syncCallbackStack", err);}
+		}
 		clearTimeout(this.syncInProgress);
 		this.syncInProgress = false;
 	//	console.log("this.syncInProgress - "+this.syncInProgress);
