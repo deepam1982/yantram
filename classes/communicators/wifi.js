@@ -26,7 +26,7 @@ var WifiCommunicator = BaseClass.extend({
 	},
 	scanNetwork : function () {
 		if(!__systemConfig.get('iRSupported')) return;
-//		sudo arp-scan --interface=wlan0  --localnet
+		// sudo arp-scan --interface=wlan0  --localnet
 		var spawn = require('child_process').spawn;
 		var nwkInfc = (__systemConfig.get('wifi'))?'wlan0':'eth0';
 		this.scan_process = spawn('sudo', ['arp-scan', '--interface='+nwkInfc, '--localnet']);

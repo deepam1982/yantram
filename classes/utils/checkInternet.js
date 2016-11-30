@@ -41,11 +41,11 @@ var syncSystemClock = function (callback) {
 };
 
 var checkInternet = function (callback) {
-	var exec = require('child_process').exec, child;
-	child = exec('ping -c 1 8.8.8.8', function(error, stdout, stderr){
-    	if(error !== null) {
-        	console.log(error, stdout, stderr);
-        	child = exec('wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date:', function(error, stdout, stderr) {
+    var exec = require('child_process').exec, child;
+    child = exec('ping -c 1 8.8.8.8', function(error, stdout, stderr){
+        if(error !== null) {
+            console.log(error, stdout, stderr);
+            child = exec('wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date:', function(error, stdout, stderr) {
                 if(stdout.indexOf('Date:') == -1) {
                     console.log("Internet Check failed");
                     callback("Internet not available");
@@ -56,11 +56,11 @@ var checkInternet = function (callback) {
                 }
             })
         }
-    	else{
-        	console.log("Internet is available");
-        	callback(null);
+        else{
+            console.log("Internet is available");
+            callback(null);
         }
-	});
+    });
 };
 var findIpAddress = function () {
     var os = require('os');
