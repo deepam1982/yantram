@@ -26,7 +26,7 @@ module.exports = function(app) {
 		var avoidRestoTime = __userConfig.get('restoreWithInMins');
 		var dLP = __userConfig.get('periods.dayLight'); if(!dLP) dLP = [6,30,17,0];
 		var sHP = __userConfig.get('periods.sleepHour'); if(!sHP) sHP = [22,0,7,0];
-		var evP = __userConfig.get('periods.evening'); if(!evP) evP = [17,30,23,0];
+		var evP = __userConfig.get('periods.evening'); if(!evP) evP = [17,30,22,30];
 		__.each(dLP, function(num, idx){if(num<10)dLP[idx]='0'+num;});
 		dLP = [dLP[0]+':'+dLP[1], dLP[2]+':'+dLP[3]];
 		__.each(sHP, function(num, idx){if(num<10)sHP[idx]='0'+num;});
