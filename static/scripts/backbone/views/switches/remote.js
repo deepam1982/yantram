@@ -161,6 +161,7 @@ return "\
 		"+remoteStyle1()+"\
 		<div id='singleRemotePannel' class=''>\
 			"+miniSectionRemoteHtml()+"\
+			"+nevigationPannelHtml()+"\
 		</div>\
 	"	
 }
@@ -192,6 +193,84 @@ return "\
 		</div>\
 	"	
 }
+
+IrCodeSelector = BaseView.extend(Popup).extend({
+	name : "IrCodeSelector",
+	templateSelector:"#irCodeSelector",
+	keepPopupFixed : true,
+	avoidCloneOnPullup : true,
+	events: {
+		"tap .popupPannel > .cross" : "hidePopUp",
+		"tap .btn" : "onButtonTap",
+		"tap .remIcon" : "switchRemote",
+		"tap .codeProxy .cancle" : "onCodeCancle"
+	},
+	onCodeCancle : function (event) {
+		var $codeProxy = $(event.target).closest('.codeProxy');
+		$codeProxy.remove();
+	},
+	onButtonTap : function (event) {
+		var $btn = $(event.target).closest('.btn');
+		var code = $btn.attr('code');
+		var remId = this.$el.find('.tick:visible').closest('.remIcon').attr('remId');
+		var $codeProxy = this.getIRCodeProxy(code, remId);
+		this.$el.find('.codeProxyCont').append($codeProxy);
+
+	},
+	getIRCodeProxy : function(code, remId) {
+		var remName = this.remotes[remId].name;
+		return $("<span class='codeProxy button font10' code='"+code+"' remId='"+remId+"'><span>"+remName+"</span>: <span>"+code+"</span><i class='fa fa-times-circle-o cancle'></i></span>");
+	},
+	showPopUp : function(remotes, codeArr, callback){
+		this.remotes = remotes;
+		this.onDone = callback;
+		this.$el.find('.codeProxyCont').html("");
+		_.each(codeArr, function(obj) {
+			this.$el.find('.codeProxyCont').append(this.getIRCodeProxy(obj.code, obj.remId));
+		}, this);
+		this.$el.find('.remIconCont').html("");
+		_.each(remotes, function(rem, indx){
+			this.$el.find('.remIconCont').append($('<div class="remIcon" icon="'+rem.icon+'" remId="'+rem.id+'" style="position:relative;width:50px;float:left;margin:5px 0px;z-index:5;text-align:center;"><img style="width:100%;cursor:pointer;" src="static/'+revId+'/images/transparent/'+rem.icon+'.png" /><br/><div class="font8">'+rem.name+'</div><div class="tick theamBGColor"></div></div>'));
+		}, this);
+		this.$el.find('.tick').hide();
+		this.paintRemote('remote_default'); //this is required so that pop is places at right postition
+		var retObj = Popup.showPopUp.apply(this, arguments);
+		this._switchRemote(_.keys(remotes)[0])
+		return retObj
+	},
+	hidePopUp : function () {
+		var codeArr = []
+		_.each(this.$el.find('.codeProxy'), function(codeProxy){
+			var $codeProxy = $(codeProxy);
+			codeArr.push({"remId":$codeProxy.attr('remId'), "code":$codeProxy.attr('code')})
+		});
+		this.onDone(codeArr);
+		return Popup.hidePopUp.apply(this, arguments);
+	},
+	switchRemote : function (event) {
+		var $remIcon = $(event.target).closest('.remIcon');
+		var remId = $remIcon.attr('remId');
+		this._switchRemote(remId);
+	},
+	_switchRemote : function (remId) {
+		var icon = this.remotes[remId].icon;
+		this.$el.find('.tick').hide();
+		this.$el.find('.remIcon[remId='+remId+'] .tick').show();
+		this.paintRemote(icon);
+	},
+	paintRemote : function(icon){
+		switch (icon) {
+			case 'remote_mini' : 		this.$el.find('.remoteCont').html(miniRemoteHtml()); break;
+			case 'remote_mini_generic': this.$el.find('.remoteCont').html(mini2ChnlRemoteHtml()); break;
+			case 'remote_with_numpad' : this.$el.find('.remoteCont').html(numPadRemoteHtml()); break;
+			case 'remote_ac_default'  : this.$el.find('.remoteCont').html(defaultAcRemoteHtml()); break;
+			case 'remote_default' : 	
+			default : 					this.$el.find('.remoteCont').html(defaultRemoteHtml());
+		}
+	}
+})
+var irCodeSelector = new IrCodeSelector({'el':$("#irCodeSelectorCont")});
+irCodeSelector.render();
 
 RemoteViewer = BaseView.extend(Popup).extend({
 	name : "RemoteViewer",
