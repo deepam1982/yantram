@@ -1,6 +1,6 @@
 EditMoodPannel = BaseView.extend({
 	name : "EditMoodPannel",
-	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
+	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym', 'partial', 'presentation'],
 	templateSelector:"#editMoodTemplate",
 	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'this.options.gC','eval':['deviceCollection=this.options.deviceCollection'], 'createOnRender':true}],
 		events : {
