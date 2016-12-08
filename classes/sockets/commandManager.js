@@ -245,7 +245,7 @@ var CommandManager = BaseClass.extend({
 				}
 				groupConfig.set((++maxId)+"", group);
 				groupIds.push(maxId);
-				deviceManager.emit('deviceStateChanged');
+				deviceManager.emit('deviceStateChanged', macAdd);
 				groupConfig.save();
 				return callback(null, groupIds);
 			}
