@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
-		<title>Inoho</title>
+		<title><$=brand$></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="/static/<$=revId$>/fontawesome/css/font-awesome.min.css">
 	<style>
@@ -554,13 +554,19 @@
 
 	<body class='unselectable appColor_<$=appColor$> appTheme<$=appTheme$>' homeView='<$=homeView$>'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
-			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
+			<a href='' style='text-decoration:none;color:white;'><span><$=brand$><span></a>
 		</div>
 		<div class='' id='mainCont'>
 			<div class='headerCont' style='float: left;width:100%;padding-bottom:50px;'>
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin-bottom:18px;">
-						<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'><span style="color:gray;">ino</span><span class="theamTextColor logoDiv">ho</span></a>
+						<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'>
+							<$ if(typeof brand == 'undefined' || brand == 'inoho') { $>
+								<span style="color:gray;">ino</span><span class="theamTextColor logoDiv">ho</span>
+							<$ } else {$>
+								<span class="theamTextColor logoDiv"><$=brand$></span>
+							<$ }$>	
+						</a>
 						<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 							<i id='burgerImage' class='theamTextColor fa fa-bars'></i>
 						</div>
@@ -800,7 +806,7 @@
 	<script type="text/template" id="homeControllerDownTemplate">
 		<div>
 			<br/><br/>
-			<span>Oops! Inoho cloud server is unable to reach your home controller.</span><br/><br/>
+			<span>Oops! Cloud server is unable to reach your home controller.</span><br/><br/>
 			<span class='helpText'>This could be because of </span><br/>
 			<span class='helpText'>1) The home controller is not powered on.</span><br/>
 			<span class='helpText'>2) The home controller is not connected to the wifi router.</span><br/>
@@ -811,7 +817,7 @@
 		<div>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
-			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
+			<div class='helpText'>We creates a zigbee network for communication among all inoho devices. You must protect your network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
 			<br/>
 			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
@@ -832,19 +838,19 @@
 	</script>
 	<script type="text/template" id="welcomeScreenTemplate">
 		<div>
-			<div class="titleCont theamBGColor"><span style="text-align:left;">Welcome to Inoho!</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Welcome!</span></div>
 			<br/>
 			
 			<span class='helpText'>We will now take you through 3 step installation process.</span>
 			<br/><br/>
 			<span>Step 1 Network Configuration.</span><br/>
-			<span class='helpText'>inoho home controller comes with default network settings, we recommend that you configure network with your own password.</span>
+			<span class='helpText'>Home controller comes with default network settings, we recommend that you configure network with your own password.</span>
 			<br/><br/>
 			<span>Step 2 Cloud Configuration.</span><br/>
-			<span class='helpText'>In order to use inoho over the internet, you will have to create an account with inoho cloud services.</span>
+			<span class='helpText'>In order to use product over the internet, you will have to create an account with cloud services.</span>
 			<br/><br/>
 			<span>Step 3 Module Configuration.</span>
-			<br/><span class='helpText'>Each switch board module needs to be configured with inoho home controller.</span>
+			<br/><span class='helpText'>Each switch board module needs to be configured with home controller.</span>
 			<br/><br/><br/>
 			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
 
@@ -857,7 +863,7 @@
 			<br/><br/>
 			<div class="loader" style="text-align:center;"><i class="theamTextColor spinner fa fa-spinner fa-spin fa-5x"></i></div>
 			<div class="msgBox helpText" style="display:none;"></div>
-			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
+			<div class="updateNowMsg" style='display:none;'><span style='font-size:14px;'>Updates are available; they will require Home controller to reboot, which might take 2 to 5 minutes.<br/><br/></span><span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span></div>
 		</div>
 	</script>
 	<script type="text/template" id="cloudSettingTemplate">
@@ -865,7 +871,7 @@
 			<br/>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
-			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
+			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with our cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
 			<br/>
 			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail' onblur='this.value=this.value.toLowerCase()'></input>
