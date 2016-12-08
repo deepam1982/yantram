@@ -502,10 +502,16 @@ var CommandManager = BaseClass.extend({
 	    });
 	    var conf = {};
 	    __.each(__.groupBy(moodData.controls, function(ctl){ return ctl.devId;}), function (controls, devId) {
-	    	var state = {};
-	    	__.each(controls, function (ctl) {state[""+ctl.switchId]=(ctl.state=='on')?true:false}); //in case of dimmer state will be number fom 0 to 255
-	    	conf[devId]=state;
+	    	if(devId == "irBlasters") {
+	    		__.each(controls, function (ctl) {conf[""+ctl.switchId]=ctl.irCodes});
+	    	}
+	    	else {	
+		    	var state = {};
+		    	__.each(controls, function (ctl) {state[""+ctl.switchId]=(ctl.state=='on')?true:false}); //in case of dimmer state will be number fom 0 to 255
+	    		conf[devId]=state;
+	    	}
 	    });
+	    // console.log("mood conf to apply ", conf);
 	    deviceManager.applyConfig(conf);
 	},
 	groupOff : function (commandData) {

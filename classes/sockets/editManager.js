@@ -138,12 +138,14 @@ var EditManager = BaseClass.extend({
 		var invalidParams = false, controls=[], id=0;
 		var hashToAvoidDuplicate = {};
 		__.each(obj.controls, function (ctrl) {
-			if(!ctrl.devId || typeof ctrl.switchId == "undefined" || !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchId))
+			if(!ctrl.devId || typeof ctrl.switchId == "undefined" || ctrl.devId != "irBlasters" && !deviceInfoConfig.get(ctrl.devId) || deviceInfoConfig.get(ctrl.devId+".loads.normal") < parseInt(ctrl.switchId))
 				return invalidParams = true;
 			var uniqueKey = ctrl.devId+'-'+ctrl.switchId;
 			if(!__.has(hashToAvoidDuplicate, uniqueKey)) {
 				hashToAvoidDuplicate[uniqueKey] = true;
-				controls.push({"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state)?"on":"off"});
+				var pushObj = {"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state==true || ctrl.state=="on")?"on":"off"};
+				if(ctrl.devId == "irBlasters" && ctrl.irCodes) pushObj.irCodes = ctrl.irCodes;
+				controls.push(pushObj);
 			}
 		}, this);
 		if(invalidParams) return callback && callback({'success':false, 'msg':'invalid parameters1'});

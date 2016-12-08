@@ -1,8 +1,8 @@
 EditMoodPannel = BaseView.extend({
 	name : "EditMoodPannel",
-	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym'],
+	iconNameArray : ['morning', 'evening', 'welcome', 'leave', 'coffee', 'tea', 'meditate', 'ideate', 'wine', 'chat', 'romance', 'movie', 'gaming', 'meal', 'supper', 'sleepy', 'work', 'gym', 'partial', 'presentation'],
 	templateSelector:"#editMoodTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'this.options.gC','createOnRender':true}],
+	subViewArrays : [{'viewClassName':'DeviceGroupView', 'reference':'deviceGroupView', 'parentSelector':'.deviceGroupCont', 'array':'this.options.gC','eval':['deviceCollection=this.options.deviceCollection'], 'createOnRender':true}],
 		events : {
 		"tap .moodIcon" : 'changeMoodIcon'
 	},
@@ -29,7 +29,10 @@ EditMoodPannel = BaseView.extend({
 			_.each(grp.get('controls'), function (sw, key) {
 				if(sw.selected && !_.contains(arr, sw.devId+sw.switchID)) {
 					arr.push(sw.devId+sw.switchID);
-					controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
+					if(sw.devId == 'irBlasters')
+						controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":"off", "irCodes":sw.setOn});
+					else 
+						controls.push({"id":++id, "devId":sw.devId, "switchId":sw.switchID, "state":sw.setOn});
 				}
 			}, this);
 		}, this);
@@ -45,6 +48,7 @@ EditMoodPannel = BaseView.extend({
 		_.each((this.moodInfo)?this.moodInfo.controls:this.model.get('controls'), function (obj) {
 			if(!hash[obj.devId]) hash[obj.devId]={}; 
 			hash[obj.devId][obj.switchId]= (obj.state=='on'||obj.state==true)?true:false;
+			if(obj.devId == 'irBlasters')hash[obj.devId][obj.switchId] = obj.irCodes;
 		}, this);
 
 		this.options.gC.each(function (grp) {
@@ -53,7 +57,7 @@ EditMoodPannel = BaseView.extend({
 				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){
 					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID];
 				}
-				if(_.contains(['irRem', 'irBlstr', 'ipCam', 'curtain'], sw.type)) sw.hidden=true;
+				if(_.contains(['irRem', 'ipCam', 'curtain'], sw.type)) sw.hidden=true;
 			}, this);
 		}, this);
 

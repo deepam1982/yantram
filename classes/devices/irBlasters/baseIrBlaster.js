@@ -28,6 +28,12 @@ var BaseIrBlaster = BaseClass.extend({
 	},
 	_onMsgRecieved : function (type, msg, callback) {},
 	getConfig : function () {return {'reachable':this.reachable};},
+	applyConfig : function (codeArr) {
+		console.log("BaseIrBlaster", codeArr);
+		if(!codeArr || !codeArr.length) return;
+		var obj = codeArr.shift();
+		this.executeCode(obj.code, obj.remId, __.bind(this.applyConfig, this, codeArr));
+	},
 	getRemoteLircObj : function (lircfile, calBack) {
 		if (this.remoteLircObjs[lircfile]) return calBack && calBack(null,this.remoteLircObjs[lircfile]);
 		var thisObj = this;

@@ -43,6 +43,7 @@ module.exports = function(app) {
 			'periods':{'dLP':dLP, 'sHP':sHP, 'evP':evP},
 			'clusteringSupported':__systemConfig.get('clusteringSupported'), 
 			'revId':__systemConfig.get('revId')||'0000000',
+			'brand':__systemConfig.get('brand')||'inoho',
 			'cloudRequest':(req.headers.host.indexOf("cloud")==-1)?false:true,
 			'hcId':hcId, 
 			'ipMask':ipMask,

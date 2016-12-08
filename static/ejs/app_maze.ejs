@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 	<head>
-		<title>Inoho</title>
+		<title><$=brand$></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="/static/<$=revId$>/fontawesome/css/font-awesome.min.css">
 	<style>
@@ -277,6 +277,20 @@
 		  	-moz-border-radius: 3px;
     		-webkit-border-radius: 3px;
 		}
+		.codeProxy{
+			margin: 0 8px 5px 0;
+			white-space: nowrap;
+			float: left;
+			cursor: default;
+    		position: relative;
+		}
+		.codeProxy .cancle{
+			position:absolute;
+			top:-7px;right:-7px;
+			cursor:pointer;
+			font-size: 18px;
+			z-index: 5;
+		}
 		.errorMsgDiv{
 			display: none;
 			font-weight: 100;
@@ -339,6 +353,7 @@
 			font-size: 16px;
 			text-align: center;
 		}
+		.irCodeCountIndicator,
 		.followObjIndicator {
 			position: absolute;
 			height: 25px;
@@ -349,6 +364,11 @@
 			border-radius: 13px;
 			font-size: 18px;
 			text-align: center;
+		}
+		.irCodeCountIndicator {
+			right: -7px;
+			top: 0px;
+			left: inherit;
 		}
 
 		.powerOffIcon {
@@ -659,7 +679,7 @@
 
 	<body class='unselectable trapTheam theamTextColor appColor_<$=appColor$> appTheme<$=appTheme$>'  homeView='<$=homeView$>'>
 		<div class='theamBGColor' id='appLoadingVeil' style='width:100%; height:100%; position:absolute; z-index:105; text-align:center;font-size:100px;color:white;padding-top:250px;'>
-			<a href='' style='text-decoration:none;color:white;'><span>inoho<span></a>
+			<a href='' style='text-decoration:none;color:white;'><span><$=brand$><span></a>
 		</div>
 		<div id='bgImageContWrapper'><div id='bgImageCont'></div></div>
 		<div id='mainCont'>
@@ -668,7 +688,13 @@
 				<div id='header'>
 					<div style="font-weight:200;font-size:28px;margin:-43px 0 0 0;padding:0; width:100%;">
 						<div style='padding:0 20px;'>
-							<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'><span class="theamTextColor">ino</span><span class='brightColor'>ho</span></a>
+							<a href="about:blank" onClick="window.location.reload();return false;" style='text-decoration:none;'>
+								<$ if(typeof brand == 'undefined' || brand == 'inoho') { $>
+									<span class="theamTextColor">ino</span><span class='brightColor'>ho</span>
+								<$ } else {$>
+									<span class="brightColor"><$=brand$></span>
+								<$ }$>		
+							</a>
 							<div id='burgerImageCont' style='display:none;float:right; text-align:right; width:25px; margin:-2px -20px 0 0; padding:5px 20px; cursor:pointer;'>
 								<i id='burgerImage' class='theamTextColor fa fa-bars'></i>
 							</div>
@@ -687,6 +713,7 @@
 			<div id='moodWigitCont' class='moodWidgetArea theamBGColor footer' style='overflow-x: auto; text-align:center;'></div>
 			<div id='ipCamaraFeedViewerCont'></div>
 			<div id='remoteViewerCont'></div>
+			<div id='irCodeSelectorCont'></div>
 			<div id='remoteEditorCont'></div>			
 		</div>
 	</body>
@@ -776,6 +803,29 @@
 			<div style='clear:both'></div>
 			<class='iRrecorderCont'></div>
 			
+		</div>
+	</script>
+	<script type="text/template" id="irCodeSelector">
+		<div class='popupPannel whiteBG' style='padding:10px; display:none;'>
+			<div class='cross theamColor' style='top:-2px;right:0px;z-index:5;'>
+				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+				<br/>
+				<b>Done</b>
+			</div>
+			<div class='theamBorderColor whiteBG'>
+				<div class='meta' style='color:black; padding-left:60px;font-size:12px;'>
+					<span style='margin:5px 0 0 -60px;float:left;'>Codes:</span><div class='codeProxyCont' style='width:90%'></div>
+					<div style='clear:both'></div>
+					<br/>
+					<span style='margin:20px 0 0 -60px;float:left;'>Remotes:</span><div class='remIconCont'></div>
+					<div style='clear:both'></div>
+					<div style='text-align:center;font-size:11px;margin:10px 0 3px -60px;'>Select IR code</div>
+				</div>
+				<div class='remoteCont' style='padding:5px 0px;float:left;width:100%;'></div>
+				<div class='theamBGColor maskTransparent' style='opacity:0.3; filter:alpha(opacity=30);'></div>
+				<div style='clear:both'></div>
+			</div>
+			<div style='clear:both'></div>
 		</div>
 	</script>
 	<script type="text/template" id="ipCamaraFeedViewer">
@@ -896,7 +946,7 @@
 	<script type="text/template" id="homeControllerDownTemplate">
 		<div>
 			<br/><br/>
-			<span>Oops! Inoho cloud server is unable to reach your home controller.</span><br/><br/>
+			<span>Oops! Cloud server is unable to reach your home controller.</span><br/><br/>
 			<span class='helpText'>This could be because of </span><br/>
 			<span class='helpText'>1) The home controller is not powered on.</span><br/>
 			<span class='helpText'>2) The home controller is not connected to the wifi router.</span><br/>
@@ -907,7 +957,7 @@
 		<div>
 			<div class="titleCont theamBGColor"><span style="text-align:left;">Network Settings</span></div>
 			<br/>
-			<div class='helpText'>inoho creates a zigbee network for communication among all inoho devices. You must protect your inoho network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
+			<div class='helpText'>We creates a zigbee network for communication among all inoho devices. You must protect your network with your own password. If you ever wish to change network password, you must reconfigure all devices in inoho network.</div>
 			<br/>
 			<!-- <span style='margin-right:10px'>Enter network name</span>&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='nwkname'></input>
@@ -928,19 +978,19 @@
 	</script>
 	<script type="text/template" id="welcomeScreenTemplate">
 		<div>
-			<div class="titleCont theamBGColor"><span style="text-align:left;">Welcome to Inoho!</span></div>
+			<div class="titleCont theamBGColor"><span style="text-align:left;">Welcome!</span></div>
 			<br/>
 			
 			<span class='helpText'>We will now take you through 3 step installation process.</span>
 			<br/><br/>
 			<span>Step 1 Network Configuration.</span><br/>
-			<span class='helpText'>inoho home controller comes with default network settings, we recommend that you configure network with your own password.</span>
+			<span class='helpText'>Home controller comes with default network settings, we recommend that you configure network with your own password.</span>
 			<br/><br/>
 			<span>Step 2 Cloud Configuration.</span><br/>
-			<span class='helpText'>In order to use inoho over the internet, you will have to create an account with inoho cloud services.</span>
+			<span class='helpText'>In order to use Product over the internet, you will have to create an account with cloud services.</span>
 			<br/><br/>
 			<span>Step 3 Module Configuration.</span>
-			<br/><span class='helpText'>Each switch board module needs to be configured with inoho home controller.</span>
+			<br/><span class='helpText'>Each switch board module needs to be configured with home controller.</span>
 			<br/><br/><br/>
 			<span class='button theamBorderColor theamTextColor' id='startConfigurationButton'>Start Configuration</span>
 
@@ -953,7 +1003,7 @@
 			<div class="loader" style="text-align:center;"><i class="brightColor spinner fa fa-spinner fa-spin fa-5x"></i></div>
 			<div class="msgBox helpText" style="display:none;"></div>
 			<div class="updateNowMsg" style='display:none; padding:15px;'>
-				<span style='font-size:14px;'>Updates are available; they will require Inoho to reboot, which might take 2 to 5 minutes.</span>
+				<span style='font-size:14px;'>Updates are available; they will require home controller to reboot, which might take 2 to 5 minutes.</span>
 				<br/><br/>
 				<span style='float:right' class="updateNow button theamBorderColor theamTextColor">Update Now</span>
 				</div>
@@ -967,7 +1017,7 @@
 			<div class="titleCont brightColor"><span style="text-align:left;">Cloud Settings</span></div>
 			<br/>
 			<div class='paddingDiv'>
-			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with inoho cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
+			<div class='helpText'>While you are away from home, you can access your home controller over the internet. Fill the following details to create an account with our cloud services. You will have to use the same email id and password to access your home controller over the internet through http://cloud.inoho.com.</div>		
 			<br/>
 			<span style='margin-right:10px'>Enter email id</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input style='margin:10px 0px 10px 0px; width:180px;' type='text' class='cloudEmail'></input>
@@ -1098,11 +1148,14 @@
 			<div class="translucentBg50">
 			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
 				<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
-					<div class='iconPartition' style='width:65px;float:left;text-align:center; margin:10px 5px 0px 1px;'>
+					<div class='iconPartition' style='width:65px;float:left;text-align:center; margin:10px 5px 0px 1px; position:relative;'>
 						<div style='width:65px;height:45px;position:relative;'>
 							<img style="width:45px;height:45px;cursor:pointer;margin:-1px 0 0 -1px;" src='static/<$=revId$>/images/<%print((ctl.state=="on")?"on":"off")%>/<$=appColor$>/<%=ctl.icon%>.png' />
 							<div class='toggelSwitch' style='width:65px;height:75px;position:absolute;top:0px;left:0px;z-index:5;background-color:white;opacity: 0.0;filter: alpha(opacity=00);'></div>
-						</div>	
+						</div>
+						<% if(ctl.irCodes) {%>
+							<div class='irCodeCountIndicator theamBGColor'><i class='fa fa-paperclip hInvert' style='position:absolute;left:-7px;bottom:-7px;'></i><span style='color:white;'><%=ctl.irCodes.length%></span></div>
+						<%}%>
 						<span class='toggelSwitch font12 <%print((ctl.state=="on")?"brightColor":"theamTextColor")%>' style='white-space:nowrap;line-height:2;'>
 							<span class='font10' style='text-transform: uppercase;'><%=ctl.name%></span>
 							<div class='font8' style='margin-top:-3px;'>(<%=group.name%>)</div>
@@ -1622,9 +1675,13 @@
 	</script>
 	<script type="text/template" id="switchProxyTemplate">
 		<div class='iconPartition' style='width:45px;float:left;text-align:center;position:relative;'>
-			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected)?"":"display:none;"); print((typeof task != "undefined" && task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
+			<div class='tick theamBGColor' style='<% print((typeof selected != "undefined" && selected && typeof setOn != "object")?"":"display:none;"); print((typeof task != "undefined" && task == "moodSelection" && typeof setOn != "undefined" && !setOn)?"background-color:black":"")%>' ></div>
 			<% if(typeof task != "undefined" && task == "moodSelection" && selected){%>
+				<% if(typeof setOn == "object" && setOn.length){%>
+					<div class='irCodeCountIndicator theamBGColor'><i class='fa fa-paperclip hInvert' style='position:absolute;left:-7px;bottom:-7px;'></i><span style='color:white;'><%=setOn.length%></span></div>
+				<%} else {%>
 				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
+				<%}%>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
 				<img class='toggelSwitch' style="width:45px;height:45px;cursor:pointer;" src="static/<$=revId$>/images/transparent/<%=icon%>.png" />

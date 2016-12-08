@@ -60,6 +60,7 @@ SwitchProxy = BaseView.extend({
  	},
  	onToggelSwitch : function (event) {
  		if(this.model.task == 'moodSelection') {
+ 			if(this.model.type == 'irBlstr') return this.showIrCodeSelector();
 	 		if(!this.model.selected) {
 		 		this.model.selected = !this.model.selected;
  				this.model.setOn = true;
@@ -68,6 +69,14 @@ SwitchProxy = BaseView.extend({
  			else this.model.selected = !this.model.selected;
  		}else this.model.selected = !this.model.selected;
  		this.repaint();
+ 	},
+ 	showIrCodeSelector : function () {
+ 		var remotes = this.options.deviceCollection.get('irRemotes').get('loadInfo');
+ 		irCodeSelector.showPopUp(remotes, this.model.setOn || [], _.bind(function(codeArr){
+ 			this.model.selected = (codeArr && codeArr.length)?true:false;
+ 			this.model.setOn = codeArr;
+ 			this.repaint();
+ 		}, this));
  	},
 	_getJsonToRenderTemplate : function () {
 		return JSON.parse(JSON.stringify(this.model));
@@ -84,7 +93,7 @@ DeviceGroupSwitchProxy = SwitchProxy.extend({
 DeviceGroupView = BaseView.extend({
 	name : "DeviceGroupView",
 	templateSelector:"#deviceGroupTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")'}]
+	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")', 'eval':['deviceCollection=this.options.deviceCollection'],}]
 	//TODO arr should be collection and not simple array.
 
 });

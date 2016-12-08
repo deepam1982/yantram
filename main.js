@@ -260,9 +260,9 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                   return fs.statSync(path.join(srcpath, file)).isDirectory();
                 });
               }
-              var directories = getDirectories(__rootPath + '/whiteLabeledApps');
+              var directories = getDirectories(__rootPath + '/../whiteLabeledApps');
               __.each(directories, function(directory) {
-                var thirdPartyMain = require(__rootPath + '/whiteLabeledApps/' + directory + "/main");  
+                var thirdPartyMain = require(__rootPath + '/../whiteLabeledApps/' + directory + "/main");  
                 thirdPartyMain(app);
               });
             }
