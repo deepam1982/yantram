@@ -45,7 +45,7 @@ MoodView = BaseView.extend(Popup).extend({
 		moodJson.groups = [];
 		var groups = _.groupBy(moodJson.controls, function (ctl) {
 			var info = this.options.deviceCollection.get(ctl.devId).get('loadInfo')[ctl.switchId];
-			ctl.name = info.name; ctl.icon=info.icon; ctl.type = info.type;
+			if(info){ctl.name = info.name; ctl.icon=info.icon; ctl.type = info.type;}
 			return (ctl.groupInfo)?ctl.groupInfo.id:9999;
 		}, this);
 		_.each(groups, function (ctls, gpId){

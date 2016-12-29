@@ -63,7 +63,8 @@ IrButtonRecorder = BasicDialog.extend({
 		this.$el.find('#playCaptured').hide();
 	},
 	_stopIrCapture : function () {
-		this.options.socket.emit('runIrProcess', {process:"stopReciever"});
+		console.log("_stopIrCapture called send emit runIrProcess stopReciever")
+		this.options.socket.emit('runIrProcess', {devId:this.blstrId, process:"stopReciever"});
 		this.$el.find('#saveCaptured').hide();
 		this.$el.find('#stopIrCapture').hide();
 		this.$el.find('#startIrCapture').show();

@@ -112,8 +112,10 @@ var CommandManager = BaseClass.extend({
 			case "startReciever" :  device.startIrReciever(function(err, json){
 										if(err) return console.log(err);
 										socket.emit('irCaptureSuccess', json);
-									}); break;
-			case "stopReciever" : 	device.stopIrReciever(); break;
+									}); 
+									callback && callback();
+									break;
+			case "stopReciever" : 	device.stopIrReciever(); callback && callback();break;
 			case "playRawCode"	: 	device.sendRawCode(commandData.raw, commandData.khz, callback);break;
 		}
 		
