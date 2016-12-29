@@ -20,22 +20,27 @@ var Zmote01 = BaseIrBlaster.extend({
 	_onIrCapture : function (data) {
 	},
 	sendCommand : function (data, callback) {
+		if(this.request) this.request.abort();
 		var ip = this.router.getNetworkAdd(this.id);
 		var url = 'http://'+ip+'/v2/'+this.uuid;
-		request({
+		this.request = request({
 			url:url,
 			method: 'POST', 
 			headers: {'Content-Type':'text/plain', 
 				'Content-Length': Buffer.byteLength(data)
 			}
 		}, callback).write(data);
+		console.log("curl "+url+" -X POST -H 'Content-Type: text/plain' -d '"+data+"'");
 	},
 	startIrReciever : function (callback) {
+		console.log("started IR Reciever");
 		this.sendCommand('get_IRL', __.bind(function(e,r,b){
 			clearTimeout(this.waitForIrRecieveTimer);
 			this.waitForIrRecieveTimer=null;
 			if(e) console.log(e);
-			else if(!e && r.statusCode == 200 && b.indexOf('sendir') != -1) { //sendir,1:1,0,38400,1,1,154,151,21,....
+			else {
+			console.log(b);	
+			if(!e && r.statusCode == 200 && b.indexOf('sendir') != -1) { //sendir,1:1,0,38400,1,1,154,151,21,....
 				var arr=b.trim().substr(b.indexOf('sendir')).split(',');
 				var freq = parseInt(arr[3]), rawArr = [];
 				for(var i=6; i< arr.length;i++){
@@ -44,11 +49,12 @@ var Zmote01 = BaseIrBlaster.extend({
 				var rawCode = rawArr.join(',');
 				analyse(rawCode, function(err, jsonData){
 					if(err) return callback(err);
-					callback && callback(null, {'encoding':jsonData.spec.protocol, 'raw':rawCode, 'length':rawArr.length, 'khz':parseInt(freq/1000)});
+					//console.log(jsonData, rawCode);
+					callback && callback(null, {'encoding':(jsonData.spec)?jsonData.spec.protocol:"Unknown", 'raw':rawCode, 'length':rawArr.length, 'khz':parseInt(freq/1000)});
 
 				});
 				return;
-			}
+			}}
 			callback && callback(e||"error");
 			
 		}, this));
