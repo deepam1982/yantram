@@ -93,7 +93,7 @@ DeviceGroupSwitchProxy = SwitchProxy.extend({
 DeviceGroupView = BaseView.extend({
 	name : "DeviceGroupView",
 	templateSelector:"#deviceGroupTemplate",
-	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")', 'eval':['deviceCollection=this.options.deviceCollection'],}]
+	subViewArrays : [{'viewClassName':'DeviceGroupSwitchProxy', 'reference':'switchViewArray', 'parentSelector':'.switchProxyCont', 'array':'this.model.get("loadInfo")||this.model.get("controls")', 'eval':['deviceCollection=this.options.deviceCollection'], 'createOnRender':true}]
 	//TODO arr should be collection and not simple array.
 
 });

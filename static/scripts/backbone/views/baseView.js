@@ -214,9 +214,9 @@ var BaseView = Backbone.View.extend({
             if(!params) return;
             var events = params.events,viewObj=this[params.reference];
             if (events) for(var eventName in events){viewObj.off(eventName, this[events[eventName]], this)}
-            viewObj.rendered && viewObj.erase();
+            viewObj && viewObj.rendered && viewObj.erase();
             if(params.recreateOnRepaint) {
-                viewObj.removeView();
+                viewObj && viewObj.removeView();
                 this[params.reference] = null;
             }
         }, this);

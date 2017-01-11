@@ -5,8 +5,9 @@ module.exports ={
 		this._setCurtainState();
 		this._super(msg);
 		var changedIndexes = []
+		var fstCrtnSwIndx = this.numberOfSwitches - 2*this.numberOfCurtainControls;
 		__.times(this.numberOfCurtainControls, function(indx){
-			if(oldSt[indx] != this.curtainControlState[indx]) changedIndexes.push(indx);
+			if(oldSt[indx] != this.curtainControlState[indx]) changedIndexes.push(fstCrtnSwIndx + indx);
 		}, this);
 		if (changedIndexes.length) this.emit('stateChanged', 'curtain', changedIndexes);
 	},
