@@ -201,7 +201,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType, switchIds) {
               if(nodeType != 'sensor') {
                 console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
-                if(!devId) return;
+                if(!devId && !nodeType) return; //in case of groupModified need to publish status of all the groups
                 var groupIds = groupConfig.getGroupsHavingDevice(devId, switchIds);
                 console.log(groupIds);
                 groupConfig.publishGroupConfig(groupIds);

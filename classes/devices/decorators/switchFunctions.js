@@ -7,10 +7,12 @@ module.exports ={
 		this._super(msg);
 		var changebits = oldSwSt ^ this._binStateToInt(this.switchState)
 		var changeSwitchIndexes = []
+		var fstCrtnSwIndx = this.numberOfSwitches - 2*this.numberOfCurtainControls;
 		__.times(this.numberOfSwitches, function(indx){
-			if((changebits>>indx) % 2) changeSwitchIndexes.push(this.numberOfSwitches-1-indx);
+			var chSwindex = this.numberOfSwitches-1-indx;
+			if((changebits>>indx) % 2 && chSwindex < fstCrtnSwIndx) changeSwitchIndexes.push(chSwindex);
 		}, this);
-		if (changebits) this.emit('stateChanged', 'load', changeSwitchIndexes);
+		if (changeSwitchIndexes.length) this.emit('stateChanged', 'load', changeSwitchIndexes);
 	},
 	_setSwitchState : function (msg) {
 		var swst = this._hexCharToInt(msg[0])*0x10 + this._hexCharToInt(msg[1]);

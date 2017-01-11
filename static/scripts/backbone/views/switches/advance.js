@@ -82,8 +82,8 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		if(!this.$curtainControls)
  		this.$curtainControls = $(
  			"<div class='unselectable' style='text-align:center; width:200px; margin:auto;'>\
- 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"whiteBG")+"' style='float:left; padding:15px; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
- 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"whiteBG")+"' style='float:right; padding:15px; margin:0 40px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
+ 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"")+"' style='float:left; padding:15px; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
+ 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"")+"' style='float:right; padding:15px; margin:0 40px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
  				<div style='clear:both'></div>\
  			</div>"
  		)//don't convert background-image div to img-tag, as on phones it dosn't trigger touchend after longtab.
@@ -121,8 +121,10 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 	closeCurtain : function (event) {
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("closeCurtain");
-		this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
-		this.$el.find('.openCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		// this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		// this.$el.find('.openCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		this.$el.find('.closeCurtain').addClass('theamBGColor');
+		this.$el.find('.openCurtain').removeClass('theamBGColor');		
 		this.model.moveCurtain("close");
 		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 1000);
 		clearTimeout(this.openCurtainTimer);this.openCurtainTimer = null;
@@ -130,8 +132,10 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 	openCurtain : function (event) {
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("openCurtain");
-		this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
-		this.$el.find('.closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		// this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
+		// this.$el.find('.closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		this.$el.find('.openCurtain').addClass('theamBGColor');
+		this.$el.find('.closeCurtain').removeClass('theamBGColor');
 		this.model.moveCurtain("open");
 		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 1000);
 		clearTimeout(this.closeCurtainTimer);this.closeCurtainTimer = null;
@@ -142,7 +146,8 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 		clearTimeout(this.openCurtainTimer);
 		clearTimeout(this.closeCurtainTimer);
 		this.openCurtainTimer = this.closeCurtainTimer = null;
-		this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		// this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
+		this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor');
 	}
 })
 

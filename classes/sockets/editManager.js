@@ -221,7 +221,7 @@ var EditManager = BaseClass.extend({
 				if (indx+1 < rank) return data.rank = indx+1;
 				return data.rank = indx+2;
 			});
-			if(rankModified || !controls.length) deviceManager.emit('deviceStateChanged');
+			if(rankModified || !controls.length) deviceManager.emit('deviceStateChanged', null, null, 'groupModified');
 			else deviceManager.emit('deviceStateChanged', controls[0].devId, null, 'groupModified');
 			if(!controls.length) groupConfig.emit('groupDeleted', obj.id);
 			groupConfig.save(function (err) {if(err) console.log(err);});
