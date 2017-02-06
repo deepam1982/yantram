@@ -29,7 +29,7 @@ var Zmote01 = BaseIrBlaster.extend({
 			headers: {'Content-Type':'text/plain', 
 				'Content-Length': Buffer.byteLength(data)
 			}
-		}, callback).write(data);
+		}, function(e,r,b) {console.log("### got response from zmote ###");callback && callback(e,r,b);}).write(data);
 		console.log("curl "+url+" -X POST -H 'Content-Type: text/plain' -d '"+data+"'");
 	},
 	startIrReciever : function (callback) {

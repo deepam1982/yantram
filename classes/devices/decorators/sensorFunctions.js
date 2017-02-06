@@ -6,12 +6,13 @@ module.exports ={
 		if(!this.senToglCnt) this.senToglCnt = [8,8];
 		var oldSnSt = this.sensorState.slice(0); //make a clone
 		this._setSensorState(__.bind(this._getSensorStateMsg, this)(msg));
-		var sensorStateChanged = false;
+		var sensorStateChanged = false, changedIndx = [];
 		for (var i=0; i<this.numberOfSensors; i++) {
 			if(oldSnSt[i] != this.sensorState[i]){
 				if(this.sensorState)
 					this.sensorLastOnTime[i] = (new Date()).getTime();
 				sensorStateChanged = true;
+				changedIndx.push(i);
 				if(this.senToglCnt[i]) --this.senToglCnt[i];
 				else __remoteDevInfoConf.setSensorActive(this.id, i);
 			}
@@ -19,7 +20,7 @@ module.exports ={
 //		var sensorStateChanged = (oldSnSt[0] != this.sensorState[0] || oldSnSt[1] != this.sensorState[1]);
 //		if(sensorStateChanged) this.avoidLogDVST = true;
 		this._super(msg);
-		if(sensorStateChanged) this.emit('stateChanged', 'sensor');
+		if(sensorStateChanged) this.emit('stateChanged', 'sensor', changedIndx);
 //		this.avoidLogDVST = false;
 	},
 	_logDVST : function (msg) {

@@ -199,6 +199,15 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             sm.initCloudSocket();
 
             deviceManager.on('deviceStateChanged', function (devId, devConf, nodeType, switchIds) {
+              if(nodeType == 'sensor') {
+                //  console.log('########## deviceStateChanged ', devId, nodeType, switchIds, devConf, devConf[devId].sensor['1']);
+                  __.each(switchIds, function(swId) {
+                    var senInfo = __remoteDevInfoConf.getSensorInfo(devId, swId);
+                    eventLogger.addEvent("sensorStateChanged", {  
+                      'boardId':devId, 'id':senInfo.id, name:senInfo.name, state:devConf[devId].sensor[swId].state
+                    });  
+                  });
+              }
               if(nodeType != 'sensor') {
                 console.log('########## deviceStateChanged ', devId, nodeType, switchIds);
                 if(!devId && !nodeType) return; //in case of groupModified need to publish status of all the groups
