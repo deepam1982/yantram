@@ -321,7 +321,13 @@ EditIrBlstrParams = EditIpCamParams.extend({
 		var retObj = EditIpCamParams.prototype.render.apply(this, arguments);
 		_.each(this.model.get("remotes"), function (idx) {
 			idx = parseInt(idx);
-			this.iconViewArray[idx-1].selectSwitch();
+			for (var i=0; i < this.iconViewArray.length; i++) {
+				var mdl = this.iconViewArray[i].model;
+				if(mdl.id == idx) {
+					this.iconViewArray[i].selectSwitch();
+					break;
+				}
+			}
 		}, this);
 		return retObj
 	},

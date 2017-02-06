@@ -56,6 +56,11 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 		}, this);
 		return retData;
 	},
+	getSensorInfo : function(deviceId, senId) {
+		var nrmlCnt = parseInt(this.get(deviceId+'.loads.normal')), crtnCnt = parseInt(this.get(deviceId+'.loads.curtain'))||0;
+		var loadId = nrmlCnt + crtnCnt + parseInt(senId);
+		return this.getLoadInfo(deviceId, loadId);
+	},
 	getLoadInfo : function (deviceId, loadId) {
 		var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 		var ctl = {'switchID':parseInt(loadId)};
