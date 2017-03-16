@@ -25,12 +25,16 @@ var MoodConfigManager = BasicConfigManager.extend({
 		return mood;
 	},
 	getList : function () {
-		var data = [];
-		var count = __.keys(this.data).length;
-		__.each(this.toJSON(), function (conf, id) {
-			data.push(this.getMoodDetails(id));
-		}, this);
-		return data;
+		var maxUpdateTs = Math.max(this.updateTs, groupConfig.updateTs)
+		if(!this.moodListData || this.moodDataTs < maxUpdateTs) {
+			this.moodDataTs = maxUpdateTs;
+			this.moodListData = [];
+			var count = __.keys(this.data).length;
+			__.each(this.toJSON(), function (conf, id) {
+				this.moodListData.push(this.getMoodDetails(id));
+			}, this);
+		}
+		return this.moodListData;
 	},
 	getSingleGroupMoods : function () {
 		if(this._singleGroupMoods) return this._singleGroupMoods;

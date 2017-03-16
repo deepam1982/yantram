@@ -126,7 +126,7 @@ SelectSwitchIcon = BaseView.extend({
 
 EditSwitchParams = BaseView.extend({
 	templateSelector:"#editSwitchTemplate",
-	iconList : ['switch', 'bulb', 'cfl', 'cfl1', 'tubelight', 'chandelier', 'ceiling', 'ceiling1', 'fan', 'fan1', 'plug', 'plug1', 'lamp', 'lamp1', 'mosquito coil', 'iron', 'geyser', 'tv', 'tv1', 'ac', 'ac1', 'heater', 'air cooler', 'washing machine', 'water purifier'],
+	iconList : ['switch', 'bulb', 'cfl', 'cfl1', 'tubelight', 'chandelier', 'ceiling', 'ceiling1', 'fan', 'fan1', 'plug', 'plug1', 'lamp', 'lamp1', 'mosquito coil', 'iron', 'geyser', 'tv', 'tv1', 'ac', 'ac1', 'heater', 'air cooler', 'washing machine', 'water purifier', 'curtain'],
 	subViews : [{'viewClassName':'EditSensorRulePannel', 'reference':'sensorRuleDialog', 'parentSelector':'.sensorRuleEditorCont', 'model':'this.model', 'eval':['deviceCollection=this.options.deviceCollection'], 'supressRender':true},
 				{'viewClassName':'ScheduleEditor', 'reference':'schEditor', 'parentSelector':'#scheduleEditor', 'model':'this.model', 'events' : {
 		'change':'doneEditSchedule',

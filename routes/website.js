@@ -48,7 +48,8 @@ module.exports = function(app) {
 			'hcId':hcId, 
 			'ipMask':ipMask,
 			'ipOctate':__systemConfig.get('ipOctate')||'123',
-			'clusterIpArr':clusterIpArr
+			'clusterIpArr':clusterIpArr,
+			'debug':(__.has(req.query, 'debug'))?true:false
 		});
 		// try {res.sendFile(appFile);}
 		// catch(err) {res.sendfile(appFile);}

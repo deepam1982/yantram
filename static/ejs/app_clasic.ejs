@@ -255,6 +255,10 @@
 			position:absolute;right:2px;top:2px;font-size:40px;
 		}
 
+		.curtainControlPopup {
+			text-align:center; width:200px; margin:auto;
+		}
+
 		#experiment, #experiment1{
 			margin-left: 20px;
 			font-size: 15px;
@@ -494,7 +498,8 @@
 		    cursor:pointer;
 		}
 		
-		input[type="range"].pirRange::-webkit-slider-thumb {
+		input[type="range"].pirRange::-webkit-slider-thumb,
+		input[type="range"].rangeSelector::-webkit-slider-thumb {
 			height: 30px;
 			top:2px;
 		}
@@ -584,21 +589,28 @@
 			<div id='ipCamaraFeedViewerCont'></div>
 			<div id='remoteViewerCont'></div>
 			<div id='irCodeSelectorCont'></div>
+			<div id='rangeSelectorCont'></div>
 			<div id='remoteEditorCont'></div>
 		</div>		
 	</body>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/iefix.js"></script>
-<!--	
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/zepto.js"></script>
--->
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/jquery/jquery.1.9.0.min.js"></script>
-	<script>Zepto=$</script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/touch.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/underscore.1.7.0.min.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/backbone.1.0.0.js"></script>
-	<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class-->
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/baseModel.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/roomModel.js"></script>
+	<script> var isCloudRequest=<$=cloudRequest$>; </script>
+	<script type="text/javascript" src="/static/<$=revId$>/scripts/rawAjaxGet.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<!-- <script type="text/javascript" src="/static/<$=revId$>/scripts/socket.io/socket.io.js"></script> -->
+	<$ if(debug) { $>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/iefix.js"></script>
+		<!-- // <script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/zepto.js"></script>	 -->
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/jquery/jquery.1.9.0.min.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/zeptoDolar.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/zepto/touch.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/underscore.1.7.0.min.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/backbone.1.0.0.js"></script>
+		<!-- backbone.1.0.0.min.js fails to work when we use this.options in view class -->
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/baseModel.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/models/roomModel.js"></script>
+	<$ } else { $>	
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/headerScript.js"></script>
+	<$ } $>	
 	<script type="text/template" id="sideMenuTemplate">
 		<div id='menuCont' class='menuArea theamBGColor'>
 			<i class='fa fa-arrow-right hideMe' style='position:absolute;top:22px;right:22px;font-size:20px;cursor:pointer;padding:10px'></i>
@@ -706,6 +718,19 @@
 				<div class='camFeedCont' style='min-height:300px;'>
 				</div>
 				<dic class='camGroupCont'></div>
+			</div>
+			<div style='clear:both'></div>
+		</div>
+	</script>
+	<script type="text/template" id="editRangeTemplate">
+		<div class='popupPannel whiteBG' style='padding:10px; display:none; height:30px;'>
+			<div class='cross' style='top:-2px;right:0px;'>
+				<i class='fa fa-thumbs-o-up' style='font-size:20px;'></i>
+				<br/>
+				<b>Done</b>
+			</div>
+			<div class='theamBorderColor'>
+				<input type="range" class="rangeSelector" min="20" max="100" value="40" showemptylabels="false" style="width: 90%; display: inline-block;float: left;margin-top:12px;"/>
 			</div>
 			<div style='clear:both'></div>
 		</div>
@@ -1000,7 +1025,7 @@
 			<% for (var i=0; i<groups.length; i++) { var group=groups[i]; %>
 					<% for (var j=0; j<group.controls.length; j++) {var ctl = group.controls[j] %>
 						<div class='iconPartition' type='<%=ctl.type%>' devId='<%=ctl.devId%>' switchId='<%=ctl.switchId%>' style='margin:5px 0px;width:65px;float:left;text-align:center; position:relative;'>
-							<div style='width:64px;height:64px;position:relative;' class='<%print((ctl.state=="on")?"theamBGColor":"whiteBG")%>'>
+							<div style='width:64px;height:64px;position:relative;' class='<%print((ctl.state=="on" || parseInt(ctl.state))?"theamBGColor":"whiteBG")%>'>
 								<img style="width:65px;height:65px;cursor:pointer;margin-top:-1px;" src='static/<$=revId$>/images/transparent/<%=ctl.icon%>.png' />
 							</div>
 							<% if(ctl.irCodes) {%>
@@ -1499,7 +1524,10 @@
 				<% if(typeof setOn == "object" && setOn.length){%>
 					<div class='irCodeCountIndicator theamBGColor'><i class='fa fa-paperclip hInvert' style='position:absolute;left:-7px;bottom:-7px;'></i><span style='color:white;'><%=setOn.length%></span></div>
 				<%} else {%>
-				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% print((typeof setOn != "undefined" && setOn)?'ON':'OFF')%></span>
+				<span class='tickLable theamTextColor font10' style='<% print((typeof setOn != "undefined" && !setOn)?"color:black":"")%>'><% 
+						if(type == 'curtain') print((typeof setOn != "undefined" && setOn)?'OPEN':'CLOSE')
+						else print((typeof setOn != "undefined" && setOn)?(parseInt(setOn)?setOn+'%':'ON'):'OFF')
+				%></span>
 				<%}%>
 			<%}%>
 			<div class='toggelSwitchBackgroundDiv' style="width:45px;height:60px;line-height:0.9;">
@@ -1547,39 +1575,42 @@
 	<script>
 		revId = "<$=revId$>";
 		hcId = "<$=hcId$>";
+		appColor = "<$=appColor$>";
 		var localIpArr =[];
 		<$ for(var i=0; i<clusterIpArr.length; i++) { $>localIpArr.push('<$=clusterIpArr[i]$>');<$}$>
 	</script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/jsxcompressor.min.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/baseView.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/utility/dialog.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/basic.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/remote.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/advance.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/edit.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/group/view1.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodStrip.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/editMood.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodView.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/deviceSettings.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/irSetting.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureClusterView.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureNewModule.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureIpCamara.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/md5.min.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/update.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/welcomeScreen.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/networkSetting.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/cloudSetting.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/theamSetting.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/sideMenuView.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/readFile.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/commandPoster.js"></script>
-	<!-- <script type="text/javascript" src="/static/<$=revId$>/scripts/socket.io/socket.io.js"></script> -->
-	<script src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="/static/<$=revId$>/scripts/app.js"></script>
-	
+	<$ if(debug) { $>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/jsxcompressor.min.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/baseView.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/utility/dialog.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/basic.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/remote.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/advance.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/switches/edit.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/group/view1.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodStrip.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/editMood.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/moods/moodView.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/mainPage.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editPage.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/deviceSettings.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/irSetting.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/editMoodPage.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureClusterView.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureNewModule.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/configureIpCamara.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/md5.min.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/update.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/welcomeScreen.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/networkSetting.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/cloudSetting.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/theamSetting.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/sideMenuView.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/readFile.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/backbone/views/pages/commandPoster.js"></script>
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/app.js"></script>
+	<$ } else { $>	
+		<script type="text/javascript" src="/static/<$=revId$>/scripts/footerScript.js"></script>
+	<$ } $>	
+		
 <HTML>	

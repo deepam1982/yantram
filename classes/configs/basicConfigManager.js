@@ -5,6 +5,7 @@ var BasicConfigManager = BaseClass.extend({
 	file : "",//extender of the calss will provide a valid path
 	init : function (obj) {this.load((obj||{}).callback);},
 	load : function (calback) {
+		this.updateTs = new Date;
 		this.readfile(__rootPath+this.file, __.bind(function (err, data) { 
 			if(err && (err+" ").indexOf("SyntaxError") != -1) {
 				var splitPath = (__rootPath+this.file).split("/");
@@ -33,6 +34,7 @@ var BasicConfigManager = BaseClass.extend({
 				if(err) console.log("######## Error:", err);
 			})
 		}, this));
+		this.updateTs = new Date; // dont wait for file write must update as soon as the data is modified
 	}, 
 	has : function (path) {
 		path = path.split('.');

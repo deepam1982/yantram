@@ -115,6 +115,7 @@ hashChanged = function (hash) {
 	switch(window.location.hash) {
 		case '#updatenow'				: 	ioSockets[primeIndx].emit('updateNow');removeHash=true;break;
 		case '#restorenetwork'			: 	ioSockets[primeIndx].emit('restoreNetwork');removeHash=true;break;
+		case '#apprestart'				:
 		case '#restartinoho'			: 	ioSockets[primeIndx].emit('restartHomeController');removeHash=true;break;
 		case '#configurecloudtunnel'	: 	ioSockets[primeIndx].emit('configureCloudTunnel');removeHash=true;break;
 		case '#restartzigbee'			: 	ioSockets[primeIndx].emit('restartZigbee');removeHash=true;break;
@@ -269,11 +270,20 @@ _.each(localIpArr, function(ip, idx){
 	(gCs[idx] = new RoomCollection()).ioSocket=ioSockets[idx];
 	(dCs[idx] = new DeviceCollection()).ioSocket=ioSockets[idx];
 	(mCs[idx] = new MoodCollection()).ioSocket=ioSockets[idx];
+	if (idx) {
+		dCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+		mCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+		gCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
+	}
+	else { // idx = 0 mean local cluster 
+		onGroupDataReady = function() {var d=initGroupData; if(isCloudRequest) d=JXG.decompress(d);	gCs[idx].add(JSON.parse(d)); fetchComplete();}
+		onDeviceDataReady = function() {var d=initDeviceData; if(isCloudRequest) d=JXG.decompress(d); dCs[idx].add(JSON.parse(d)); fetchComplete();}
+		onMoodDataReady = function() {var d=initMoodData; if(isCloudRequest) d=JXG.decompress(d); mCs[idx].add(JSON.parse(d)); fetchComplete();}
 
-	dCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
-	mCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
-	gCs[idx].fetch({update:true, remove: false, useSocket:useSockets, success:fetchComplete, socket:ioSockets[idx]});
-
+		if(typeof initGroupData != "undefined") onGroupDataReady();
+		if(typeof initDeviceData != "undefined") onDeviceDataReady();
+		if(typeof initMoodData != "undefined") onMoodDataReady();
+	}
 })
 
 

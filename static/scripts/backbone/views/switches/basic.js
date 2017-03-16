@@ -19,7 +19,8 @@ Popup = {
 	events: {
 		"tap .popupPannel .cross" : "hidePopUp"
 	},
-	showPopUp : function () {
+	showPopUp : function (calbackOnHide) {
+		this.calbackOnHide = calbackOnHide;
 		this.bd = new Backdrop({'$parent':$('#mainCont')});
 		this.bd.render();
 		if(!this.avoidCloneOnPullup) 
@@ -41,9 +42,27 @@ Popup = {
 		this.bd = null;
 		var $last = $(_.last(this.$el.find('.popupPannel'))).hide();
 		$last.css('position', 'inherit').css('top', '').css('left', '');
-	}
+		(typeof this.calbackOnHide == 'function') && this.calbackOnHide(this.findValueOnHide());
+	},
+	findValueOnHide : function() {return null;}
 
 }
+
+RangeSelector1 = BaseView.extend(Popup).extend({
+	name : "RangeSelector",
+	templateSelector:"#editRangeTemplate",
+	keepPopupFixed : true,
+	avoidCloneOnPullup : false,
+	events: {
+		"tap .popupPannel > .cross" : "hidePopUp"
+	},
+	findValueOnHide : function() {return this.$el.find('.rangeSelector').val();},
+	setValue : function(num) {this.$el.find('.rangeSelector').val(num);}
+});
+
+var rangeSelector1 = new RangeSelector1({'el':$("#rangeSelectorCont")});
+rangeSelector1.render();	
+
 
 IpCamaraFeedViewer = BaseView.extend(Popup).extend({
 	templateSelector:"#ipCamaraFeedViewer",

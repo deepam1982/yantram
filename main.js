@@ -150,6 +150,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             }
 
             app.set('view engine', 'ejs');
+            app.set('view cache', true);
             app.use(function(req, res, next) {
               req.url =  req.url.replace(/^\/static\/[0-9a-f]{7}(.*)/, "/static$1");
               next();

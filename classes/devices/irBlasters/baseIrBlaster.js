@@ -32,7 +32,7 @@ var BaseIrBlaster = BaseClass.extend({
 		console.log("BaseIrBlaster", codeArr);
 		if(!codeArr || !codeArr.length) return;
 		var obj = codeArr.shift();
-		this.executeCode(obj.code, obj.remId, __.bind(this.applyConfig, this, codeArr));
+		this.executeCode(obj.code, obj.remId, __.bind(function(codeArr){setTimeout(__.bind(this.applyConfig, this, codeArr), 500)}, this, codeArr));
 	},
 	getRemoteLircObj : function (lircfile, calBack) {
 		if (this.remoteLircObjs[lircfile]) return calBack && calBack(null,this.remoteLircObjs[lircfile]);

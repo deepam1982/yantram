@@ -433,7 +433,7 @@ var CommandManager = BaseClass.extend({
 		},this));
 	},
 	onMoveCurtainCommand : function (commandData) {
-		var devId = commandData.devId, switchId = commandData.switchId, direction=commandData.direction;
+		var devId = commandData.devId, switchId = commandData.switchId, direction=commandData.direction, timeInSec = commandData.timeInSec;
 		var device = deviceManager.getDevice(devId);
 		if(!device) 
 			return console.log('device not found');
@@ -445,7 +445,8 @@ var CommandManager = BaseClass.extend({
   //           'remoteDevice':commandData.deviceType, 
   //           'state':direction
   //      });
-		device.moveCurtain(switchId, direction)
+		console.log(switchId, direction, timeInSec);
+		device.moveCurtain(switchId, direction, timeInSec);
 	},
 	onSetDutyCommand : function (commandData) {
 		console.log('setDuty called');
@@ -509,11 +510,15 @@ var CommandManager = BaseClass.extend({
 	    	}
 	    	else {	
 		    	var state = {};
-		    	__.each(controls, function (ctl) {state[""+ctl.switchId]=(ctl.state=='on')?true:false}); //in case of dimmer state will be number fom 0 to 255
+		    	__.each(controls, function (ctl) {
+		    		if(parseInt(ctl.state)){ //in case of dimmer state will be number fom 0 to 255
+		    			state[""+ctl.switchId] = parseInt(Math.min(255, 255 * parseInt(ctl.state)/100));
+		    		} else state[""+ctl.switchId] =(ctl.state=='on')?true:false;
+		    	}); 
 	    		conf[devId]=state;
 	    	}
 	    });
-	    // console.log("mood conf to apply ", conf);
+	    console.log("mood conf to apply ", conf);
 	    deviceManager.applyConfig(conf);
 	},
 	groupOff : function (commandData) {

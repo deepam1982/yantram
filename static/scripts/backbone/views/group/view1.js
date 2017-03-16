@@ -58,17 +58,27 @@ SwitchProxy = BaseView.extend({
 	events: {
  		"tap .toggelSwitch" : "onToggelSwitch"
  	},
- 	onToggelSwitch : function (event) {
- 		if(this.model.task == 'moodSelection') {
- 			if(this.model.type == 'irBlstr') return this.showIrCodeSelector();
+	onToggelSwitch : function (event) {
+		if(this.model.type == 'dimmer' && parseInt(this.model.setOn)) this.buff = parseInt(this.model.setOn);
+		if(this.model.task == 'moodSelection') {
+			if(this.model.type == 'irBlstr') return this.showIrCodeSelector();
 	 		if(!this.model.selected) {
+	 			if(this.model.type == 'dimmer') return this.showRangeSelector();
 		 		this.model.selected = !this.model.selected;
- 				this.model.setOn = true;
+				this.model.setOn = true;
 	 		}
- 			else if(this.model.setOn) this.model.setOn = false;
- 			else this.model.selected = !this.model.selected;
- 		}else this.model.selected = !this.model.selected;
- 		this.repaint();
+			else if(this.model.setOn) this.model.setOn = false;
+			else this.model.selected = !this.model.selected;
+		}else this.model.selected = !this.model.selected;
+		this.repaint();
+	},
+	showRangeSelector : function () {
+		rangeSelector1.setValue(this.buff || 80);
+		rangeSelector1.showPopUp(_.bind(function(v) {
+			this.model.selected = !this.model.selected;
+			this.buff = this.model.setOn = v;
+			this.repaint();
+		}, this));
  	},
  	showIrCodeSelector : function () {
  		var remotes = this.options.deviceCollection.get('irRemotes').get('loadInfo');
