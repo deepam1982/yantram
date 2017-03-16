@@ -1846,9 +1846,7 @@ EditMoodPannel = BaseView.extend({
 	},
 	_saveMood : function () {
 		if(this.avoidSaving) return;
-		var info = this._getMoodInfo();
-		console.log(info);
-		this.model.ioSocket.emit("modifyMood", info, function (err){if(err)console.log(err)});
+		this.model.ioSocket.emit("modifyMood", this._getMoodInfo(), function (err){if(err)console.log(err)});
 	},
 	_onGroupModelChange : function(grp) {
 		this._reMakeHash();
@@ -3124,7 +3122,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	select, input[type=password], input[type=text], textarea \
 	{border-color:"+inputColor+((appTheam=="maze")?(";background-color:"+inputColor):"")+";}\
 	.brightBorderColor{border-color:"+brightColor+";}\
-	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
+    #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
 	.translucentBg45 {background-color: rgba("+traprntColor+",0.45);}\
 	.translucentBdr45 {border-color: rgba("+traprntColor+",0.45);}\
 	#groupTitleHeaderForTrapTheam{border-bottom-color:rgba("+traprntColor+",0.45);}\
@@ -3214,12 +3212,19 @@ var connectSocket = function (ip, idx, callback) {
 		}});
 	});
 };
-var setTheme = function () {
-	ioSockets[primeIndx].emit('getThemeSettings', {}, function (rsp) {
-		setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
-	});
+try {
+	setAppTheamColor(appTheme, appColor); //appTheme, appColor are set in ejs itself.
+	_.each(localIpArr, function(ip, indx){connectSocket(ip, indx);})
 }
-_.each(localIpArr, function(ip, indx){connectSocket(ip, indx, (indx == primeIndx)?setTheme:null);})
+catch (err) {
+	var setTheme = function () {
+		ioSockets[primeIndx].emit('getThemeSettings', {}, function (rsp) {
+			setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
+		});
+	}
+
+	_.each(localIpArr, function(ip, indx){connectSocket(ip, indx, (indx == primeIndx)?setTheme:null);})
+}
 
 var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
 sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});

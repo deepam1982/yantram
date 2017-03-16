@@ -539,6 +539,11 @@
 		.appColor_blue  #bgImageCont{background-color:#7D94CB;}
 		.appColor_green  #bgImageCont{background-color:#97BD80;}
 
+		.appColor_orange #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_orange.png');}
+		.appColor_red #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_red.png');}
+		.appColor_blue #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_blue.png');}
+		.appColor_green #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_green.png');}
+
 
 		.maskTransparent {
 			position:absolute;top:0px;bottom:0px;right:0px;left:0px;opacity:0.0;filter:alpha(opacity=00);
@@ -1759,6 +1764,7 @@
 		revId = "<$=revId$>";
 		hcId = "<$=hcId$>";
 		appColor = "<$=appColor$>";
+		appTheme = "<$=appTheme$>";
 		var localIpArr =[];
 		<$ for(var i=0; i<clusterIpArr.length; i++) { $>localIpArr.push('<$=clusterIpArr[i]$>');<$}$>
 	</script>
