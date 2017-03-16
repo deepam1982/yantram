@@ -186,12 +186,19 @@ var connectSocket = function (ip, idx, callback) {
 		}});
 	});
 };
-var setTheme = function () {
-	ioSockets[primeIndx].emit('getThemeSettings', {}, function (rsp) {
-		setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
-	});
+try {
+	setAppTheamColor(appTheme, appColor); //appTheme, appColor are set in ejs itself.
+	_.each(localIpArr, function(ip, indx){connectSocket(ip, indx);})
 }
-_.each(localIpArr, function(ip, indx){connectSocket(ip, indx, (indx == primeIndx)?setTheme:null);})
+catch (err) {
+	var setTheme = function () {
+		ioSockets[primeIndx].emit('getThemeSettings', {}, function (rsp) {
+			setAppTheamColor(rsp.data.appTheme, rsp.data.appColor);
+		});
+	}
+
+	_.each(localIpArr, function(ip, indx){connectSocket(ip, indx, (indx == primeIndx)?setTheme:null);})
+}
 
 var sideMenu = new SideMenuView({'el':$("#sideMenuCont")});
 sideMenu.on('hideMe', function () {$('#burgerImageCont').trigger('tap')});
