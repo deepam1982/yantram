@@ -143,7 +143,7 @@ var EditManager = BaseClass.extend({
 			var uniqueKey = ctrl.devId+'-'+ctrl.switchId;
 			if(!__.has(hashToAvoidDuplicate, uniqueKey)) {
 				hashToAvoidDuplicate[uniqueKey] = true;
-				var pushObj = {"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state==true || ctrl.state=="on")?"on":"off"};
+				var pushObj = {"id":++id, "devId":ctrl.devId, "switchId":ctrl.switchId, "state":(ctrl.state==false || ctrl.state=="off")?"off":((parseInt(ctrl.state))?ctrl.state:"on")};
 				if(ctrl.devId == "irBlasters" && ctrl.irCodes) pushObj.irCodes = ctrl.irCodes;
 				controls.push(pushObj);
 			}
@@ -171,10 +171,12 @@ var EditManager = BaseClass.extend({
 				if (indx+1 < rank) return data.rank = indx+1;
 				return data.rank = indx+2;
 			});
+			moodConfig.save(function (err) {if(err) console.log(err);});
+			// following statements will not be in save calback as we want the status be reflected immidiately.
+			// however calling save earlier is necessary as it updates updateTS which invalidates the cash.
 			if(rankModified || !controls.length) moodConfig.emit('moodConfigChanged');
 			else moodConfig.emit('moodConfigChanged', obj.id);
 			if(!controls.length) moodConfig.emit('moodDeleted', obj.id);
-			moodConfig.save(function (err) {if(err) console.log(err);});
 		}, this);	
 	},
 	modifyGroup : function (obj, callback) {

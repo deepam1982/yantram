@@ -39,6 +39,8 @@ begin remote
           KEY_9                    0x26002709
 
           KEY_POWER                0x2600270C
+          KEY_MUTE                 0x2600270D
+          KEY_MENU                 0x26002712
 
           KEY_VOLUMEUP             0x26002710
           KEY_VOLUMEDOWN           0x26002711

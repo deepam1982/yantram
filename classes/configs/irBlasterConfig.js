@@ -10,7 +10,8 @@ var IrBlasterConfigManager = BasicConfigManager.extend({
 				__.extend(conf, {"category":"ZMOTE01", "icon": "zmote", "uuid":data.uuid, "name":"Blstr_"+data.uuid.substr(6)});
 			}
 			this.set(id, conf);
-			//return this.save(calback); dont save.
+			//return this.save(calback); dont save. but update the time stamp
+			this.updateTs = new Date;
 			return calback(null);
 		}
 		calback && calback("device already exist!")

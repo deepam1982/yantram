@@ -43,22 +43,30 @@ EditMoodPannel = BaseView.extend({
 		if(this.avoidSaving) return;
 		this.model.ioSocket.emit("modifyMood", this._getMoodInfo(), function (err){if(err)console.log(err)});
 	},
-	render : function () {
+	_onGroupModelChange : function(grp) {
+		this._reMakeHash();
+		_.each(grp.get('controls'), function (sw, key) {
+			sw.task='moodSelection';sw.selected=sw.hidden=false;
+			if(this.hash[sw.devId] && _.has(this.hash[sw.devId], sw.switchID)){
+				sw.selected=true;sw.setOn=this.hash[sw.devId][sw.switchID];
+			}
+			if(_.contains(['irRem', 'ipCam'], sw.type)) sw.hidden=true;
+		}, this);
+	},
+	_reMakeHash : function () {
 		var hash = {};
 		_.each((this.moodInfo)?this.moodInfo.controls:this.model.get('controls'), function (obj) {
 			if(!hash[obj.devId]) hash[obj.devId]={}; 
-			hash[obj.devId][obj.switchId]= (obj.state=='on'||obj.state==true)?true:false;
+			hash[obj.devId][obj.switchId]= parseInt(obj.state)?obj.state:((obj.state=='on'||obj.state==true)?true:false);
 			if(obj.devId == 'irBlasters')hash[obj.devId][obj.switchId] = obj.irCodes;
 		}, this);
-
+		this.hash = hash;
+	},
+	render : function () {
+		this._reMakeHash();
 		this.options.gC.each(function (grp) {
-			_.each(grp.get('controls'), function (sw, key) {
-				sw.task='moodSelection';sw.selected=sw.hidden=false;
-				if(hash[sw.devId] && _.has(hash[sw.devId], sw.switchID)){
-					sw.selected=true;sw.setOn=hash[sw.devId][sw.switchID];
-				}
-				if(_.contains(['irRem', 'ipCam', 'curtain'], sw.type)) sw.hidden=true;
-			}, this);
+			grp.on('change', this._onGroupModelChange, this);
+			this._onGroupModelChange(grp);
 		}, this);
 
 		BaseView.prototype.render.apply(this, arguments);
@@ -67,6 +75,9 @@ EditMoodPannel = BaseView.extend({
 	},
 	erase : function () {
 		if(!this.rendered) return;
+		this.options.gC.each(function (grp) {
+			grp.off('change', this._onGroupModelChange);
+		}, this);
 		this._saveMood();
 		return BaseView.prototype.erase.apply(this, arguments);
 	},
@@ -80,3 +91,8 @@ EditMoodPannel = BaseView.extend({
 	}
 });
 
+/*
+
+
+
+*/

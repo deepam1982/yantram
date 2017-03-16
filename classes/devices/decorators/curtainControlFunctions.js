@@ -20,22 +20,29 @@ module.exports ={
 			if(this.switchState[indx]) this.curtainControlState[crtnIndx] =((indx-(fstCrtnSwIndx+2*crtnIndx))%2)?"closing":"opening";
 		}, this);
 	},
-	moveCurtain : function (switchId, state, callback) {
-		var direction = (state == "close")?1:0;
+	curtainTimerObj : {}, //it could be singleton as every instance will have unique device id
+	moveCurtain : function (switchId, state, timeInSec, callback) {
+		if(!timeInSec || typeof timeInSec == 'function') {callback = timeInSec; timeInSec=0}
+		var direction = (state == "close")?1:0; //possible state are stop, open, close
 		var normalSwitches = this.numberOfSwitches - 2*this.numberOfCurtainControls;
-		var curtainId = switchId - normalSwitches;
+		var curtainId = switchId - normalSwitches, iSwId = switchId;
 		switchId = normalSwitches + 2*curtainId + direction;
+		var curtainUID = this.id + '-c' + curtainId;
+		if(!this.curtainTimerObj[curtainUID]) this.curtainTimerObj[curtainUID] = {};
+		var tmrObj = this.curtainTimerObj[curtainUID]
+		if(tmrObj.tmr) clearTimeout(tmrObj.tmr);
 		var switchId_sec = switchId+((direction)?(-1):1), pState = (state!='stop')?1:0;
 		if(state=='stop') this.stopPendingSwitchCommands();
-		if(this.getSwitchState(switchId) ^ pState || this.getSwitchState(switchId_sec) ^ 0) {
+		if(this.getSwitchState(switchId) ^ pState || this.getSwitchState(switchId_sec) ^ 0) { //case of first command
 			this.setSwitchState(switchId_sec,0);
 			this.setSwitchState(switchId,pState);
 			callback && callback();
-
 		}
-		else {
+		else { // case of repeated command
 			var switchObjArr = [{"switchNo":switchId, "state":pState},{"switchNo":switchId_sec, "state":0}];
 			this.setSwitch(switchObjArr, callback);
 		}
+		if(timeInSec) 
+			tmrObj.tmr = setTimeout(__.bind(function(sw, st, t){this.moveCurtain(sw, (t)?st:'stop', t)}, this, iSwId, state, Math.max(0, --timeInSec)),1000); 
 	}
 }

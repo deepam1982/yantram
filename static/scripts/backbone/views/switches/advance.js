@@ -81,9 +81,9 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		var state = this.model.get("state");
  		if(!this.$curtainControls)
  		this.$curtainControls = $(
- 			"<div class='unselectable' style='text-align:center; width:200px; margin:auto;'>\
- 				<div class='openCurtain "+((state=='opening')?"theamBGColor":"")+"' style='float:left; padding:15px; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
- 				<div class='closeCurtain "+((state=='closing')?"theamBGColor":"")+"' style='float:right; padding:15px; margin:0 40px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
+ 			"<div class='unselectable curtainControlPopup'>\
+ 				<div class='openCurtain "+((state=='opening')?"brightBGColor":"")+"' style='float:left; padding:15px; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/opencurtain.png\"); background-size:50px 50px;'></div><span>Open</span></div>\
+ 				<div class='closeCurtain "+((state=='closing')?"brightBGColor":"")+"' style='float:right; padding:15px; margin:0 40px 0 0; width:50px;'><div style='width:50px;height:50px;float:left;background-image:url(\"static/images/transparent/closecurtain.png\"); background-size:50px 50px;'></div><span>Close</span></div>\
  				<div style='clear:both'></div>\
  			</div>"
  		)//don't convert background-image div to img-tag, as on phones it dosn't trigger touchend after longtab.
@@ -95,14 +95,21 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
  		{console.log("removing curtain control UI!!");this.$curtainControls.remove(); this.$curtainControls=null;}
  		return AdvanceSwitch.prototype.erase.apply(this, arguments);
  	},
+ 	hideAdvancePannel : function() {
+ 		var $img = this.$el.find('.iconPartition img');
+ 		$img.attr('src', $img.attr('src').replace('black', appColor+''));
+ 		return AdvanceSwitch.prototype.hideAdvancePannel.apply(this, arguments);
+ 	},
  	showAdvancePannel : function () {
  		if(this.model.get('disabled') || this.advancePannelVisible) return;
  		var ret = AdvanceSwitch.prototype.showAdvancePannel.apply(this, arguments);
- 		!this.touchendConnected && (this.touchendConnected = true) && $('body').on('touchend', this.stopCurtain)
+ 		!this.touchendConnected && (this.touchendConnected = true) && $('body').on('touchend', _.bind(this._stopCurtain,this));
+ 		var $img = this.$el.find('.iconPartition img');
+ 		$img.attr('src', $img.attr('src').replace(appColor+'','black'));
  		return ret
  	},
  	done : function () {
- 		this.stopCurtain();
+ 		this._stopCurtain();
  		$('body').off('touchend', this.stopCurtain);
  		this.touchendConnected = false;
  		return AdvanceSwitch.prototype.done.apply(this, arguments);
@@ -113,41 +120,61 @@ AdvanceCurtainSwitch = AdvanceSwitch.extend({
 		,"longTap .toggelSwitch" : "showAdvancePannel"
 		,"longTap .openCurtain" : "openCurtain"
 		,"longTap .closeCurtain" : "closeCurtain"
+		,"tap .openCurtain" : "autoOpenCurtain"
+		,"tap .closeCurtain" : "autoCloseCurtain"
 		// ,"touchend .openCurtain" : "stopCurtain"
 		// ,"touchend .closeCurtain" : "stopCurtain"
 		// ,"touchleave .closeCurtain" : "stopCurtain" 
 		
 	},
+	autoOpenCurtain : function (event) {
+		if(this.model.get("state") != "off") return this.stopCurtain();
+		this.$el.find('.openCurtain').addClass('brightBGColor');
+		this.$el.find('.closeCurtain').removeClass('brightBGColor');
+		this.model.moveCurtain("open", 15);
+	},
+	autoCloseCurtain : function (event) {
+		if(this.model.get("state") != "off") return this.stopCurtain();
+		this.$el.find('.closeCurtain').addClass('brightBGColor');
+		this.$el.find('.openCurtain').removeClass('brightBGColor');
+		this.model.moveCurtain("close", 15);
+	},
 	closeCurtain : function (event) {
+		this.longPressOn = true;
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("closeCurtain");
 		// this.$el.find('.closeCurtain').removeClass('whiteBG').addClass('theamBGColor');
 		// this.$el.find('.openCurtain').removeClass('theamBGColor').addClass('whiteBG');		
-		this.$el.find('.closeCurtain').addClass('theamBGColor');
-		this.$el.find('.openCurtain').removeClass('theamBGColor');		
+		this.$el.find('.closeCurtain').addClass('brightBGColor');
+		this.$el.find('.openCurtain').removeClass('brightBGColor');		
 		this.model.moveCurtain("close");
 		this.closeCurtainTimer = setTimeout(_.bind(this.closeCurtain, this), 1000);
 		clearTimeout(this.openCurtainTimer);this.openCurtainTimer = null;
 	},
 	openCurtain : function (event) {
+		this.longPressOn = true;
 		if(!event && this.model.get("state") == "off") return this.stopCurtain();
 		console.log("openCurtain");
 		// this.$el.find('.openCurtain').removeClass('whiteBG').addClass('theamBGColor');
 		// this.$el.find('.closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
-		this.$el.find('.openCurtain').addClass('theamBGColor');
-		this.$el.find('.closeCurtain').removeClass('theamBGColor');
+		this.$el.find('.openCurtain').addClass('brightBGColor');
+		this.$el.find('.closeCurtain').removeClass('brightBGColor');
 		this.model.moveCurtain("open");
 		this.openCurtainTimer = setTimeout(_.bind(this.openCurtain, this), 1000);
 		clearTimeout(this.closeCurtainTimer);this.closeCurtainTimer = null;
 	},
+	_stopCurtain : function () {
+		if(this.longPressOn) this.stopCurtain();
+	},
 	stopCurtain : function() {
+		this.longPressOn = false;
 		console.log("stopCurtain");
 		this.model.moveCurtain("stop");
 		clearTimeout(this.openCurtainTimer);
 		clearTimeout(this.closeCurtainTimer);
 		this.openCurtainTimer = this.closeCurtainTimer = null;
 		// this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor').addClass('whiteBG');		
-		this.$el.find('.openCurtain, .closeCurtain').removeClass('theamBGColor');
+		this.$el.find('.openCurtain, .closeCurtain').removeClass('brightBGColor');
 	}
 })
 

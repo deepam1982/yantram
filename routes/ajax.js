@@ -4,7 +4,8 @@ var deviceInfoConfig = require(__rootPath+"/classes/configs/deviceInfoConfig");
 var moodConfig = require(__rootPath+"/classes/configs/moodConfig");
 var zlib = require('zlib');
 var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
-
+// var md5Hash = require(__rootPath+"/classes/utils/hash").md5Hash;
+var __ = require("underscore");
 module.exports = function(app, cmdMngr) {
 	
 	// app.get('/group/list', function (req, res) {
@@ -12,21 +13,27 @@ module.exports = function(app, cmdMngr) {
 	// });
 
 	app.get('/group/list', function (req, res) {
-		zlib.gzip(JSON.stringify(groupConfig.getList()), function (err, buffer) {
+		var data = JSON.stringify(groupConfig.getList());
+		if(req.headers.host.indexOf("cloud")==-1) { res.send(data);res.end();return;}
+		zlib.gzip(data, function (err, buffer) {
 			res.send((err)?"error in gzip":buffer.toString('base64'));
 			res.end()
 		});
 	});
 
 	app.get('/device/list', function (req, res) {
-		zlib.gzip(JSON.stringify(deviceInfoConfig.getList()), function(err, buffer) {
+		var data = JSON.stringify(deviceInfoConfig.getList());
+		if(req.headers.host.indexOf("cloud")==-1) { res.send(data);res.end();return;}
+		zlib.gzip(data, function (err, buffer) {
 			res.send((err)?"error in gzip":buffer.toString('base64'));
 			res.end()
 		});
 	});
 	
 	app.get('/mood/list', function (req, res) {
-		zlib.gzip(JSON.stringify(moodConfig.getList()), function(err, buffer) {
+		var data = JSON.stringify(moodConfig.getList()); 
+		if(req.headers.host.indexOf("cloud")==-1) { res.send(data);res.end();return;}
+		zlib.gzip(data, function (err, buffer) {
 			res.send((err)?"error in gzip":buffer.toString('base64'));
 			res.end()
 		});

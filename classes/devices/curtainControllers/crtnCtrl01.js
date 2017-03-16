@@ -10,6 +10,12 @@ var CrtnCtrl01 = BaseDevice.extend(CurtainControlFunctions).extend(SwitchFunctio
 	_logDVST : function (msg) {
 		if(!this.avoidLogDVST)
 		console.log("#### DVST of "+this.id+" is " + this.switchState + "    " + this.curtainControlState);
+	},
+	applyConfig : function (conf) {
+		__.each(conf, function (value, switchId) {
+			if(parseInt(switchId)>this.numberOfSwitches) return;
+			this.moveCurtain(switchId, (value)?'open':'close', 20)
+		}, this);
 	}
 });
 
