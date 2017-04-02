@@ -246,9 +246,6 @@ EditSwitchParams = BaseView.extend({
 	}
 });
 
-EditCurtainParams = EditSwitchParams.extend({
-	iconList : ['curtain', 'curtain1', 'curtain2', 'curtain3', 'curtain4']
-});
 
 EditIpCamParams = EditSwitchParams.extend({
 	templateSelector:"#editIpCameraTemplate",
@@ -261,6 +258,10 @@ EditIpCamParams = EditSwitchParams.extend({
 		return this;
 	}
 });
+EditCurtainParams = EditIpCamParams.extend({
+	iconList : ['curtain', 'curtain1', 'curtain2', 'curtain3', 'curtain4']
+});
+
 
 EditSensorParams = EditIpCamParams.extend({
 	templateSelector:"#editPirTemplate",

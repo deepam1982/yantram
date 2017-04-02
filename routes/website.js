@@ -35,7 +35,7 @@ module.exports = function(app) {
 		evP = [evP[0]+':'+evP[1], evP[2]+':'+evP[3]];
 
 		clusterIpArr = (clusterIpArr)?[piIpAddr].concat(clusterIpArr):[piIpAddr];
-		res.render(appFile,{'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
+		var data = {'appColor':appColor,'appTheme':appTheme, 'homeView':homeView,
 			'ipCamaraSupported':__systemConfig.get('ipCamaraSupported'), 
 			'iRSupported':__systemConfig.get('iRSupported'),
 			'sensorsPresent':deviceManager.sensorsPresentInSystem,
@@ -50,7 +50,10 @@ module.exports = function(app) {
 			'ipOctate':__systemConfig.get('ipOctate')||'123',
 			'clusterIpArr':clusterIpArr,
 			'debug':(__.has(req.query, 'debug'))?true:false
-		});
+		};
+		res.render(appFile,data);
+		data.debug = false; data.cloudRequest = true;
+		// console.log(JSON.stringify(data));
 		// try {res.sendFile(appFile);}
 		// catch(err) {res.sendfile(appFile);}
 

@@ -3,10 +3,10 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var TimerConfigManager = BasicConfigManager.extend({
 	file : '/../configs/timerConfig.json',
 	setAutoOffParams : function (devId, loadId, param, callback) {
-		if(!__.has(param, 'enabled') || !__.has(param, 'time'))
+		if(!__.has(param, 'enabled') && !__.has(param, 'time'))
 			return (callback && callback("invalid autoOff params"));
 		var autoOffArr = this.data.autoOff || [];
-		var entry = {"devId":devId, "loadId":loadId};
+		var entry = {"devId":devId, "loadId":loadId, "enabled":false, "time":0};
 		entry = __.where(autoOffArr, entry).pop() || entry;
 		autoOffArr =__.reject(autoOffArr, function (obj){return (obj === entry);});
 		autoOffArr.push(__.extend(entry,__.pick(param, 'enabled', 'time')));

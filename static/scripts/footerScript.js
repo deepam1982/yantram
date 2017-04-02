@@ -1340,9 +1340,6 @@ EditSwitchParams = BaseView.extend({
 	}
 });
 
-EditCurtainParams = EditSwitchParams.extend({
-	iconList : ['curtain', 'curtain1', 'curtain2', 'curtain3', 'curtain4']
-});
 
 EditIpCamParams = EditSwitchParams.extend({
 	templateSelector:"#editIpCameraTemplate",
@@ -1355,6 +1352,10 @@ EditIpCamParams = EditSwitchParams.extend({
 		return this;
 	}
 });
+EditCurtainParams = EditIpCamParams.extend({
+	iconList : ['curtain', 'curtain1', 'curtain2', 'curtain3', 'curtain4']
+});
+
 
 EditSensorParams = EditIpCamParams.extend({
 	templateSelector:"#editPirTemplate",
@@ -3122,7 +3123,7 @@ var setAppTheamColor = function (appTheme, themeColor) {
 	select, input[type=password], input[type=text], textarea \
 	{border-color:"+inputColor+((appTheam=="maze")?(";background-color:"+inputColor):"")+";}\
 	.brightBorderColor{border-color:"+brightColor+";}\
-    #bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
+	#bgImageCont{background-image: url('/static/images/backgrounds/app_2_2x_"+themeColor+".png');}\
 	.translucentBg45 {background-color: rgba("+traprntColor+",0.45);}\
 	.translucentBdr45 {border-color: rgba("+traprntColor+",0.45);}\
 	#groupTitleHeaderForTrapTheam{border-bottom-color:rgba("+traprntColor+",0.45);}\

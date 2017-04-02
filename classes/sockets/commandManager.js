@@ -39,8 +39,11 @@ var CommandManager = BaseClass.extend({
 	},
 	executeCommand : function (commandData) {
 		switch(commandData.actionName) {
+			case 'toggle' :  	commandData.actionName = 'toggleSwitch';
 			case 'toggleSwitch' : this.onToggleSwitchCommand(commandData); break;
+			case 'turn-on' : 	commandData.actionName = 'turnSwitchOn';
 			case 'turnSwitchOn' : this.onSwitchCommand(commandData); break;
+			case 'turn-off' : 	commandData.actionName = 'turnSwitchOff';
 			case 'turnSwitchOff' : this.onSwitchCommand(commandData); break;
 			case 'setDuty' 		: this.onSetDutyCommand(commandData); break;
 			case 'moveCurtain'	: this.onMoveCurtainCommand(commandData); break;
