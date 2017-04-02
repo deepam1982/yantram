@@ -69,6 +69,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 		return this.getLoadInfo(deviceId, loadId);
 	},
 	loadInfoMap : {},
+	getLoadId : function(deviceId, loadId) {return deviceId + '-l' + loadId;},
 	getLoadInfo : function (deviceId, loadId) {
 		var loadIdForMap = deviceId + '-l' + loadId;
 		var deviceManager = require(__rootPath+'/classes/devices/deviceManager');

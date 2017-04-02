@@ -4,6 +4,59 @@ var BasicConfigManager = require(__rootPath+"/classes/configs/basicConfigManager
 var timerConfig = require(__rootPath+"/classes/configs/timerConfig");
 var GroupConfigManager = BasicConfigManager.extend({
 	file : '/../configs/groupConfig.json',
+	editGroup : function (iObj, calback) {
+		var grpData = null;
+		if(iObj.id) grpData = this.data[iObj.id];
+		if(!grpData) {
+			iObj.id = 1 + __.max(__.map(this.data, function (v, k){return parseInt(k)}));
+			var rank = 1 + __.max(__.map(this.data, function (v, k){return v.rank}));
+			this.set(iObj.id+"", grpData={"name":"group", "rank":rank, "controls" :[]});
+		}
+		__.extend(grpData, __.pick(iObj, "name", "icon", "customIcon"));
+		if(iObj.rank) {
+			var maxRank = __.max(__.map(this.data, function (v, k){return v.rank}));
+			grpData.rank = 1+maxRank; // shift the object to last rank
+			iObj.rank = Math.min(maxRank, Math.max(0, parseInt(iObj.rank))); // make sure rank is not out of range
+			__.each(__.sortBy(__.values(this.data), 'rank'), function (data, indx) {
+				data.rank = (indx+1 < iObj.rank)?(indx+1):(indx+2);
+			});
+			grpData.rank = iObj.rank; // shift the object to correct rank
+		}
+		deviceManager.emit('deviceStateChanged', null, null, 'groupModified');
+		this.save(function(err) {calback&&calback(err, iObj.id);});
+	},
+	deleteGroup : function (gId, calback) {
+		var grpData = this.data[gId+""];
+		if(!grpData) return calback && calback("invalid group id!");
+		this.emit('groupDeleteStart', gId);
+		this.data = __.omit(this.data, gId+"");
+		deviceManager.emit('deviceStateChanged', null, null, 'groupModified');
+		this.emit('groupDeleted', gId);
+		this.save(calback);
+	},
+	addToGroup : function (gId, devId, loadId, calback){
+		var grpData = this.data[gId+""];
+		if(!grpData) return calback && calback("invalid group id!");
+		var ctrls = grpData.controls;
+		if(!__.where(ctrls, {"devId":devId, "switchID":loadId}).length){
+			ctrls.push({"id":ctrls.length+1, "devId":devId, "switchID":loadId});
+			deviceManager.emit('deviceStateChanged', devId, null, 'groupModified');
+		}
+		this.save(calback);
+	},
+	removeFromGroup : function (gId, devId, loadId, calback){
+		var grpData = this.data[gId+""];
+		if(!grpData) return calback && calback("invalid group id!");
+		var ctrls = grpData.controls;
+		var objArr = __.where(ctrls, {"devId":devId, "switchID":loadId})
+		if(objArr.length){
+			grpData.controls = __.without(ctrls, objArr[0])
+			var dId = null;
+			__.each(grpData.controls, function(obj, indx){obj.id=indx+1; dId=obj.devId;});
+			deviceManager.emit('deviceStateChanged', dId, null, 'groupModified');
+		}
+		this.save(calback);
+	},
 	getGroupInfo : function (devId, switchId) { // static data depends on data writen in file groupConfig.json
 		var data = this.toJSON();
 		for (var id in data) {
