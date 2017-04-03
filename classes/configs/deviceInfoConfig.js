@@ -75,6 +75,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 		var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
 		var maxUpdateTs = Math.max(this.updateTs, timerConfig.updateTs);
 		var avoidMapping = false;
+		var vLoad = deviceManager.getVirtualLoad(deviceId, loadId);
 		if(!this.loadInfoMap[loadIdForMap] || this.loadInfoMap[loadIdForMap].ts < maxUpdateTs){
 			if(!this.loadInfoMap[loadIdForMap]) this.loadInfoMap[loadIdForMap] = {};
 			this.loadInfoMap[loadIdForMap].ts = maxUpdateTs;
@@ -90,8 +91,6 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 			__.each(this.get(deviceId+'.loadInfo.'+loadId), function (val, key) {
 				ctl[key] = val;
 			});
-
-			var vLoad = deviceManager.getVirtualLoad(deviceId, loadId);
 			if(vLoad) {
 				ctl.id = vLoad.id;
 				ctl.followObjs = [];
@@ -120,6 +119,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 			this.loadInfoMap[loadIdForMap].loadIndxInvalid = !(lodIndx < (nrmlCnt+crtnCnt));
 		}
 		var ctl = this.loadInfoMap[loadIdForMap].ctl, sensorIndx = this.loadInfoMap[loadIdForMap].sensorIndx;
+		ctl.autoToggleTime = null;
 		var loadIndxInvalid = this.loadInfoMap[loadIdForMap].loadIndxInvalid;
 		if(avoidMapping) this.loadInfoMap[loadIdForMap] = null;
 		var config = deviceManager.getConfig(deviceId);
