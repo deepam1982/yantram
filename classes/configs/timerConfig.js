@@ -7,7 +7,7 @@ var TimerConfigManager = BasicConfigManager.extend({
 			return (callback && callback("invalid autoOff params"));
 		var autoOffArr = this.data.autoOff || [];
 		var entry = {"devId":devId, "loadId":loadId, "enabled":false, "time":0};
-		entry = __.where(autoOffArr, entry).pop() || entry;
+		entry = __.where(autoOffArr, __.pick(entry, "devId", "loadId")).pop() || entry;
 		autoOffArr =__.reject(autoOffArr, function (obj){return (obj === entry);});
 		autoOffArr.push(__.extend(entry,__.pick(param, 'enabled', 'time')));
 		this.data.autoOff = autoOffArr;
