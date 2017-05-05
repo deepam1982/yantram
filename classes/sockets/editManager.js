@@ -235,7 +235,10 @@ var EditManager = BaseClass.extend({
 		if(obj.devId == 'irBlasters') return this.modifyIrBlasterParam(obj, callback);
 		if(obj.devId == 'irRemotes') return this.modifyIrRemoteParam(obj, callback);
 		if(obj.params.followObjects) 
-			return deviceInfoConfig.modifyFollowObjects(obj.devId, parseInt(obj.switchId), obj.params.followObjects, callback);
+			return deviceInfoConfig.modifyFollowObjects(obj.devId, parseInt(obj.switchId), obj.params.followObjects, function(err){
+				callback && callback(err);
+				deviceManager.emit('deviceStateChanged', obj.devId, null, 'switchParams');
+			});
 		if(!deviceInfoConfig.get(obj.devId+".loadInfo."+obj.switchId)) 
 			return callback && callback({'success':false, 'msg':'device do not exist'});
 		if(obj.params.autoOff) { //TODO this piece of code should not be along with deviceInfoConfig

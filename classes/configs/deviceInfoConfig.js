@@ -73,7 +73,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 	getLoadInfo : function (deviceId, loadId) {
 		var loadIdForMap = deviceId + '-l' + loadId;
 		var deviceManager = require(__rootPath+'/classes/devices/deviceManager');
-		var maxUpdateTs = Math.max(this.updateTs, timerConfig.updateTs);
+		var maxUpdateTs = Math.max(this.updateTs, timerConfig.updateTs, devCoordConf.updateTs);
 		var avoidMapping = false;
 		var vLoad = deviceManager.getVirtualLoad(deviceId, loadId);
 		if(!this.loadInfoMap[loadIdForMap] || this.loadInfoMap[loadIdForMap].ts < maxUpdateTs){
@@ -103,6 +103,7 @@ var DevInfoConfigManager = BasicConfigManager.extend({
 				var sensorIndx = lodIndx-(nrmlCnt+crtnCnt);
 				var vSen = deviceManager.getVirtualSensor(deviceId, sensorIndx)
 				if(vSen) ctl.id = vSen.id;
+				else ctl.id = deviceId + "-s"+sensorIndx; // Its a hack 
 			}
 			else avoidMapping = true;
 
