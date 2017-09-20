@@ -146,7 +146,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             server.listen(__systemConfig.get('port') || 8079);
             if(!__systemConfig.get('port')) {
               var createPortProxy = require(__rootPath+"/classes/utils/portProxy");
-              createPortProxy(8080, 80)
+              createPortProxy(8080, 8079)
             }
 
             app.set('view engine', 'ejs');
