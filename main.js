@@ -143,10 +143,10 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 //               var auth = require(__rootPath+"/classes/auth/jwt");
 //             }
 //             catch(err){console.log("Error while starting auth server -----", err);}
-            server.listen(__systemConfig.get('port') || 8079);
+            server.listen(__systemConfig.get('port') || 80);
             if(!__systemConfig.get('port')) {
               var createPortProxy = require(__rootPath+"/classes/utils/portProxy");
-              createPortProxy(8080, 8079)
+              createPortProxy(8080, 80)
             }
 
             app.set('view engine', 'ejs');
