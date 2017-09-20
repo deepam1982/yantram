@@ -146,6 +146,9 @@ var DeviceManager = BaseClass.extend({
 	},
 	getDevice : function (deviceId) {
 		return this._deviceMap[deviceId];
+	},
+	getRechableDevices : function () {
+		return __.filter(this._deviceMap, function(val, key){return val.reachable;});
 	}
 });
 

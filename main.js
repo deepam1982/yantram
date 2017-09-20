@@ -143,7 +143,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
 //               var auth = require(__rootPath+"/classes/auth/jwt");
 //             }
 //             catch(err){console.log("Error while starting auth server -----", err);}
-            server.listen(__systemConfig.get('port') || 80);
+            server.listen(__systemConfig.get('port') || 8079);
             if(!__systemConfig.get('port')) {
               var createPortProxy = require(__rootPath+"/classes/utils/portProxy");
               createPortProxy(8080, 80)
@@ -224,23 +224,45 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
               }
             });
             deviceManager.communicator.on("publishingNetworkKey", function (name, key, id) {
-              if(!__remoteDevInfoConf.getList().length || name == '0B0B0B0B0B0B0B0B') return;
-              var fileName = __rootPath+'/../logs/network.log', str ;
-              var logString = "Id:"+ id + " Name:"+name+" Key:"+key, logStrWtDt = logString+" Date:"+ (new Date()).format('log')+'\n';
-              fs.exists(fileName, function(exists) {
-                if(!exists) return fs.writeFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
-                fs.readFile(fileName, "utf8", function(err, data) {
-                  if(err) return console.log(err);
-                  data = data.split('\n');
-                  while(data.length) {
-                    if (!(str = data.pop())) continue;
-                    if(str.indexOf(logString) != -1) return;
-                    break;
-                  }
-                  fs.appendFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
+              setTimeout(function(){
+                if(!__remoteDevInfoConf.getList().length || name == '0B0B0B0B0B0B0B0B') return;
+                if(!deviceManager.getRechableDevices().length) return;
+                var fileName = __rootPath+'/../logs/network.log', str ;
+                var logString = "Id:"+ id + " Name:"+name+" Key:"+key, logStrWtDt = logString+" Date:"+ (new Date()).format('log')+'\n';
+                fs.exists(fileName, function(exists) {
+                  if(!exists) return fs.writeFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
+                  fs.readFile(fileName, "utf8", function(err, data) {
+                    if(err) return console.log(err);
+                    data = data.split('\n');
+                    while(data.length) {
+                      if (!(str = data.pop())) continue;
+                      if(str.indexOf(logString) != -1) return;
+                      break;
+                    }
+                    fs.appendFile(fileName, logStrWtDt, function (err) {if(err) console.log(err)});
+                  });
                 });
-              });
-              
+                console.log("######################### Getting cloning info!!!!!");
+                deviceManager.communicator.getCloningInfo(function(err, cloneInfo){
+                  var fileName = __rootPath+'/../logs/cloneInfo.log'
+                  console.log(err, "Cloning info ->", cloneInfo);
+                  if(err || !cloneInfo) return;
+                  var logString = cloneInfo + '\n';
+                  fs.exists(fileName, function(exists) {
+                    if(!exists) return fs.writeFile(fileName, logString, function (err) {if(err) console.log(err)});
+                    fs.readFile(fileName, "utf8", function(err, data) {
+                      if(err) return console.log(err);
+                      data = data.split('\n');
+                      while(data.length) {
+                        if (!(str = data.pop())) continue;
+                        if(str.indexOf(logString.substr(0, logString.length-17)) != -1) return;
+                        break;
+                      }
+                      fs.appendFile(fileName, logString, function (err) {if(err) console.log(err)});
+                    });
+                  });  
+                });
+              },5000);
             })
 
             var coordinator = require(__rootPath+"/classes/coordinator");

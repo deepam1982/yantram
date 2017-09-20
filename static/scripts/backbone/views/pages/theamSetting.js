@@ -22,16 +22,16 @@ ThemeSettingPageView = BaseView.extend({
 	onSysSetngChange : function () {
 		var sysStngObj = {};
 		sysStngObj.restoreWithInMins = this.$el.find(".avoidRestoTime").val()
-
-		var dlpSltrs = this.$el.find(".dayLightTime select");
-		sysStngObj.dLP = _.map($(dlpSltrs[0]).val().split(":").concat($(dlpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
+		try {
+			var dlpSltrs = this.$el.find(".dayLightTime select");
+			sysStngObj.dLP = _.map($(dlpSltrs[0]).val().split(":").concat($(dlpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
 		
-		var evpSltrs = this.$el.find(".eveningTime select");
-		sysStngObj.evP = _.map($(evpSltrs[0]).val().split(":").concat($(evpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
+			var evpSltrs = this.$el.find(".eveningTime select");
+			sysStngObj.evP = _.map($(evpSltrs[0]).val().split(":").concat($(evpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
 
-		var shpSltrs = this.$el.find(".sleepHourTime select");
-		sysStngObj.sHP = _.map($(shpSltrs[0]).val().split(":").concat($(shpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
-
+			var shpSltrs = this.$el.find(".sleepHourTime select");
+			sysStngObj.sHP = _.map($(shpSltrs[0]).val().split(":").concat($(shpSltrs[1]).val().split(":")), function(i){return parseInt(i);});
+		} catch(e){console.log(e);}
 		this.options.socket.emit('modifySystemSettings', sysStngObj);
 
 	}	

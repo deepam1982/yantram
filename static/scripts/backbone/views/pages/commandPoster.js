@@ -8,6 +8,6 @@ CommandPosterPageView = BaseView.extend({
 		console.log(eventName);
 		var json = JSON.parse(this.$el.find('.textJson').val());
 		console.log(json);
-		this.options.socket.emit(eventName, json);
+		this.options.socket.emit(eventName, json, function(err, data){ console.log(err, data);});
 	}
 });

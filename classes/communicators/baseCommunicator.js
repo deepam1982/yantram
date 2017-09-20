@@ -86,9 +86,9 @@ var BaseCommunicator = BaseClass.extend({
 			this.zModRestartedAt = this.lastPacketRecievedAt = new Date().getTime()/1000;
 			__restartZigbeeModule();
 		}
-		var unreachableCount=0, maxTimeStamp=0, recheckList = [];
+		var maxTimeStamp=0, recheckList = [], unreachableList = [];
 		__.each(this.deviceList, function (dev) {
-			if(dev.unreachable) unreachableCount++;
+			if(dev.unreachable) unreachableList.push(dev);
 			maxTimeStamp=Math.max(maxTimeStamp, dev.lastSeenAt);
 			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds)) && !dev.unreachable) {
 				dev.unreachable = true;
@@ -97,14 +97,37 @@ var BaseCommunicator = BaseClass.extend({
 			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds/2)) && !dev.unreachable) recheckList.push(dev);
 		}, this)
 		__.each(recheckList, function (dev, i) {
-			console.log("########### rechecking connectivity of",dev.macAdd, "last seen", parseInt((Date.now()/1000)-dev.lastSeenAt)+"sec ago");
-			setTimeout(__.bind(function(dInfo){
-				this._send("\x2B0302"+dInfo.nwkAdd+"\x0D", function () { });
-			},this, dev), i*100);
+			var rptr = (dev.repeaters)?_.last(dev.repeaters):null;
+			console.log("########### rechecking connectivity of",dev.macAdd, (rptr)?"via "+rptr.macAdd:"", "last seen", parseInt((Date.now()/1000)-dev.lastSeenAt)+"sec ago");
+			setTimeout(__.bind(function(dInfo, viaInfo){
+				if(!viaInfo)
+					this._send("\x2B0302"+dInfo.nwkAdd+"\x0D", function () { });
+				else
+					this._send("\x2B04080302"+dInfo.nwkAdd+viaInfo.nwkAdd+"\x0D", function () { });
+			},this, dev, rptr), i*100);
+		}, this);
+		__.each(unreachableList, function (dev, i) {
+			console.log("### Finding path to unreachable device ",dev.macAdd);
+			var repeaters = __.where(this.deviceList, {'canRepeat':true});
+			if(!repeaters.length) {
+				console.log("## No repeators found to reach ",dev.macAdd)
+				return;
+			}
+			if(!dev.repeaters) dev.repeaters = [];
+			var toTry = (__.difference(repeaters, dev.repeaters)).pop()
+			if(!toTry) {
+				console.log("## No untried repeater found to reach ",dev.macAdd)
+				return;
+			}
+			dev.repeaters.push(toTry);
+			console.log("########### rechecking connectivity of",dev.macAdd, "via", toTry.macAdd);
+			setTimeout(__.bind(function(dInfo, viaInfo){
+				this._send("\x2B04080302"+dInfo.nwkAdd+viaInfo.nwkAdd+"\x0D", function () { });
+			},this, dev, toTry), i*100);
 		}, this);
 		maxTimeStamp=Math.max(maxTimeStamp, this.zModRestartedAt||0);
-		if(this.deviceList.length == unreachableCount) {
-			console.log("########### all",unreachableCount, "devices seems unreachable.");
+		if(this.deviceList.length == unreachableList.length) {
+			console.log("########### all",this.deviceList.length, "devices seems unreachable.");
 			var threstHold = 120
 			if(maxTimeStamp < ((Date.now()/1000) - threstHold)) {
 				console.log("########### no communication from any router for more than", threstHold, 'seconds')

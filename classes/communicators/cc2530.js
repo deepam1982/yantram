@@ -24,7 +24,7 @@ var CC2530Controller = BaseCommunicator.extend({
 			return setTimeout(__.bind(this.checkBroadCastRsp, this), 1000);
 		__.each(this.deviceList, __.bind(function (devInfo) {
 			if(devInfo.lastSeenAt+3 < (new Date().getTime() / 1000)){
-				this._queryQ.push({'query':"\x2B"+"0302"+devInfo.nwkAdd+"\x0D", 'callback':function () {}, 'queryInHexStr':"0302"});
+				this._pushIntoQueryQ("0302", devInfo.nwkAdd, devInfo, function () {});
 //				this._send("\x2B0302"+devInfo.nwkAdd+"\x0D", function () { });
 			}
 		}, this));
@@ -62,6 +62,10 @@ var CC2530Controller = BaseCommunicator.extend({
 		var sourceNwkAdd = data.substr(23,4);
 		var msg = data.substr(29);
 		this._macIdNwkIdMap[sourceMacAdd] = sourceNwkAdd;
+		// if(sourceMacAdd == "E7281707004B1200" && __.findWhere(this.deviceList, {'macAdd':sourceMacAdd})
+		// 	&& !__.findWhere(this.deviceList, {'macAdd':sourceMacAdd}).repeaters) {
+		// 	return;
+		// }
 		switch (msgTypeCode) {
 			case '0301' : 	this._handleDevTypeResponse(sourceMacAdd, sourceNwkAdd, msg); break;
 			case '0302a': 	this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd, msg); break;
@@ -70,9 +74,16 @@ var CC2530Controller = BaseCommunicator.extend({
 			case '0305'	: 	this.emit('msgRecieved', "STFSD", msg, sourceMacAdd); break;
 			case '0103'	: 	this._networkKeyUpdateResponse && this._networkKeyUpdateResponse(); return; break; //????
 			case '0404'	: 	this.sendQuery(sourceNwkAdd, {name:"0404"}); 
-							console.log("## sent link alive acknowledgment to",sourceMacAdd, sourceNwkAdd);
+							console.log("## App sent link alive acknowledgment to",sourceMacAdd, sourceNwkAdd);
 							this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd);
 							break; // Link alive acknowledgment.
+			case '0405'	: 	console.log("## Coordinator sent link alive acknowledgment to",sourceMacAdd, sourceNwkAdd);
+							this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd);
+							break; // Link alive acknowledgment.
+			case '0408'	: 	console.log("## sent message", msg, "via", sourceMacAdd, sourceNwkAdd)
+							__.findWhere(this.deviceList, {'macAdd':sourceMacAdd}).canRepeat=true;
+							this._handleBroadcastResponse(sourceMacAdd, sourceNwkAdd);
+							break;
 			default 	: 	console.log("Unknown message from zigbee module -", data); return;
 		}
 //		console.log(msgId);
@@ -130,6 +141,11 @@ var CC2530Controller = BaseCommunicator.extend({
 				__.extend(listItem, {'lastMsg':msg});
 			}
 			__.extend(listItem, {'nwkAdd':nwkAdd, 'lastSeenAt':(new Date().getTime() / 1000)});
+			if(typeof listItem.canRepeat == 'undefined') {// check if the found node is also repeater
+				listItem.canRepeat = false;
+				console.log("## sending message \x2B0408"+nwkAdd+"\x0D");
+				this._pushIntoQueryQ("0408", nwkAdd, listItem, function () {});
+			}
 
 		}
 		else {
@@ -146,9 +162,17 @@ var CC2530Controller = BaseCommunicator.extend({
 			case "GTDVST" :  qry="0302"; break;
 			case "STSWPT" :  qry="0304"+this._invertBinaryNumber(queryObj.value);break; 
 			case "STFSD" :  qry="0305"+this._intToHexStr(queryObj.id)+queryObj.value;break;
-			default :  qry = queryObj.name;
+			default :  qry = queryObj.name;// + (queryObj.value)?queryObj.value:"";
+						if(queryObj.value)	qry += queryObj.value;
 		}
 		return qry;
+	},
+	_pushIntoQueryQ : function (queryInHexStr, nwkAdd, dev, cbk) {
+		if(!dev) dev = __.findWhere(this.deviceList, {'nwkAdd':nwkAdd});
+		var rptr = (dev && dev.repeaters)?__.last(dev.repeaters):null;
+		var qry = queryInHexStr+nwkAdd;
+		if(rptr) qry = "0408"+qry+rptr.nwkAdd;
+		this._queryQ.push({'query':"\x2B"+qry+"\x0D", 'callback':cbk, 'queryInHexStr':queryInHexStr});
 	},
 	_processQueryQ : function() {
 		if(this.___processQueryQ) return this.___processQueryQ();
@@ -169,12 +193,68 @@ var CC2530Controller = BaseCommunicator.extend({
 			// console.log( "$$$$$$$$$$$$$$$$$$$$$ sent query - "+queryInHxStr);
 			callback && callback(err, results, queryInHxStr);
 		}
-		this._queryQ.push({'query':"\x2B"+queryInHexStr+nwkAdd+"\x0D", 'callback':cbk, 'queryInHexStr':queryInHexStr});
-//		console.log("Qurey pushed to Query Q");
+		this._pushIntoQueryQ(queryInHexStr, nwkAdd, null, cbk);
 		this._processQueryQ();
 		//this._send(mask+queryInHexStr, callback);
 		if(queryInHexStr == "0302")
 			this._pendingReqCallbackMap["0302"] = function() {};
+	},
+	setCloningInfo :function(info, callback) {
+		var qry="0111";
+		this.sendQuery(null, {name:qry, value:info.substr(0,2*56)});
+		this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+			console.log(err, msg);
+			if(err) return callback && callback(err, qry);
+			var qry="0113";
+			this.sendQuery(null, {name:qry, value:info.substr(2*56, 2*54)});
+			this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+				console.log(err, msg);
+				if(err) return callback && callback(err, qry);
+				var qry="0115";
+				this.sendQuery(null, {name:qry, value:info.substr(2*110,2*52)});
+				this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+					console.log(err, msg);
+					if(err) return callback && callback(err, qry);
+					var qry="0117";
+					this.sendQuery(null, {name:qry, value:info.substr(2*162)});
+					this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+						console.log(err, msg);
+						callback && callback(err, msg);
+					}, this);
+				}, this);				
+			}, this);		
+		}, this);
+	},
+	getCloningInfo: function(callback) {
+		var qry="0110";
+		this.sendQuery(null, {name:qry});
+		console.log('getting Cloning Info');
+		var finalMsg = "";
+		this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+			if(err) return callback && callback(err, msg);
+			finalMsg += msg
+			// return callback && callback(err, msg);
+			var qry="0112";
+			this.sendQuery(null, {name:qry});
+			this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+				if(err) return callback && callback(err, msg);
+				finalMsg += msg
+				var qry="0114";
+				this.sendQuery(null, {name:qry});
+				this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+					if(err) return callback && callback(err, msg);
+					finalMsg += msg
+					var qry="0116";
+					this.sendQuery(null, {name:qry});
+					this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+						if(err) return callback && callback(err, msg);
+						finalMsg += msg
+						// console.log(finalMsg)
+						callback && callback(err, finalMsg);
+					}, this);
+				}, this);
+			}, this);
+		}, this);		
 	},
 	getNetworkKey : function (callback, retrying) {
 		var qry="0102";

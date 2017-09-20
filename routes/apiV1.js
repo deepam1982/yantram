@@ -134,6 +134,7 @@ module.exports = function(app, cmdMngr) {
 
 	});
 	app.get('/api/v1/activatemoodbyname/:moodname', function(req, res) {
+		console.log('/api/v1/activatemoodbyname/', req.params.moodname);
 		var moodId = moodConfig.getMoodIdByName(req.params.moodname);
 		if(!moodId) return res.send({'success':false, 'msg':"mood by the name '"+req.params.moodname+"'' does not exist."})
 		cmdMngr.activateMood({'id':moodId});

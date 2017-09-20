@@ -33,6 +33,8 @@ var CommandManager = BaseClass.extend({
 		socket.on('startCloudLogs', __.bind(this.setLogOnCloud, this, true));
 		socket.on('stopCloudLogs', __.bind(this.setLogOnCloud, this, false));
 		socket.on('restoreNetwork', __.bind(this.restoreNetwork, this));
+		socket.on('getCloningInfo', __.bind(this.getCloningInfo, this));
+		socket.on('setCloningInfo', __.bind(this.setCloningInfo, this));
 		socket.on('restartZigbee', __.bind(this.restartZigbee, this));
 		socket.on('applyMood', __.bind(this.activateMood, this));
 		socket.on('configureCloudTunnel', __.bind(this.configureCloudTunnel, this));
@@ -279,10 +281,10 @@ var CommandManager = BaseClass.extend({
 		});
 	},
 	modifySystemSettings : function (commandData, callback) {
-		__userConfig.set('restoreWithInMins', commandData.restoreWithInMins);
-		__userConfig.set('periods.dayLight', commandData.dLP);
-		__userConfig.set('periods.evening', commandData.evP);
-		__userConfig.set('periods.sleepHour', commandData.sHP);
+		commandData.restoreWithInMins && __userConfig.set('restoreWithInMins', commandData.restoreWithInMins);
+		commandData.dLP && __userConfig.set('periods.dayLight', commandData.dLP);
+		commandData.evP && __userConfig.set('periods.evening', commandData.evP);
+		commandData.sHP && __userConfig.set('periods.sleepHour', commandData.sHP);
 		__userConfig.save(function (err) {
 			if(err) return console.log(err);
 			console.log('System setting modification success');
@@ -376,6 +378,13 @@ var CommandManager = BaseClass.extend({
 	},
 	getNetworkSettings	: function (commandData, callback) {
 		callback({'success':true, 'name':__userConfig.get('zigbeeNetworkName')});
+	},
+	getCloningInfo 	: function (commandData, callback) {
+		console.log("getCloningInfo commandManager", commandData);
+		deviceManager.communicator.getCloningInfo(callback)
+	},
+	setCloningInfo :  function (commandData, callback) {
+		deviceManager.communicator.setCloningInfo(commandData.info, callback)
 	},
 	restoreNetwork : function (commandData, callback) {
 		console.log("---------- restoreNetwork called -------------");

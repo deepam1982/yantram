@@ -141,31 +141,44 @@ EditGroupPannel = BaseView.extend({
 	events: {
 		"tap .editGroupIcon" : "editGroupIcon"
 	},
+	initialize: function(obj) {
+		_.bindAll(this, "ondeviceCollectionChange");
+		return BaseView.prototype.initialize.apply(this, arguments);
+	},
+	// bindFunctions :_.union(BaseView.prototype.bindFunctions,['ondeviceCollectionChange']),
 	editGroupIcon : function () {
 		this.choseIconDialog.show(this.model.get('icon'),_.bind(function(newIconName){
 			this.model.set('icon', newIconName, {silent: true});
 			this.$el.find('.roomIcon').css('background-image','url("static/images/rooms/'+newIconName+'.png")')
 		},this));
 	},
-	render : function () {
+	_getJsonToRenderTemplate : function () {
+		return (this.repainting)	?
+				this._groupInfo 	:
+				BaseView.prototype._getJsonToRenderTemplate.apply(this, arguments);
+	},
+	render : function (repainting) {
+		this.repainting = repainting
 		var irRemIndx = -1;
 		this.options.deviceCollection.each(function (dev, indx) {
 			if(dev.get("id") == "irRemotes") irRemIndx = indx;
 			_.each(dev.get('loadInfo'), function (sw, key) {sw.task=sw.selected=sw.hidden=false;}, this);
 		}, this);
-		_.each(this.model.get('controls'), function (obj) {
+		_.each((repainting)?this._groupInfo.controls:this.model.get('controls'), function (obj) {
 			this.options.deviceCollection.get(obj.devId).get('loadInfo')[obj.switchID].selected=true;
 		}, this);
+		this.options.deviceCollection.on("change", this.ondeviceCollectionChange);
 		BaseView.prototype.render.apply(this, arguments);
 		if(irRemIndx != -1) this.deviceGroupView[irRemIndx].$el.hide();
 		return this;
 	},
 	erase : function () {
 		if(!this.rendered) return;
-		this.saveGroupInfo()
+		this.options.deviceCollection.off("change", this.ondeviceCollectionChange);
+		this._groupInfo = this._getGroupInfo();
 		return BaseView.prototype.erase.apply(this, arguments);
 	},
-	saveGroupInfo : function () {
+	_getGroupInfo : function () {
 		var groupInfo = this.model.toJSON();
 		groupInfo.rank = this.$el.find('input[name=rank]:checked').val() || groupInfo.rank;
 		groupInfo.name=this.$el.find('.groupName').val() || groupInfo.name;
@@ -177,9 +190,18 @@ EditGroupPannel = BaseView.extend({
 			}, this);
 		}, this);
 		groupInfo.controls = controls;
-		if(groupInfo.name && controls.length)
+		return groupInfo;
+	},
+	saveGroupInfo : function () {
+		var groupInfo = this._getGroupInfo();
+		if(groupInfo.name && groupInfo.controls.length)
 		this.model.ioSocket.emit("modifyGroup", groupInfo, function (err){if(err)console.log(err)});
-		console.log(groupInfo);		
+		console.log("saveGroupInfo", groupInfo);		
+	},
+	ondeviceCollectionChange : function(model) {
+		_.each(model._previousAttributes.loadInfo, function(obj, idx){
+			if(obj.selected) model.attributes.loadInfo[idx].selected = obj.selected
+		}, this);
 	}
 });
 
@@ -190,6 +212,21 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
 	render	:	function () {
  		GroupView1.prototype.render.apply(this, arguments);
  		AdvancePannel.render.apply(this, arguments);
+ 		// setTimeout(_.bind(function(){
+ 			this.showAdvancePannelOnRender && this.showAdvancePannel();
+ 			this.showAdvancePannelOnRender = false;
+ 		// }, this), 0)
+ 		return this;
+ 	},
+ 	erase : function() {
+ 		this.advancePannelVisible && this.hideAdvancePannel();
+ 		return GroupView1.prototype.erase.apply(this, arguments);
+ 	},
+ 	repaint : function () {
+ 		this.advancePannelVisible && (this.showAdvancePannelOnRender = true);
+ 		this.repainting=true;
+ 		GroupView1.prototype.repaint.apply(this, arguments);
+ 		this.repainting=false;
  		return this;
  	},
  	events: _.extend(GroupView1.prototype.events,AdvancePannel.events, {
@@ -210,7 +247,7 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
 		//this.$el.css('top', '50px');
 		this.$el.find('.roomTitleCont').hide();
 		this.$el.find('.switchCont').hide();
-		this.editPannel.render();
+		this.editPannel.render(this.repainting);
 
 		var left = this.$el.offset().left;
 		var top = Math.max(0,($(window).height() - this.$el.height())/2)
@@ -233,6 +270,7 @@ GroupEditView = GroupView1.extend(AdvancePannel).extend({
  		
  		this.$el.find('.groupView').css('max-height','').removeClass('overflowScroll');
  		this.$el.css('top', '').css('left', '').css('position','');
+ 		!this.repainting && this.editPannel.saveGroupInfo();
  		this.editPannel.erase();
  		this.$el.find('.switchCont').show();
  		this.$el.find('.roomTitleCont').show();
