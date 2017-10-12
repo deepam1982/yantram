@@ -256,6 +256,32 @@ var CC2530Controller = BaseCommunicator.extend({
 			}, this);
 		}, this);		
 	},
+	switchToCommissioningNetwork : function(callback) {
+		var qry="0103";
+		this.sendQuery(null, {name:qry});
+		console.log('Sending command to switch to commissioning network.');
+		this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+			if(!retrying && err && err == 'timeout') {
+				console.log('timeout! retrying to get network key');
+				return setTimeout(__.bind(this.getNetworkKey, this, callback), 1500);
+			}
+			if (err) return console.log("Error while getting network key:", err, msg);
+			console.log("Response of 0103 -", msg)
+		});
+	},
+	switchToHomeNetwork : function(callback) {
+		var qry="0104";
+		this.sendQuery(null, {name:qry});
+		console.log('Sending command to switch to home network.');
+		this._pendingReqCallbackMap[qry] = __.bind(function (err, msg){
+			if(!retrying && err && err == 'timeout') {
+				console.log('timeout! retrying to get network key');
+				return setTimeout(__.bind(this.getNetworkKey, this, callback), 1500);
+			}
+			if (err) return console.log("Error while getting network key:", err, msg);
+			console.log("Response of 0104 -", msg)
+		});
+	},
 	getNetworkKey : function (callback, retrying) {
 		var qry="0102";
 		this.sendQuery(null, {name:qry});

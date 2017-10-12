@@ -149,6 +149,9 @@ var DeviceManager = BaseClass.extend({
 	},
 	getRechableDevices : function () {
 		return __.filter(this._deviceMap, function(val, key){return val.reachable;});
+	},
+	getRechableZigbeeDevices : function () {
+		return __.filter(this._deviceMap, function(val, key){return val.reachable && val.id.match('[0-9|a-f|A-F]{16}');});
 	}
 });
 

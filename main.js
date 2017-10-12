@@ -226,7 +226,8 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             deviceManager.communicator.on("publishingNetworkKey", function (name, key, id) {
               setTimeout(function(){
                 if(!__remoteDevInfoConf.getList().length || name == '0B0B0B0B0B0B0B0B') return;
-                if(!deviceManager.getRechableDevices().length) return;
+                if(!deviceManager.getRechableZigbeeDevices().length) return;
+                console.log("number of reachable devices -", deviceManager.getRechableZigbeeDevices().length);
                 var fileName = __rootPath+'/../logs/network.log', str ;
                 var logString = "Id:"+ id + " Name:"+name+" Key:"+key, logStrWtDt = logString+" Date:"+ (new Date()).format('log')+'\n';
                 fs.exists(fileName, function(exists) {

@@ -35,6 +35,8 @@ var CommandManager = BaseClass.extend({
 		socket.on('restoreNetwork', __.bind(this.restoreNetwork, this));
 		socket.on('getCloningInfo', __.bind(this.getCloningInfo, this));
 		socket.on('setCloningInfo', __.bind(this.setCloningInfo, this));
+		socket.on('switchToCommNtwk', __.bind(this.switchToCommNtwk, this));
+		socket.on('switchToHomeNtwk', __.bind(this.switchToHomeNtwk, this));
 		socket.on('restartZigbee', __.bind(this.restartZigbee, this));
 		socket.on('applyMood', __.bind(this.activateMood, this));
 		socket.on('configureCloudTunnel', __.bind(this.configureCloudTunnel, this));
@@ -386,6 +388,13 @@ var CommandManager = BaseClass.extend({
 	setCloningInfo :  function (commandData, callback) {
 		deviceManager.communicator.setCloningInfo(commandData.info, callback)
 	},
+	switchToCommNtwk : function (commandData, callback) {
+		deviceManager.communicator.switchToCommissioningNetwork(callback)	
+	},
+	switchToHomeNtwk : function (commandData, callback) {
+		deviceManager.communicator.switchToHomeNetwork(callback)	
+	},
+
 	restoreNetwork : function (commandData, callback) {
 		console.log("---------- restoreNetwork called -------------");
 		var nwkKey = commandData.key || __userConfig.get('zigbeeNetworkKey');
