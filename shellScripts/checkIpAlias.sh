@@ -17,6 +17,9 @@ echo $ipOct
 
 
 IP=`ifconfig wlan0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
+if [ "$IP" == "" ]; then
+    IP=`ifconfig wlan0 2>/dev/null|awk '/inet / {print $2}'`
+fi
 if [ "$IP" != "" ]; then
 	echo "$IP"
 	IFS=.
@@ -30,6 +33,9 @@ if [ "$IP" != "" ]; then
 fi
 
 IP=`ifconfig eth0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
+if [ "$IP" == "" ]; then
+    IP=`ifconfig eth0 2>/dev/null|awk '/inet / {print $2}'`
+fi
 if [ "$IP" != "" ]; then
         echo "$IP"
         IFS=.

@@ -62,24 +62,24 @@ fi
 echo $$ > $lockfile
 
 # We can perform check
-if ifconfig $eth | grep -q "inet addr:" ; then
+if ifconfig $eth | grep -q "inet " ; then
     echo "Performing Network check for $eth"
     echo "Network is Okay"
     echo "Current Setting:"
-    ifconfig $eth | grep "inet addr:"
+    ifconfig $eth | grep "inet "
 
-elif ifconfig $wlan | grep -q "inet addr:" ; then
+elif ifconfig $wlan | grep -q "inet " ; then
     echo "Performing Network check for $wlan"
     echo "Network is Okay"
     echo "Current Setting:"
-    ifconfig $wlan | grep "inet addr:"
+    ifconfig $wlan | grep "inet "
 	
 else
     echo "Network connection down! Attempting reconnection."
     ifdown $wlan
     sleep 5
     ifup --force $wlan
-    ifconfig $wlan | grep "inet addr"
+    ifconfig $wlan | grep "inet "
 fi
  
 # Check is complete, Remove Lock file and exit
