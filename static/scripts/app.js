@@ -131,7 +131,7 @@ hashChanged = function (hash) {
 		case '#showfilereader'			:	sideMenu.switchPage('fileReaderPage');break;
 		case '#showcommandposter'		:	sideMenu.switchPage('commandPosterPage');break;
 		case '#showirsettings'			:	sideMenu.switchPage('iRSettingPage');break;
-
+		case '#showdevsettings'			:   sideMenu.switchPage('devStngPageView');break;
 
 	}
 	if(removeHash)window.location.hash = '';

@@ -13,7 +13,8 @@
     "cron": "x",
     "keen.io": "x",
     "request": "x",
-    "xmlhttprequest": "x"
+    "xmlhttprequest": "x",
+    "ejs": "x"
   },
   "devDependencies": {
     "xmlhttprequest": "~1.6.0"

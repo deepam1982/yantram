@@ -88,7 +88,7 @@ fs.exists('/sys/class/gpio/gpio18', function (exist) {
           console.log('Direction gpio 18 was set');
           fs.writeFile('/sys/class/gpio/gpio18/value',on, function(err) {if(err)console.log(err);
             console.log('Starting App Running indication on GPIO');
-            setInterval(function () {on = (on + 1) % 2;fs.writeFile('/sys/class/gpio/gpio18/value',on);}, 800);
+            setInterval(function () {on = (on + 1) % 2;fs.writeFile('/sys/class/gpio/gpio18/value',on, function(){});}, 800);
           });  
         });  
       });

@@ -1,5 +1,5 @@
 var parsers = require("serialport").parsers;
-var SerialPort = require("serialport").SerialPort;
+var SerialPort = require("serialport").SerialPort || require("serialport"); // v1 || v6
 
 var BaseClass = require(__rootPath+"/classes/baseClass");
 var __ = require("underscore");
@@ -37,7 +37,7 @@ var BaseCommunicator = BaseClass.extend({
 	},
 	init : function () {
 		this.serialPort = new SerialPort(this.portAddress, {
-			baudrate: this.baudrate,
+			baudRate: this.baudrate,
 			parser: parsers.raw
 		}, false);
 		this.serialPort.open(__.bind(function () {
