@@ -1,12 +1,12 @@
-# /etc/init.d/inoho
+# /etc/init.d/checkIpAlias
 ### BEGIN INIT INFO
 # Provides:          inoho
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start daemon at boot time
-# Description:       Enable service provided by daemon.
+# Short-Description: checkIpAlias
+# Description:       checkIpAlias
 ### END INIT INFO
 
 #!/bin/bash

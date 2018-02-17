@@ -97,7 +97,7 @@ var BaseCommunicator = BaseClass.extend({
 			if((dev.lastSeenAt < ((Date.now()/1000) - allowedNoOfSeconds/2)) && !dev.unreachable) recheckList.push(dev);
 		}, this)
 		__.each(recheckList, function (dev, i) {
-			var rptr = (dev.repeaters)?_.last(dev.repeaters):null;
+			var rptr = (dev.repeaters)?__.last(dev.repeaters):null;
 			console.log("########### rechecking connectivity of",dev.macAdd, (rptr)?"via "+rptr.macAdd:"", "last seen", parseInt((Date.now()/1000)-dev.lastSeenAt)+"sec ago");
 			setTimeout(__.bind(function(dInfo, viaInfo){
 				if(!viaInfo)
