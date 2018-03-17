@@ -278,39 +278,71 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
                 console.log( "[Inside 'uncaughtException' event] " + err.stack || err.message, err );
             });
 
-            var websiteRoutes = require(__rootPath + '/routes/website');
-            var ajaxRoutes = require(__rootPath + '/routes/ajax');
-            websiteRoutes(app, socComMngr);
-            ajaxRoutes(app, socComMngr);
-            if(__systemConfig.get('iRSupported')) {
-              var zmoteRoute = require(__rootPath + '/partners/zmote/app/routes/irp.server.routes');
-              zmoteRoute(app);
-            }
-            try {
-              var fs = require('fs'),path = require('path');
-              var getDirectories = function (srcpath) {
-                return fs.readdirSync(srcpath).filter(function(file) {
-                  return fs.statSync(path.join(srcpath, file)).isDirectory();
-                });
-              }
-              var directories = getDirectories(__rootPath + '/../whiteLabeledApps');
-              __.each(directories, function(directory) {
-                var thirdPartyMain = require(__rootPath + '/../whiteLabeledApps/' + directory + "/main");  
-                thirdPartyMain(app);
-              });
-            }
-            catch (err) {console.log(err.message)}
-            if(__systemConfig.get('ipCamaraSupported')){
-              var cameraRoutes = require(__rootPath + '/routes/cam');
-              cameraRoutes(app, socComMngr)
-            }
-
-            var apiV1 = require(__rootPath + '/routes/apiV1');
-            apiV1(app, socComMngr);
-
-
+  
+            startWebsiteRoutes(app, socComMngr);
+            startAjaxRoutes(app, socComMngr);
+            startZmoteRoute(app);
+            startWhiteLabelApps(app);
+            startCameraRoutes(app, socComMngr);
+            startApiV1(app, socComMngr);
+            startAlaxaSuportProcess();
 
           }})
 
         }});
 }});
+
+var startWebsiteRoutes = function (app, socComMngr){
+  var websiteRoutes = require(__rootPath + '/routes/website');
+  websiteRoutes(app, socComMngr);
+}
+
+var startAjaxRoutes = function (app, socComMngr){
+  var ajaxRoutes = require(__rootPath + '/routes/ajax');
+  ajaxRoutes(app, socComMngr);
+}
+
+var startZmoteRoute = function (app) {
+  if(__systemConfig.get('iRSupported')) {
+    var zmoteRoute = require(__rootPath + '/partners/zmote/app/routes/irp.server.routes');
+    zmoteRoute(app);
+  }
+}
+
+var startWhiteLabelApps = function (app) {
+  try {
+    var fs = require('fs'),path = require('path');
+    var getDirectories = function (srcpath) {
+      return fs.readdirSync(srcpath).filter(function(file) {
+        return fs.statSync(path.join(srcpath, file)).isDirectory();
+      });
+    }
+    var directories = getDirectories(__rootPath + '/../whiteLabeledApps');
+    __.each(directories, function(directory) {
+      var thirdPartyMain = require(__rootPath + '/../whiteLabeledApps/' + directory + "/main");  
+      thirdPartyMain(app);
+    });
+  }
+  catch (err) {console.log(err.message)}
+}
+
+var startCameraRoutes = function (app, socComMngr) {
+  if(__systemConfig.get('ipCamaraSupported')){
+    var cameraRoutes = require(__rootPath + '/routes/cam');
+    cameraRoutes(app, socComMngr)
+  }
+}
+
+var startApiV1 = function(app, socComMngr) {
+  var apiV1 = require(__rootPath + '/routes/apiV1');
+  apiV1(app, socComMngr);
+}
+
+var startAlaxaSuportProcess  = function() {
+  try {
+    var child_process = require('child_process').spawn('node', [__rootPath +'/alaxaSupport.js']);
+    child_process.stdout.on('data', data => console.log(` -->> alaxaSupport stdout: ${data}`));
+    child_process.stderr.on('data', data => console.log(` -->> alaxaSupport stderr: ${data}`));
+  }
+  catch (err) {console.log(err)}
+}

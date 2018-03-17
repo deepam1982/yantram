@@ -149,6 +149,15 @@ module.exports = function(app, cmdMngr) {
 			if(!err) deviceManager.emit('deviceStateChanged', devId, null, 'switchParams');
 		});
 	});
+	app.get('/api/v1/load/:devId([0-9a-fA-F]{16})-l:swId([0-9]{1,2})/status', function (req, res) {
+		var devId = req.params.devId, swId = req.params.swId;
+		var lInfo = deviceInfoConfig.getLoadInfo(devId, swId)
+		, ctl = __.pick(lInfo, "id", "name", "icon", "type", "disabled", "state", 
+						"duty", "autoOff", "schedules", "sensorLastOnTime"
+				);
+		if(lInfo.customIcon) ctl.icon = lInfo.customIcon;
+		res.end(JSON.stringify({"success":true,"data":ctl}));
+	});
 	app.get('/api/v1/load/:devId([0-9a-fA-F]{16})-l:swId([0-9]{1,2})/:actNm(toggle|turn-on|turn-off)', function (req, res) {
 		var devId = req.params.devId, swId = req.params.swId, actNm=req.params.actNm;
 		cmdMngr.executeCommand({"actionName":actNm, "devId":devId, "switchId":swId})
