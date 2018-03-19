@@ -341,8 +341,8 @@ var startApiV1 = function(app, socComMngr) {
 var startAlaxaSuportProcess  = function() {
   try {
     var child_process = require('child_process').spawn('node', [__rootPath +'/alaxaSupport.js']);
-    child_process.stdout.on('data', data => console.log(` -->> alaxaSupport stdout: ${data}`));
-    child_process.stderr.on('data', data => console.log(` -->> alaxaSupport stderr: ${data}`));
+    child_process.stdout.on('data', function(data) {console.log("-->> alaxaSupport stdout:"+data)});
+    child_process.stderr.on('data', function(data) {console.log("-->> alaxaSupport stderr:"+data)});
   }
   catch (err) {console.log(err)}
 }
