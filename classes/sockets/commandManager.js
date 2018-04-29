@@ -202,8 +202,17 @@ var CommandManager = BaseClass.extend({
 										__userConfig.save(function (err) {
 											if(err) return callback({'success':false, 'msg':err});
 											console.log("__userConfig reset");
-											setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
-											return callback({'success':true});
+											var FauxmoConfigMngr = BasicConfigManager.extend({file : '/../configs/fauxmoConfig.json'});
+											var fauxmoConfMngr = new FauxmoConfigMngr({'callback': function(err){
+												if(err) { /* console.log(err); */}
+												fauxmoConfMngr.data='';
+												fauxmoConfMngr.save(function (err) {
+													if(err) return callback({'success':false, 'msg':err});
+													console.log("fauxmoConfMngr reset");
+													setTimeout(__.bind(thisObj.restartHomeController, thisObj), 1000)
+													return callback({'success':true});
+												});
+											}})
 										});
 									});
 								});
