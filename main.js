@@ -286,6 +286,7 @@ __systemConfig = new SystemConfigMngr({'callback':function(err){
             startCameraRoutes(app, socComMngr);
             startApiV1(app, socComMngr);
             startAlaxaSuportProcess();
+            setTimeout(function(){updateFauxmoConfig()}, 1*60*1000);
 
           }})
 
@@ -340,9 +341,18 @@ var startApiV1 = function(app, socComMngr) {
 
 var startAlaxaSuportProcess  = function() {
   try {
+    var child_process = require('child_process').spawn('/home/admin/fauxmo-env/bin/fauxmo', ['-c', __rootPath +'/../configs/fauxmoConfig.json', '-vv']);
+    child_process.stdout.on('data', function(data) {console.log("-->> Fauxmo stdout:"+data)});
+    child_process.stderr.on('data', function(data) {console.log("-->> Fauxmo stderr:"+data)});
+  }
+  catch (err) {console.log(err)}
+}
+
+var updateFauxmoConfig  = function() {
+  try {
     var child_process = require('child_process').spawn('node', [__rootPath +'/alaxaSupport.js']);
-    child_process.stdout.on('data', function(data) {console.log("-->> alaxaSupport stdout:"+data)});
-    child_process.stderr.on('data', function(data) {console.log("-->> alaxaSupport stderr:"+data)});
+    child_process.stdout.on('data', function(data) {console.log("-->> updateFauxmoConfig stdout:"+data)});
+    child_process.stderr.on('data', function(data) {console.log("-->> updateFauxmoConfig stderr:"+data)});
   }
   catch (err) {console.log(err)}
 }
